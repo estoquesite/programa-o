@@ -58,12 +58,13 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             text-transform: uppercase;
         }
+        /* Grelha com cartões sempre da mesma altura (alinhados) */
         .week-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
-            align-items: start;
+            align-items: stretch; 
         }
         .day-card {
             background: var(--card-bg);
@@ -75,10 +76,15 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 270px;
-            height: auto;
+            height: 100%; /* Todos terminam exatamente na mesma altura para impressão perfeita */
+            min-height: 300px;
         }
         .day-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .tasks-container {
             flex-grow: 1;
         }
         .day-title {
@@ -107,14 +113,14 @@
         .task-box:active {
             cursor: grabbing;
         }
-        /* Espaçamento bem generoso e divisória clara entre tarefas e recursos */
         .day-resources {
             display: flex;
             flex-direction: column;
             gap: 4px;
             border-top: 2px dashed #c8e6c9;
             padding-top: 10px;
-            margin-top: 22px; 
+            margin-top: 16px; 
+            margin-bottom: 0;
         }
         .resources-title {
             font-size: 9px;
@@ -139,6 +145,11 @@
         .resource-tag:active {
             cursor: grabbing;
         }
+        .item-controls {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+        }
         .drag-handle {
             cursor: grab;
             font-size: 14px;
@@ -149,15 +160,21 @@
         .drag-handle:active {
             cursor: grabbing;
         }
-        .btn-delete-item {
+        .btn-action-item {
             background: none;
             border: none;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+        .btn-edit-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .btn-delete-item {
             color: #c62828;
             font-weight: bold;
-            cursor: pointer;
             font-size: 12px;
-            padding: 0 4px;
-            border-radius: 3px;
         }
         .btn-delete-item:hover {
             background-color: rgba(198, 40, 40, 0.1);
@@ -222,14 +239,13 @@
                 <div class="day-content">
                     <div class="day-title" id="titleSegunda">Segunda<br><small>--/---</small></div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 🕒 HORA CERTA</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 📦 MOVIMENTAÇÃO G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 🧰 ARRUMAÇÃO DA FERRAMENTARIA</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
                 </div>
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> Empilhadeira G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">Empilhadeira G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -238,13 +254,13 @@
                 <div class="day-content">
                     <div class="day-title" id="titleTerca">Terça<br><small>--/---</small></div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 🕒 HORA CERTA</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 📦 MOVIMENTAÇÃO G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
                 </div>
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> Caminhão Dia Inteiro</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">Caminhão Dia Inteiro</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -253,14 +269,14 @@
                 <div class="day-content">
                     <div class="day-title" id="titleQuarta">Quarta<br><small>--/---</small></div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 🕒 HORA CERTA</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 📦 MOVIMENTAÇÃO G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
                 </div>
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> Carro</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">Carro</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -269,13 +285,13 @@
                 <div class="day-content">
                     <div class="day-title" id="titleQuinta">Quinta<br><small>--/---</small></div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 🕒 HORA CERTA</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 📦 MOVIMENTAÇÃO G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
                 </div>
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> Empilhadeira G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">Empilhadeira G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -284,13 +300,13 @@
                 <div class="day-content">
                     <div class="day-title" id="titleSexta">Sexta<br><small>--/---</small></div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 🕒 HORA CERTA</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
-                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> 📦 MOVIMENTAÇÃO G4</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
                 </div>
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> Carro</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">Carro</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
         </div>
@@ -351,7 +367,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">
                 🌙/☀️ Tema
             </button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v2.9</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.0</span>
         </div>
         <!-- MICROFONE INTELIGENTE -->
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105" title="Falar Comando de Voz">
@@ -370,7 +386,7 @@
             definirSemanaAtual();
             document.getElementById('inputDataEvento').valueAsDate = new Date();
 
-            const salvo = localStorage.getItem('programacao_semana_custom_v2.9');
+            const salvo = localStorage.getItem('programacao_semana_custom_v3.0');
             if (salvo) {
                 document.getElementById('weekGridContainer').innerHTML = salvo;
                 reativarEventosDragDrop();
@@ -528,6 +544,7 @@
             }
 
             const handleHtml = `<span class="drag-handle">⠿</span>`;
+            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
 
             if (tipo === 'task') {
                 const container = card.querySelector('.tasks-container');
@@ -535,7 +552,7 @@
                 div.className = 'task-box';
                 div.setAttribute('draggable', 'true');
                 div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                div.innerHTML = `<span>${handleHtml} ${desc}</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button>`;
+                div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
                 container.appendChild(div);
             } else {
                 const container = card.querySelector('.day-resources');
@@ -543,13 +560,24 @@
                 div.className = 'resource-tag';
                 div.setAttribute('draggable', 'true');
                 div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                div.innerHTML = `<span>${handleHtml} ${desc}</span><button onclick="removerElemento(this)" class="btn-delete-item">✕</button>`;
+                div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
                 container.appendChild(div);
             }
 
             document.getElementById('inputDesc').value = '';
             document.getElementById('selectFrequentes').value = '';
             guardarEstadoDOM();
+        }
+
+        function editarItem(botao) {
+            const itemBox = botao.closest('.task-box') || botao.closest('.resource-tag');
+            const itemSpan = itemBox.querySelector('.item-text');
+            const textoAtual = itemSpan.innerText;
+            const novoTexto = prompt("Editar descrição do item:", textoAtual);
+            if (novoTexto !== null && novoTexto.trim() !== "") {
+                itemSpan.innerText = novoTexto.trim();
+                guardarEstadoDOM();
+            }
         }
 
         function removerElemento(botao) {
@@ -559,12 +587,12 @@
         }
 
         function guardarEstadoDOM() {
-            localStorage.setItem('programacao_semana_custom_v2.9', document.getElementById('weekGridContainer').innerHTML);
+            localStorage.setItem('programacao_semana_custom_v3.0', document.getElementById('weekGridContainer').innerHTML);
         }
 
         function limparTudo() {
             if (confirm("Deseja redefinir a programação para o padrão original?")) {
-                localStorage.removeItem('programacao_semana_custom_v2.9');
+                localStorage.removeItem('programacao_semana_custom_v3.0');
                 location.reload();
             }
         }
@@ -599,14 +627,14 @@
                     <title>Impressão - Programação Semanal</title>
                     <style>
                         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #fff; color: #333; }
-                        .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; align-items: start; }
-                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; height: auto; min-height: 220px; }
+                        .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; align-items: stretch; }
+                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-height: 250px; }
                         .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; border-bottom: 2px solid #e8f5e9; padding-bottom: 4px; margin-bottom: 8px; }
                         .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
                         .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: 14px; }
                         .resources-title { font-size: 8px; font-weight: 800; color: #2e7d32; text-transform: uppercase; margin-bottom: 3px; }
                         .resource-tag { background: #e8f5e9; color: #1b5e20; padding: 3px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-                        .drag-handle, .btn-delete-item { display: none !important; }
+                        .drag-handle, .item-controls { display: none !important; }
                         .header { text-align: center; margin-bottom: 15px; position: relative; }
                         h2 { text-align: center; color: #1b5e20; font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
                         .week-badge { position: absolute; top: 0; right: 5px; background-color: #1b5e20; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
