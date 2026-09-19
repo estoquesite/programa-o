@@ -371,10 +371,16 @@
             </div>
         </div>
 
-        <!-- 3. ANALISADOR INTELIGENTE DE SCRIPT / TEXTO -->
+        <!-- 3. ANALISADOR INTELIGENTE DE SCRIPT / TEXTO (COM GESTÃO DE PALAVRAS-CHAVE) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Script / Texto</h3>
-            <p class="text-[10px] text-gray-500 dark:text-gray-400">Cole abaixo o texto ou notas (ex: menção a Alfredo, Alan, Almoxarifado, Caminhão) para detetar e enviar rapidamente:</p>
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Script / Texto</h3>
+                <div class="flex gap-1.5">
+                    <button onclick="adicionarNovaPalavraChave()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" title="Adicionar nova palavra-chave para procurar">➕ Palavra</button>
+                    <button onclick="gerenciarPalavrasChave()" class="bg-gray-600 hover:bg-gray-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" title="Gerir palavras-chave">⚙️ Gerir</button>
+                </div>
+            </div>
+            <p class="text-[10px] text-gray-500 dark:text-gray-400">Cole abaixo o texto ou notas (procura por nomes e recursos cadastrados) para detetar e enviar rapidamente:</p>
             <textarea id="inputScriptTexto" rows="3" placeholder="Cole aqui o texto da reunião ou apontamentos..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
             <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">
                 🔎 Analisar e Gerar Sugestões
@@ -389,7 +395,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">
                 🌙/☀️ Tema
             </button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.6</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.7</span>
         </div>
         <!-- MICROFONE INTELIGENTE -->
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105" title="Falar Comando de Voz">
@@ -411,6 +417,10 @@
             "CARRO"
         ];
 
+        let palavrasChavePadrao = [
+            "ALFREDO", "ALAN", "ALMOXARIFADO", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"
+        ];
+
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
@@ -419,7 +429,7 @@
             definirSemanaAtual();
             document.getElementById('inputDataEvento').valueAsDate = new Date();
 
-            const salvo = localStorage.getItem('programacao_semana_custom_v3.6');
+            const salvo = localStorage.getItem('programacao_semana_custom_v3.7');
             if (salvo) {
                 document.getElementById('weekGridContainer').innerHTML = salvo;
                 reativarEventosDragDrop();
@@ -493,6 +503,34 @@
             }
         }
 
+        // GESTÃO DE PALAVRAS-CHAVE DO ANALISADOR
+        function adicionarNovaPalavraChave() {
+            const nova = prompt("Digite a nova palavra ou nome para o analisador procurar (ex: ALAN, FIDA):");
+            if (nova && nova.trim() !== "") {
+                const termo = nova.trim().toUpperCase();
+                let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
+                if (!chaves.includes(termo)) {
+                    chaves.push(termo);
+                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
+                    alert(`Palavra-chave "${termo}" adicionada com sucesso!`);
+                }
+            }
+        }
+
+        function gerenciarPalavrasChave() {
+            let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
+            let listaStr = chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
+            let escolha = prompt(`Palavras-Chave do Analisador:\n\n${listaStr}\n\nDigite o número do item que deseja APAGAR (ou cancelar):`);
+            if (escolha !== null && !isNaN(escolha)) {
+                let index = parseInt(escolha) - 1;
+                if (index >= 0 && index < chaves.length) {
+                    let removido = chaves.splice(index, 1);
+                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
+                    alert(`Palavra-chave "${removido}" apagada com sucesso!`);
+                }
+            }
+        }
+
         function analisarScript() {
             const texto = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
@@ -503,7 +541,7 @@
                 return;
             }
 
-            const palavrasChave = ["ALFREDO", "ALAN", "ALMOXARIFADO", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
+            const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
             const linhas = texto.split(/[\n.!?]+/);
             let encontradas = 0;
 
@@ -731,12 +769,12 @@
         }
 
         function guardarEstadoDOM() {
-            localStorage.setItem('programacao_semana_custom_v3.6', document.getElementById('weekGridContainer').innerHTML);
+            localStorage.setItem('programacao_semana_custom_v3.7', document.getElementById('weekGridContainer').innerHTML);
         }
 
         function limparTudo() {
             if (confirm("Deseja redefinir a programação para o padrão original?")) {
-                localStorage.removeItem('programacao_semana_custom_v3.6');
+                localStorage.removeItem('programacao_semana_custom_v3.7');
                 location.reload();
             }
         }
@@ -755,7 +793,6 @@
             recognition.onresult = (event) => {
                 const texto = event.results[0][0].transcript;
                 document.getElementById('inputDesc').value = texto.toUpperCase();
-                // Envia automaticamente ("manda o OK sozinho")
                 adicionarItemPorData();
             };
             recognition.onerror = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
