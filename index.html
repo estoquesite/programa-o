@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa</title>
+    <title>Programação Semanal Interativa (v3.12)</title>
     <!-- Tailwind CSS para os painéis de controlo e botões -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -258,13 +258,13 @@
     </div>
 
     <!-- CONTEÚDO PRINCIPAL (OCULTO ATÉ LOGIN) -->
-    <div id="conteudo-site" class="hidden container" id="printableArea">
+    <div id="conteudo-site" class="hidden container">
         <div class="header">
             <h2>Programação Semanal</h2>
             <div class="week-badge" id="badgeSemana">Semana 40</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA NO TOPO (OCULTO NA IMPRESSÃO) -->
+        <!-- SELETOR DE ANO E SEMANA NO TOPO + BOTÃO DE HISTÓRICO -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
@@ -274,9 +274,14 @@
                 <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Nº da Semana:</label>
                 <input type="number" id="inputNumSemana" value="40" min="1" max="53" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
             </div>
-            <button onclick="definirSemanaAtual()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200">
-                🔄 Semana Atual
-            </button>
+            <div class="flex gap-2">
+                <button onclick="definirSemanaAtual()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200">
+                    🔄 Atual
+                </button>
+                <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
+                    📁 Histórico de Semanas
+                </button>
+            </div>
         </div>
 
         <!-- 1. CALENDÁRIO EM DESTAQUE NO TOPO -->
@@ -311,7 +316,7 @@
                 </div>
             </div>
 
-            <!-- Quarta (Com Equipe APC Fixa) -->
+            <!-- Quarta -->
             <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta">
                 <div class="day-content">
                     <div class="day-title" id="titleQuarta">Quarta<br><small>--/---</small></div>
@@ -362,11 +367,10 @@
             <button class="btn-action" onclick="imprimirProgramacao()">🖨️ Imprimir Programação (PDF Limpo)</button>
         </div>
 
-        <!-- 2. CAIXA DE ADICIONAR EM BAIXO (OCULTA NA IMPRESSÃO/PDF) -->
+        <!-- 2. CAIXA DE ADICIONAR EM BAIXO -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-8 space-y-3">
             <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Adicionar Nova Tarefa ou Recurso por Data</h3>
             
-            <!-- SELETOR DE FREQUENTES + BOTÕES CADASTRAR E GERIR -->
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tarefas e Recursos Frequentes</label>
                 <div class="flex gap-2">
@@ -409,7 +413,7 @@
             </div>
         </div>
 
-        <!-- 3. ANALISADOR INTELIGENTE DE SCRIPT / TEXTO (COM BOTÃO APAGAR SUGESTÃO) -->
+        <!-- 3. ANALISADOR INTELIGENTE DE SCRIPT / TEXTO -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Script / Texto</h3>
@@ -418,12 +422,36 @@
                     <button onclick="gerenciarPalavrasChave()" class="bg-gray-600 hover:bg-gray-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" title="Gerir palavras-chave">⚙️ Gerir</button>
                 </div>
             </div>
-            <p class="text-[10px] text-gray-500 dark:text-gray-400">Cole abaixo o texto ou notas (procura por nomes e recursos cadastrados) para detetar e enviar rapidamente:</p>
+            <p class="text-[10px] text-gray-500 dark:text-gray-400">Cole abaixo o texto ou notas para detetar e enviar rapidamente:</p>
             <textarea id="inputScriptTexto" rows="3" placeholder="Cole aqui o texto da reunião ou apontamentos..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
             <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">
                 🔎 Analisar e Gerar Sugestões
             </button>
             <div id="resultadoSugestoes" class="space-y-1.5 pt-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE HISTÓRICO DE SEMANAS -->
+    <div id="modalHistorico" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
+                <h3 class="text-sm font-bold uppercase text-purple-800 dark:text-purple-300">📁 Histórico de Semanas Finalizadas</h3>
+                <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
+            </div>
+            
+            <div class="space-y-2">
+                <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
+                    💾 Salvar Programação da Semana Atual no Histórico
+                </button>
+            </div>
+
+            <div id="listaHistoricoSemanas" class="max-h-60 overflow-y-auto space-y-2 pt-2">
+                <!-- As semanas guardadas aparecem aqui dinamicamente -->
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="fecharModalHistorico()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button>
+            </div>
         </div>
     </div>
 
@@ -439,7 +467,7 @@
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400" title="Sair / Bloquear">
                 🔒 Sair
             </button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.10</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.12</span>
         </div>
         <!-- MICROFONE INTELIGENTE -->
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105" title="Falar Comando de Voz">
@@ -449,6 +477,9 @@
 
     <script>
         const SENHA_MESTRA = "1510";
+        // CHAVE PERMANENTE FIXA: Os teus dados nunca mais se vão perder ao atualizar versões!
+        const CHAVE_PROGRAMACAO = "programacao_semana_dados_fixos_definitiva";
+        const CHAVE_HISTORICO = "programacao_historico_semanas_definitivo";
         const nomesMeses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
         let elementoArrastado = null;
         let deferredPrompt = null;
@@ -473,6 +504,18 @@
         });
 
         window.addEventListener('DOMContentLoaded', () => {
+            let salvo = localStorage.getItem(CHAVE_PROGRAMACAO);
+            if (!salvo) {
+                for (let k of ["programacao_semana_custom_v3.10", "programacao_semana_custom_v3.9", "programacao_semana_custom"]) {
+                    let oldVal = localStorage.getItem(k);
+                    if (oldVal) {
+                        salvo = oldVal;
+                        localStorage.setItem(CHAVE_PROGRAMACAO, salvo);
+                        break;
+                    }
+                }
+            }
+
             if (sessionStorage.getItem('autenticado_programacao') === 'true') {
                 liberarAcesso();
             }
@@ -494,13 +537,10 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('App instalado com sucesso!');
-                    }
                     deferredPrompt = null;
                 });
             } else {
-                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos do canto superior direito e selecione 'Adicionar à tela inicial' ou 'Instalar aplicativo'.\n• No iPhone (Safari): Toque no botão de Compartilhar (quadrado com seta para cima) e escolha 'Adicionar à Tela de Início'.");
+                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos do canto superior direito e selecione 'Adicionar à tela inicial' ou 'Instalar aplicativo'.\n• No iPhone (Safari): Toque no botão de Compartilhar e escolha 'Adicionar à Tela de Início'.");
             }
         }
 
@@ -573,7 +613,7 @@
         function liberarAcesso() {
             document.getElementById('tela-login').classList.add('hidden');
             document.getElementById('conteudo-site').classList.remove('hidden');
-            const salvo = localStorage.getItem('programacao_semana_custom_v3.10');
+            const salvo = localStorage.getItem(CHAVE_PROGRAMACAO);
             if (salvo) {
                 document.getElementById('weekGridContainer').innerHTML = salvo;
                 reativarEventosDragDrop();
@@ -588,6 +628,87 @@
             document.getElementById('tela-login').classList.remove('hidden');
             document.getElementById('input-senha').value = '';
             document.getElementById('erro-senha').classList.add('hidden');
+        }
+
+        // FUNÇÕES DO HISTÓRICO DE SEMANAS
+        function abrirModalHistorico() {
+            renderizarListaHistorico();
+            document.getElementById('modalHistorico').classList.remove('hidden');
+        }
+
+        function fecharModalHistorico() {
+            document.getElementById('modalHistorico').classList.add('hidden');
+        }
+
+        function salvarSemanaAtualNoHistorico() {
+            const numSemana = document.getElementById('inputNumSemana').value;
+            const ano = document.getElementById('inputAno').value;
+            const idHistorico = `Semana_${numSemana}_${ano}`;
+            const htmlConteudo = document.getElementById('weekGridContainer').innerHTML;
+            const badgeTexto = document.getElementById('badgeSemana').innerText;
+
+            let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+            historico[idHistorico] = {
+                id: idHistorico,
+                titulo: `${badgeTexto} (${ano})`,
+                dataSalvo: new Date().toLocaleDateString('pt-PT'),
+                html: htmlConteudo
+            };
+
+            localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
+            alert(`✅ Programação da ${badgeTexto} de ${ano} guardada com sucesso no histórico!`);
+            renderizarListaHistorico();
+        }
+
+        function renderizarListaHistorico() {
+            const container = document.getElementById('listaHistoricoSemanas');
+            container.innerHTML = '';
+            let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+            let chaves = Object.keys(historico);
+
+            if (chaves.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada no histórico ainda.</p>';
+                return;
+            }
+
+            chaves.forEach(key => {
+                let item = historico[key];
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span>
+                        <small class="text-gray-400">Guardado em: ${item.dataSalvo}</small>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button onclick="carregarSemanaHistorico('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Carregar</button>
+                        <button onclick="apagarSemanaHistorico('${item.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function carregarSemanaHistorico(id) {
+            if (confirm("Deseja carregar esta semana para o ecrã principal? (A programação atual será substituída)")) {
+                let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+                if (historico[id]) {
+                    document.getElementById('weekGridContainer').innerHTML = historico[id].html;
+                    guardarEstadoDOM();
+                    reativarEventosDragDrop();
+                    fecharModalHistorico();
+                    alert("Semana carregada com sucesso!");
+                }
+            }
+        }
+
+        function apagarSemanaHistorico(id) {
+            if (confirm("Tem certeza que deseja apagar esta semana do histórico?")) {
+                let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+                delete historico[id];
+                localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
+                renderizarListaHistorico();
+            }
         }
 
         function carregarFrequentes() {
@@ -921,12 +1042,12 @@
         }
 
         function guardarEstadoDOM() {
-            localStorage.setItem('programacao_semana_custom_v3.10', document.getElementById('weekGridContainer').innerHTML);
+            localStorage.setItem(CHAVE_PROGRAMACAO, document.getElementById('weekGridContainer').innerHTML);
         }
 
         function limparTudo() {
             if (confirm("Deseja redefinir a programação para o padrão original?")) {
-                localStorage.removeItem('programacao_semana_custom_v3.10');
+                localStorage.removeItem(CHAVE_PROGRAMACAO);
                 location.reload();
             }
         }
