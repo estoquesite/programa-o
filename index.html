@@ -3,22 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.12)</title>
+    <title>Programação Semanal Interativa (v3.13)</title>
     <!-- Tailwind CSS para os painéis de controlo e botões -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- Manifesto Dinâmico para Instalação como App no Celular -->
-    <link id="pwa-manifest" rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-        %22name%22: %22Programação Semanal%22,
-        %22short_name%22: %22ProgSemanal%22,
-        %22start_url%22: %22.%22,
-        %22display%22: %22standalone%22,
-        %22background_color%22: %22%23f9f9f9%22,
-        %22theme_color%22: %22%231b5e20%22,
-        %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/3652/3652191.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
-    }">
+    <!-- Manifesto Dinâmico via JavaScript (Seguro contra erros de carregamento) -->
+    <link id="pwa-manifest" rel="manifest" href="">
     <style>
         :root {
             --primary-color: #1b5e20;
@@ -467,7 +459,7 @@
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400" title="Sair / Bloquear">
                 🔒 Sair
             </button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.12</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.13</span>
         </div>
         <!-- MICROFONE INTELIGENTE -->
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105" title="Falar Comando de Voz">
@@ -504,6 +496,23 @@
         });
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Configurar manifesto PWA dinamicamente de forma segura
+            const manifestObj = {
+                "name": "Programação Semanal",
+                "short_name": "ProgSemanal",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#f9f9f9",
+                "theme_color": "#1b5e20",
+                "icons": [{
+                    "src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
+            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+
             let salvo = localStorage.getItem(CHAVE_PROGRAMACAO);
             if (!salvo) {
                 for (let k of ["programacao_semana_custom_v3.10", "programacao_semana_custom_v3.9", "programacao_semana_custom"]) {
