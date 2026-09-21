@@ -253,7 +253,7 @@
     <div id="conteudo-site" class="hidden container">
         <div class="header">
             <h2>Programação Semanal</h2>
-            <div class="week-badge" id="badgeSemana">Semana 40</div>
+            <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
         <!-- SELETOR DE ANO E SEMANA NO TOPO + BOTÃO DE HISTÓRICO -->
@@ -264,7 +264,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Nº da Semana:</label>
-                <input type="number" id="inputNumSemana" value="40" min="1" max="53" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+                <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
             </div>
             <div class="flex gap-2">
                 <button onclick="definirSemanaAtual()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200">
@@ -525,15 +525,8 @@
             }
             carregarFrequentes();
 
-            // Carregar última semana visitada ou semana atual
-            let ultimaAno = localStorage.getItem('prog_ultima_ano');
-            let ultimaSemana = localStorage.getItem('prog_ultima_semana');
-            if (ultimaAno && ultimaSemana) {
-                document.getElementById('inputAno').value = ultimaAno;
-                document.getElementById('inputNumSemana').value = ultimaSemana;
-            } else {
-                definirSemanaAtualSilencioso();
-            }
+            // CORREÇÃO: Força sempre o carregamento da semana atual real ao abrir a aplicação
+            definirSemanaAtualSilencioso();
 
             document.getElementById('inputDataEvento').valueAsDate = new Date();
 
@@ -954,7 +947,7 @@
 
         function atualizarDatasSemana() {
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
-            const semana = parseInt(document.getElementById('inputNumSemana').value) || 40;
+            const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
             
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
 
@@ -969,7 +962,7 @@
                 document.getElementById('weekGridContainer').innerHTML = salvoSemana;
                 reativarEventosDragDrop();
             } else {
-                // Se for uma semana nova sem dados guardados, limpa ou mantém estrutura base e atualiza datas
+                // Se for uma semana nova sem dados guardados, mantém estrutura base e atualiza datas
             }
 
             const datas = getDateRangeOfWeek(semana, ano);
