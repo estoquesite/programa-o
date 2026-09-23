@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.14)</title>
-    <!-- Tailwind CSS para os painéis de controlo e botões -->
+    <title>Programação Semanal Interativa (v3.15 Nuvem)</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- Manifesto Dinâmico via JavaScript (Seguro contra erros de carregamento) -->
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Manifesto Dinâmico via JavaScript -->
     <link id="pwa-manifest" rel="manifest" href="">
     <style>
         :root {
@@ -60,7 +62,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             text-transform: uppercase;
         }
-        /* Grelha com cartões sempre da mesma altura (alinhados) */
         .week-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -89,7 +90,6 @@
         .tasks-container {
             flex-grow: 1;
         }
-        /* Título do dia com destaque fluorescente elegante */
         .day-title {
             font-size: 15px;
             font-weight: 900;
@@ -121,9 +121,7 @@
             border-left: 2px solid #2e7d32;
             cursor: grab;
         }
-        .task-box:active {
-            cursor: grabbing;
-        }
+        .task-box:active { cursor: grabbing; }
         .day-resources {
             display: flex;
             flex-direction: column;
@@ -153,9 +151,7 @@
             align-items: center;
             cursor: grab;
         }
-        .resource-tag:active {
-            cursor: grabbing;
-        }
+        .resource-tag:active { cursor: grabbing; }
         .item-controls {
             display: flex;
             gap: 3px;
@@ -168,9 +164,7 @@
             padding: 0 2px;
             user-select: none;
         }
-        .drag-handle:active {
-            cursor: grabbing;
-        }
+        .drag-handle:active { cursor: grabbing; }
         .btn-action-item {
             background: none;
             border: none;
@@ -179,17 +173,13 @@
             padding: 0 3px;
             border-radius: 3px;
         }
-        .btn-edit-item:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
+        .btn-edit-item:hover { background-color: rgba(0, 0, 0, 0.1); }
         .btn-delete-item {
             color: #c62828;
             font-weight: bold;
             font-size: 12px;
         }
-        .btn-delete-item:hover {
-            background-color: rgba(198, 40, 40, 0.1);
-        }
+        .btn-delete-item:hover { background-color: rgba(198, 40, 40, 0.1); }
         .actions-bar {
             display: flex;
             justify-content: center;
@@ -212,12 +202,8 @@
             border: none;
             transition: background 0.2s;
         }
-        .btn-action:hover {
-            background-color: #115293;
-        }
-        .dragging {
-            opacity: 0.4;
-        }
+        .btn-action:hover { background-color: #115293; }
+        .dragging { opacity: 0.4; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
@@ -228,7 +214,7 @@
             <div class="w-16 h-16 bg-green-50 dark:bg-green-950/50 rounded-2xl mx-auto flex items-center justify-center text-3xl">📋</div>
             <div>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Acesso Restrito</h2>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Programação Semanal</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Programação Semanal (Nuvem)</p>
             </div>
             
             <form onsubmit="verificarLogin(event)" class="space-y-3 text-left">
@@ -249,14 +235,17 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL (OCULTO ATÉ LOGIN) -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="hidden container">
         <div class="header">
             <h2>Programação Semanal</h2>
+            <div class="flex justify-center items-center gap-2 mt-1">
+                <button onclick="sincronizarComNuvemManual()" class="print-hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-xs font-bold transition">🔄 Sincronizar</button>
+            </div>
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA NO TOPO + BOTÃO DE HISTÓRICO -->
+        <!-- SELETOR DE ANO E SEMANA NO TOPO -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
@@ -271,12 +260,12 @@
                     🔄 Atual
                 </button>
                 <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
-                    📁 Histórico de Semanas
+                    📁 Histórico
                 </button>
             </div>
         </div>
 
-        <!-- 1. CALENDÁRIO EM DESTAQUE NO TOPO -->
+        <!-- CALENDÁRIO SEMANAL -->
         <div class="week-grid" id="weekGridContainer">
             <!-- Segunda -->
             <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
@@ -359,28 +348,23 @@
             <button class="btn-action" onclick="imprimirProgramacao()">🖨️ Imprimir Programação (PDF Limpo)</button>
         </div>
 
-        <!-- 2. CAIXA DE ADICIONAR EM BAIXO -->
+        <!-- ADICIONAR NOVO ITEM -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-8 space-y-3">
             <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Adicionar Nova Tarefa ou Recurso por Data</h3>
-            
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tarefas e Recursos Frequentes</label>
                 <div class="flex gap-2">
                     <select id="selectFrequentes" onchange="preencherPredefinido()" class="flex-1 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-medium">
                         <option value="">-- Escolher item frequente --</option>
                     </select>
-                    <button onclick="adicionarNovoFrequente()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold" title="Cadastrar novo item frequente">
-                        ➕ Novo
-                    </button>
-                    <button onclick="gerenciarFrequentes()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold" title="Editar ou apagar itens frequentes">
-                        ⚙️ Gerir
-                    </button>
+                    <button onclick="adicionarNovoFrequente()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">➕ Novo</button>
+                    <button onclick="gerenciarFrequentes()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">⚙️ Gerir</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Evento (Reconhece o Dia)</label>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Evento</label>
                     <input type="date" id="inputDataEvento" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
                 </div>
                 <div>
@@ -392,103 +376,77 @@
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item (Pressione Enter para Adicionar)</label>
-                <input type="text" id="inputDesc" placeholder="Ex: Manutenção de rotina, Empilhadeira..." class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
+                <input type="text" id="inputDesc" placeholder="Ex: Manutenção de rotina..." class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
             </div>
             <div class="flex gap-2 pt-1">
-                <button onclick="adicionarItemPorData()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-lg text-xs transition">
-                    ✓ Adicionar Automaticamente (OK)
-                </button>
-                <button onclick="limparTudo()" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-2 rounded-lg text-xs font-bold">
-                    🗑️ Redefinir Tudo
-                </button>
+                <button onclick="adicionarItemPorData()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Adicionar (OK)</button>
+                <button onclick="limparTudo()" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-2 rounded-lg text-xs font-bold">🗑️ Redefinir</button>
             </div>
         </div>
 
-        <!-- 3. ANALISADOR INTELIGENTE DE SCRIPT / TEXTO -->
+        <!-- ANALISADOR INTELIGENTE -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Script / Texto</h3>
                 <div class="flex gap-1.5">
-                    <button onclick="adicionarNovaPalavraChave()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" title="Adicionar nova palavra-chave para procurar">➕ Palavra</button>
-                    <button onclick="gerenciarPalavrasChave()" class="bg-gray-600 hover:bg-gray-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold" title="Gerir palavras-chave">⚙️ Gerir</button>
+                    <button onclick="adicionarNovaPalavraChave()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">➕ Palavra</button>
+                    <button onclick="gerenciarPalavrasChave()" class="bg-gray-600 hover:bg-gray-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">⚙️ Gerir</button>
                 </div>
             </div>
-            <p class="text-[10px] text-gray-500 dark:text-gray-400">Cole abaixo o texto ou notas para detetar e enviar rapidamente:</p>
             <textarea id="inputScriptTexto" rows="3" placeholder="Cole aqui o texto da reunião ou apontamentos..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
-            <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">
-                🔎 Analisar e Gerar Sugestões
-            </button>
+            <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">🔎 Analisar e Gerar Sugestões</button>
             <div id="resultadoSugestoes" class="space-y-1.5 pt-2"></div>
         </div>
     </div>
 
-    <!-- MODAL DE HISTÓRICO DE SEMANAS -->
+    <!-- MODAL DE HISTÓRICO -->
     <div id="modalHistorico" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-                <h3 class="text-sm font-bold uppercase text-purple-800 dark:text-purple-300">📁 Histórico de Semanas Finalizadas</h3>
+                <h3 class="text-sm font-bold uppercase text-purple-800 dark:text-purple-300">📁 Histórico de Semanas</h3>
                 <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
-            
             <div class="space-y-2">
-                <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
-                    💾 Salvar Programação da Semana Atual no Histórico
-                </button>
+                <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">💾 Salvar Programação Atual no Histórico</button>
             </div>
-
-            <div id="listaHistoricoSemanas" class="max-h-60 overflow-y-auto space-y-2 pt-2">
-                <!-- As semanas guardadas aparecem aqui dinamicamente -->
-            </div>
-
+            <div id="listaHistoricoSemanas" class="max-h-60 overflow-y-auto space-y-2 pt-2"></div>
             <div class="flex justify-end pt-2">
                 <button onclick="fecharModalHistorico()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button>
             </div>
         </div>
     </div>
 
-    <!-- BARRA INFERIOR FIXA COM TEMA, SAÍDA, INSTALAR APP E MICROFONE -->
+    <!-- BARRA INFERIOR FIXA -->
     <div class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
         <div class="flex items-center gap-2">
-            <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold" title="Modo Escuro/Claro">
-                🌙/☀️ Tema
-            </button>
-            <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold" title="Instalar App no Celular">
-                📱 Instalar App
-            </button>
-            <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400" title="Sair / Bloquear">
-                🔒 Sair
-            </button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.14</span>
+            <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
+            <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
+            <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.15 Nuvem</span>
         </div>
-        <!-- MICROFONE INTELIGENTE -->
-        <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105" title="Falar Comando de Voz">
-            🎤
-        </button>
+        <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
 
     <script>
+        // CONFIGURAÇÃO SUPABASE
+        const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const SENHA_MESTRA = "1510";
         const CHAVE_HISTORICO = "programacao_historico_semanas_definitivo";
         const nomesMeses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
         let elementoArrastado = null;
         let deferredPrompt = null;
+        let dadosGlobaisNuvem = {};
 
         let itensFrequentesPadrao = [
-            "🕒 HORA CERTA",
-            "📦 MOVIMENTAÇÃO G4",
-            "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
-            "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)",
-            "EMPILHADEIRA G4",
-            "CAMINHÃO DIA INTEIRO",
-            "CARRO"
+            "🕒 HORA CERTA", "📦 MOVIMENTAÇÃO G4", "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
+            "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO", "CARRO"
         ];
+        let palavrasChavePadrao = ["ALFREDO", "ALAN", "ALMOXARIFADO", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        let palavrasChavePadrao = [
-            "ALFREDO", "ALAN", "ALMOXARIFADO", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"
-        ];
-
-        // Chave dinâmica baseada no Ano e no Número da Semana selecionados
         function getWeekKey() {
             const ano = document.getElementById('inputAno').value;
             const semana = document.getElementById('inputNumSemana').value;
@@ -500,19 +458,69 @@
             deferredPrompt = e;
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
+        async function sincronizarComNuvem() {
+            try {
+                let { data, error } = await supabaseClient
+                    .from('app_dados_programacao')
+                    .select('conteudo')
+                    .eq('id', '1')
+                    .single();
+
+                if (data && data.conteudo) {
+                    dadosGlobaisNuvem = data.conteudo;
+                    if (dadosGlobaisNuvem.historico) {
+                        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
+                    }
+                    if (dadosGlobaisNuvem.semanas) {
+                        for (let k in dadosGlobaisNuvem.semanas) {
+                            localStorage.setItem(k, dadosGlobaisNuvem.semanas[k]);
+                        }
+                    }
+                } else {
+                    await salvarNaNuvem();
+                }
+            } catch(e) {
+                console.error("Erro ao sincronizar com nuvem:", e);
+            }
+        }
+
+        async function salvarNaNuvem() {
+            let historicoLocal = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+            let semanasLocal = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith('prog_grid_')) {
+                    semanasLocal[key] = localStorage.getItem(key);
+                }
+            }
+
+            dadosGlobaisNuvem = {
+                historico: historicoLocal,
+                semanas: semanasLocal
+            };
+
+            try {
+                await supabaseClient
+                    .from('app_dados_programacao')
+                    .upsert({ id: '1', conteudo: dadosGlobaisNuvem });
+            } catch (err) {
+                console.error("Erro ao gravar na nuvem:", err);
+            }
+        }
+
+        async function sincronizarComNuvemManual() {
+            await sincronizarComNuvem();
+            atualizarDatasSemana();
+            alert("✅ Sincronizado com sucesso com a nuvem!");
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await sincronizarComNuvem();
+
             const manifestObj = {
-                "name": "Programação Semanal",
-                "short_name": "ProgSemanal",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#f9f9f9",
-                "theme_color": "#1b5e20",
-                "icons": [{
-                    "src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png",
-                    "sizes": "512x512",
-                    "type": "image/png"
-                }]
+                "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
+                "display": "standalone", "background_color": "#f9f9f9", "theme_color": "#1b5e20",
+                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", "sizes": "512x512", "type": "image/png"}]
             };
             const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
             document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
@@ -524,27 +532,20 @@
                 document.documentElement.classList.add('dark');
             }
             carregarFrequentes();
-
-            // CORREÇÃO: Força sempre o carregamento da semana atual real ao abrir a aplicação
             definirSemanaAtualSilencioso();
-
             document.getElementById('inputDataEvento').valueAsDate = new Date();
 
             document.getElementById('inputDesc').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    adicionarItemPorData();
-                }
+                if (e.key === 'Enter') { adicionarItemPorData(); }
             });
         });
 
         function instalarApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
             } else {
-                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos do canto superior direito e selecione 'Adicionar à tela inicial' ou 'Instalar aplicativo'.\n• No iPhone (Safari): Toque no botão de Compartilhar e escolha 'Adicionar à Tela de Início'.");
+                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
             }
         }
 
@@ -570,28 +571,20 @@
             }
             try {
                 const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                if (!available) {
-                    alert("Nenhum leitor biométrico encontrado neste aparelho.");
-                    return;
-                }
+                if (!available) { alert("Nenhum leitor biométrico encontrado."); return; }
 
-                const challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                const userId = new Uint8Array(16);
-                window.crypto.getRandomValues(userId);
+                const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
+                const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
 
                 const createCredentialOptions = {
-                    challenge: challenge,
-                    rp: { name: "Programação Semanal", id: window.location.hostname },
-                    user: { id: userId, name: "programacao@local", displayName: "Mariana" },
+                    challenge: challenge, rp: { name: "Programação Semanal", id: window.location.hostname },
+                    user: { id: userId, name: "prog@local", displayName: "Mariana" },
                     pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
                     authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
                     timeout: 60000
                 };
 
-                let cred;
-                const credentialIdStr = localStorage.getItem('biometria_cred_id_prog');
-
+                let cred; const credentialIdStr = localStorage.getItem('biometria_cred_id_prog');
                 if (credentialIdStr) {
                     try {
                         const rawId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
@@ -610,14 +603,15 @@
                     liberarAcessoInicial();
                 }
             } catch (error) {
-                alert("Biometria cancelada ou não configurada. Podes usar a senha PIN (1510).");
+                alert("Biometria cancelada. Podes usar a senha PIN (1510).");
             }
         }
 
-        function liberarAcessoInicial() {
+        async function liberarAcessoInicial() {
+            await sincronizarComNuvem();
             document.getElementById('tela-login').classList.add('hidden');
             document.getElementById('conteudo-site').classList.remove('hidden');
-            atualizarDatasSemana(); // Carrega os dados da semana atual ou guardada
+            atualizarDatasSemana();
         }
 
         function bloquearNovamente() {
@@ -628,17 +622,15 @@
             document.getElementById('erro-senha').classList.add('hidden');
         }
 
-        // FUNÇÕES DO HISTÓRICO DE SEMANAS
         function abrirModalHistorico() {
             renderizarListaHistorico();
             document.getElementById('modalHistorico').classList.remove('hidden');
         }
-
         function fecharModalHistorico() {
             document.getElementById('modalHistorico').classList.add('hidden');
         }
 
-        function salvarSemanaAtualNoHistorico() {
+        async function salvarSemanaAtualNoHistorico() {
             const numSemana = document.getElementById('inputNumSemana').value;
             const ano = document.getElementById('inputAno').value;
             const idHistorico = `Semana_${numSemana}_${ano}`;
@@ -647,14 +639,13 @@
 
             let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
             historico[idHistorico] = {
-                id: idHistorico,
-                titulo: `${badgeTexto} (${ano})`,
-                dataSalvo: new Date().toLocaleDateString('pt-PT'),
-                html: htmlConteudo
+                id: idHistorico, titulo: `${badgeTexto} (${ano})`,
+                dataSalvo: new Date().toLocaleDateString('pt-PT'), html: htmlConteudo
             };
 
             localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
-            alert(`✅ Programação da ${badgeTexto} de ${ano} guardada com sucesso no histórico!`);
+            await salvarNaNuvem();
+            alert(`✅ Programação da ${badgeTexto} de ${ano} guardada com sucesso e sincronizada!`);
             renderizarListaHistorico();
         }
 
@@ -665,7 +656,7 @@
             let chaves = Object.keys(historico);
 
             if (chaves.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada no histórico ainda.</p>';
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada no histórico.</p>';
                 return;
             }
 
@@ -674,10 +665,7 @@
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
                 div.innerHTML = `
-                    <div>
-                        <span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span>
-                        <small class="text-gray-400">Guardado em: ${item.dataSalvo}</small>
-                    </div>
+                    <div><span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span><small class="text-gray-400">Guardado em: ${item.dataSalvo}</small></div>
                     <div class="flex gap-1.5">
                         <button onclick="carregarSemanaHistorico('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Carregar</button>
                         <button onclick="apagarSemanaHistorico('${item.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
@@ -687,12 +675,12 @@
             });
         }
 
-        function carregarSemanaHistorico(id) {
-            if (confirm("Deseja carregar esta semana para o ecrã principal? (A programação atual será substituída)")) {
+        async function carregarSemanaHistorico(id) {
+            if (confirm("Deseja carregar esta semana?")) {
                 let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
                 if (historico[id]) {
                     document.getElementById('weekGridContainer').innerHTML = historico[id].html;
-                    guardarEstadoDOM();
+                    await guardarEstadoDOM();
                     reativarEventosDragDrop();
                     fecharModalHistorico();
                     alert("Semana carregada com sucesso!");
@@ -700,11 +688,12 @@
             }
         }
 
-        function apagarSemanaHistorico(id) {
-            if (confirm("Tem certeza que deseja apagar esta semana do histórico?")) {
+        async function apagarSemanaHistorico(id) {
+            if (confirm("Tem certeza que deseja apagar?")) {
                 let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
                 delete historico[id];
                 localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
+                await salvarNaNuvem();
                 renderizarListaHistorico();
             }
         }
@@ -715,13 +704,12 @@
             select.innerHTML = '<option value="">-- Escolher item frequente --</option>';
             salvos.forEach(item => {
                 const opt = document.createElement('option');
-                opt.value = item;
-                opt.innerText = item;
+                opt.value = item; opt.innerText = item;
                 select.appendChild(opt);
             });
         }
 
-        function adicionarNovoFrequente() {
+        async function adicionarNovoFrequente() {
             const novo = prompt("Digite o nome da nova tarefa ou recurso frequente:");
             if (novo && novo.trim() !== "") {
                 const itemMaiusculo = novo.trim().toUpperCase();
@@ -739,44 +727,41 @@
         function gerenciarFrequentes() {
             let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
             let listaStr = salvos.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
-            let escolha = prompt(`Itens Frequentes Atuais:\n\n${listaStr}\n\nDigite o número do item que deseja EDITAR ou APAGAR (ou clique em Cancelar):`);
-            
+            let escolha = prompt(`Itens Frequentes:\n\n${listaStr}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
             if (escolha !== null && !isNaN(escolha)) {
                 let index = parseInt(escolha) - 1;
                 if (index >= 0 && index < salvos.length) {
                     let itemSelecionado = salvos[index];
-                    let acao = prompt(`Item selecionado: "${itemSelecionado}"\n\nO que deseja fazer?\n1 - Editar nome\n2 - Apagar item`, "1");
+                    let acao = prompt(`Item: "${itemSelecionado}"\n\n1 - Editar nome\n2 - Apagar item`, "1");
                     if (acao === "1") {
-                        let novoNome = prompt("Digite o novo nome para o item:", itemSelecionado);
+                        let novoNome = prompt("Novo nome:", itemSelecionado);
                         if (novoNome && novoNome.trim() !== "") {
                             salvos[index] = novoNome.trim().toUpperCase();
                             localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
                             carregarFrequentes();
-                            alert("Item atualizado com sucesso!");
+                            alert("Atualizado!");
                         }
                     } else if (acao === "2") {
-                        if (confirm(`Tem certeza que deseja apagar "${itemSelecionado}" dos frequentes?`)) {
+                        if (confirm(`Apagar "${itemSelecionado}"?`)) {
                             salvos.splice(index, 1);
                             localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
                             carregarFrequentes();
-                            alert("Item apagado com sucesso!");
+                            alert("Apagado!");
                         }
                     }
-                } else {
-                    alert("Número inválido.");
                 }
             }
         }
 
         function adicionarNovaPalavraChave() {
-            const nova = prompt("Digite a nova palavra ou nome para o analisador procurar (ex: ALAN, FIDA):");
+            const nova = prompt("Palavra-chave para o analisador:");
             if (nova && nova.trim() !== "") {
                 const termo = nova.trim().toUpperCase();
                 let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
                 if (!chaves.includes(termo)) {
                     chaves.push(termo);
                     localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    alert(`Palavra-chave "${termo}" adicionada com sucesso!`);
+                    alert(`Adicionada: "${termo}"!`);
                 }
             }
         }
@@ -784,13 +769,13 @@
         function gerenciarPalavrasChave() {
             let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
             let listaStr = chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
-            let escolha = prompt(`Palavras-Chave do Analisador:\n\n${listaStr}\n\nDigite o número do item que deseja APAGAR (ou cancelar):`);
+            let escolha = prompt(`Palavras-Chave:\n\n${listaStr}\n\nNúmero do item para APAGAR:`);
             if (escolha !== null && !isNaN(escolha)) {
                 let index = parseInt(escolha) - 1;
                 if (index >= 0 && index < chaves.length) {
-                    let removido = chaves.splice(index, 1);
+                    chaves.splice(index, 1);
                     localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    alert(`Palavra-chave "${removido}" apagada com sucesso!`);
+                    alert("Apagada!");
                 }
             }
         }
@@ -801,7 +786,7 @@
             containerSugestoes.innerHTML = '';
 
             if (!texto.trim()) {
-                containerSugestoes.innerHTML = `<p class="text-[10px] text-red-500">Cole algum texto no campo acima para analisar.</p>`;
+                containerSugestoes.innerHTML = `<p class="text-[10px] text-red-500">Cole algum texto no campo acima.</p>`;
                 return;
             }
 
@@ -812,8 +797,7 @@
             linhas.forEach(linha => {
                 const linhaUp = linha.trim().toUpperCase();
                 if (linhaUp.length > 3) {
-                    const contemPalavra = palavrasChave.some(palavra => linhaUp.includes(palavra));
-                    if (contemPalavra) {
+                    if (palavrasChave.some(p => linhaUp.includes(p))) {
                         encontradas++;
                         const div = document.createElement('div');
                         div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2 rounded-lg border border-blue-200 dark:border-blue-900';
@@ -821,7 +805,7 @@
                             <span class="text-[11px] font-semibold text-blue-900 dark:text-blue-200">${linhaUp}</span>
                             <div class="flex gap-1">
                                 <button onclick="usarSugestao(this)" data-texto="${linhaUp}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar ➜</button>
-                                <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2 py-1 rounded text-[10px] font-bold" title="Apagar sugestão">✕</button>
+                                <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕</button>
                             </div>
                         `;
                         containerSugestoes.appendChild(div);
@@ -830,14 +814,14 @@
             });
 
             if (encontradas === 0) {
-                containerSugestoes.innerHTML = `<p class="text-[10px] text-gray-500">Nenhuma palavra-chave reconhecida no texto colado.</p>`;
+                containerSugestoes.innerHTML = `<p class="text-[10px] text-gray-500">Nenhuma palavra-chave reconhecida.</p>`;
             }
         }
 
         function usarSugestao(botao) {
             const texto = botao.getAttribute('data-texto');
             document.getElementById('inputDesc').value = texto;
-            if (texto.toLowerCase().includes('caminhão') || texto.toLowerCase().includes('empilhadeira') || texto.toLowerCase().includes('carro') || texto.toLowerCase().includes('recurso')) {
+            if (/caminhão|empilhadeira|carro|recurso/i.test(texto)) {
                 document.getElementById('inputTipo').value = 'resource';
             } else {
                 document.getElementById('inputTipo').value = 'task';
@@ -845,9 +829,7 @@
             document.getElementById('inputDesc').focus();
         }
 
-        function removerSugestao(botao) {
-            botao.closest('div.flex').remove();
-        }
+        function removerSugestao(botao) { botao.closest('div.flex').remove(); }
 
         function iniciarArrasto(e) {
             elementoArrastado = e.currentTarget;
@@ -859,20 +841,17 @@
             const containerAlvo = e.currentTarget;
             const depoisDeElemento = obterElementoAposCursor(containerAlvo, e.clientY);
             if (elementoArrastado) {
-                if (depoisDeElemento == null) {
-                    containerAlvo.appendChild(elementoArrastado);
-                } else {
-                    containerAlvo.insertBefore(elementoArrastado, depoisDeElemento);
-                }
+                if (depoisDeElemento == null) { containerAlvo.appendChild(elementoArrastado); }
+                else { containerAlvo.insertBefore(elementoArrastado, depoisDeElemento); }
             }
         }
 
-        function soltarItem(e) {
+        async function soltarItem(e) {
             e.preventDefault();
             if (elementoArrastado) {
                 elementoArrastado.classList.remove('dragging');
                 elementoArrastado = null;
-                guardarEstadoDOM();
+                await guardarEstadoDOM();
             }
         }
 
@@ -883,9 +862,7 @@
                 const deslocamento = y - caixa.top - caixa.height / 2;
                 if (deslocamento < 0 && deslocamento > maisProximo.deslocamento) {
                     return { deslocamento: deslocamento, elemento: filho };
-                } else {
-                    return maisProximo;
-                }
+                } else { return maisProximo; }
             }, { deslocamento: Number.NEGATIVE_INFINITY }).elemento;
         }
 
@@ -901,45 +878,34 @@
         }
 
         function definirSemanaAtual() {
-            const hoje = new Date();
-            const ano = hoje.getFullYear();
+            const hoje = new Date(); const ano = hoje.getFullYear();
             document.getElementById('inputAno').value = ano;
-            
             const d = new Date(Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
             const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            
             document.getElementById('inputNumSemana').value = weekNo;
             atualizarDatasSemana();
         }
 
         function definirSemanaAtualSilencioso() {
-            const hoje = new Date();
-            const ano = hoje.getFullYear();
+            const hoje = new Date(); const ano = hoje.getFullYear();
             document.getElementById('inputAno').value = ano;
-            
             const d = new Date(Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
             const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            
             document.getElementById('inputNumSemana').value = weekNo;
             atualizarDatasSemana();
         }
 
         function getDateRangeOfWeek(weekNo, y) {
-            let d = new Date(y, 0, 1);
-            let dayNum = d.getDay();
+            let d = new Date(y, 0, 1); let dayNum = d.getDay();
             let requiredDay = (weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum);
             d.setDate(1 + requiredDay);
-            
             let dias = [];
             for (let i = 0; i < 5; i++) {
-                let temp = new Date(d);
-                temp.setDate(d.getDate() + i);
+                let temp = new Date(d); temp.setDate(d.getDate() + i);
                 dias.push(temp);
             }
             return dias;
@@ -948,12 +914,7 @@
         function atualizarDatasSemana() {
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
-            
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
-
-            // Memorizar última semana e ano usados
-            localStorage.setItem('prog_ultima_ano', ano);
-            localStorage.setItem('prog_ultima_semana', semana);
 
             const key = getWeekKey();
             const salvoSemana = localStorage.getItem(key);
@@ -961,8 +922,6 @@
             if (salvoSemana) {
                 document.getElementById('weekGridContainer').innerHTML = salvoSemana;
                 reativarEventosDragDrop();
-            } else {
-                // Se for uma semana nova sem dados guardados, mantém estrutura base e atualiza datas
             }
 
             const datas = getDateRangeOfWeek(semana, ano);
@@ -974,8 +933,7 @@
                 if (card) {
                     const diaDoMes = dataObj.getDate();
                     const mesStr = nomesMeses[dataObj.getMonth()];
-                    const titleEl = card.querySelector('.day-title');
-                    titleEl.innerHTML = `${diaNome}<br><small>${String(diaDoMes).padStart(2,'0')}/${mesStr}</small>`;
+                    card.querySelector('.day-title').innerHTML = `${diaNome}<br><small>${String(diaDoMes).padStart(2,'0')}/${mesStr}</small>`;
                 }
             });
             guardarEstadoDOM();
@@ -990,116 +948,86 @@
             const val = document.getElementById('selectFrequentes').value;
             if (val) {
                 document.getElementById('inputDesc').value = val.toUpperCase();
-                if (val.toLowerCase().includes('recurso') || val.toLowerCase().includes('empilhadeira') || val.toLowerCase().includes('caminhão') || val.toLowerCase().includes('carro')) {
+                if (/recurso|empilhadeira|caminhão|carro/i.test(val)) {
                     document.getElementById('inputTipo').value = 'resource';
-                } else {
-                    document.getElementById('inputTipo').value = 'task';
-                }
+                } else { document.getElementById('inputTipo').value = 'task'; }
             }
         }
 
-        function adicionarItemPorData() {
+        async function adicionarItemPorData() {
             const dataStr = document.getElementById('inputDataEvento').value;
             const tipo = document.getElementById('inputTipo').value;
             const desc = document.getElementById('inputDesc').value.trim().toUpperCase();
 
-            if (!dataStr || !desc) {
-                alert("Por favor, selecione a data e digite a descrição.");
-                return;
-            }
+            if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
 
             const dataObj = new Date(dataStr + 'T00:00:00');
             const diaSemanaNum = dataObj.getDay();
-
-            if (diaSemanaNum === 0 || diaSemanaNum === 6) {
-                alert("Por favor, selecione um dia útil (Segunda a Sexta).");
-                return;
-            }
+            if (diaSemanaNum === 0 || diaSemanaNum === 6) { alert("Selecione um dia útil (Segunda a Sexta)."); return; }
 
             const nomesDiasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const nomeDiaCard = nomesDiasMap[diaSemanaNum];
-
-            const card = document.querySelector(`.day-card[data-dia-nome="${nomeDiaCard}"]`);
-            if (!card) {
-                alert("O dia selecionado não está visível na grelha atual.");
-                return;
-            }
+            const card = document.querySelector(`.day-card[data-dia-nome="${nomesDiasMap[diaSemanaNum]}"]`);
+            if (!card) { alert("Dia não visível."); return; }
 
             const handleHtml = `<span class="drag-handle">⠿</span>`;
             const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
 
-            if (tipo === 'task') {
-                const container = card.querySelector('.tasks-container');
-                const div = document.createElement('div');
-                div.className = 'task-box';
-                div.setAttribute('draggable', 'true');
-                div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
-                container.appendChild(div);
-            } else {
-                const container = card.querySelector('.day-resources');
-                const div = document.createElement('div');
-                div.className = 'resource-tag';
-                div.setAttribute('draggable', 'true');
-                div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
-                container.appendChild(div);
-            }
+            const div = document.createElement('div');
+            div.className = tipo === 'task' ? 'task-box' : 'resource-tag';
+            div.setAttribute('draggable', 'true');
+            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
+
+            if (tipo === 'task') { card.querySelector('.tasks-container').appendChild(div); }
+            else { card.querySelector('.day-resources').appendChild(div); }
 
             document.getElementById('inputDesc').value = '';
             document.getElementById('selectFrequentes').value = '';
-            guardarEstadoDOM();
+            await guardarEstadoDOM();
         }
 
-        function editarItem(botao) {
+        async function editarItem(botao) {
             const itemBox = botao.closest('.task-box') || botao.closest('.resource-tag');
             const itemSpan = itemBox.querySelector('.item-text');
-            const textoAtual = itemSpan.innerText;
-            const novoTexto = prompt("Editar descrição do item:", textoAtual);
+            const novoTexto = prompt("Editar descrição:", itemSpan.innerText);
             if (novoTexto !== null && novoTexto.trim() !== "") {
                 itemSpan.innerText = novoTexto.trim().toUpperCase();
-                guardarEstadoDOM();
+                await guardarEstadoDOM();
             }
         }
 
-        function removerElemento(botao) {
-            const item = botao.closest('.task-box') || botao.closest('.resource-tag');
-            item.remove();
-            guardarEstadoDOM();
+        async function removerElemento(botao) {
+            (botao.closest('.task-box') || botao.closest('.resource-tag')).remove();
+            await guardarEstadoDOM();
         }
 
-        function guardarEstadoDOM() {
+        async function guardarEstadoDOM() {
             const key = getWeekKey();
             const html = document.getElementById('weekGridContainer').innerHTML;
             localStorage.setItem(key, html);
+            await salvarNaNuvem();
         }
 
-        function limparTudo() {
-            if (confirm("Deseja redefinir a programação desta semana para o padrão original?")) {
-                const key = getWeekKey();
-                localStorage.removeItem(key);
+        async function limparTudo() {
+            if (confirm("Deseja redefinir a programação desta semana?")) {
+                localStorage.removeItem(getWeekKey());
+                await salvarNaNuvem();
                 location.reload();
             }
         }
 
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("O seu navegador não suporta reconhecimento de voz.");
-                return;
-            }
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-PT';
+            if (!SpeechRecognition) { alert("Reconhecimento de voz não suportado."); return; }
+            const recognition = new SpeechRecognition(); recognition.lang = 'pt-PT';
             const btnVoz = document.getElementById('btn-voz');
 
             recognition.onstart = () => { btnVoz.classList.add('animate-pulse', 'bg-amber-500'); };
             recognition.onresult = (event) => {
-                const texto = event.results[0][0].transcript;
-                document.getElementById('inputDesc').value = texto.toUpperCase();
+                document.getElementById('inputDesc').value = event.results[0][0].transcript.toUpperCase();
                 adicionarItemPorData();
             };
-            recognition.onerror = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
-            recognition.onend = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
+            recognition.onerror = recognition.onend = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
             recognition.start();
         }
 
@@ -1112,9 +1040,9 @@
                     <meta charset="UTF-8">
                     <title>Impressão - Programação Semanal</title>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #fff; color: #333; }
-                        .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; align-items: stretch; }
-                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-height: 250px; }
+                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background: #fff; color: #333; }
+                        .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
+                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; min-height: 250px; }
                         .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 8px; }
                         .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
                         .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: 14px; }
@@ -1122,8 +1050,8 @@
                         .resource-tag { background: #e8f5e9; color: #1b5e20; padding: 3px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
                         .drag-handle, .item-controls { display: none !important; }
                         .header { text-align: center; margin-bottom: 15px; position: relative; }
-                        h2 { text-align: center; color: #1b5e20; font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
-                        .week-badge { position: absolute; top: 0; right: 5px; background-color: #1b5e20; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+                        h2 { color: #1b5e20; font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
+                        .week-badge { position: absolute; top: 0; right: 5px; background-color: #1b5e20; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; }
                         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     </style>
                 </head>
@@ -1135,11 +1063,7 @@
                     <div class="week-grid">
                         ${document.getElementById('conteudo-site').querySelector('.week-grid').innerHTML}
                     </div>
-                    <script>
-                        window.onload = function() {
-                            setTimeout(function() { window.print(); }, 500);
-                        }
-                    <\/script>
+                    <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }<\/script>
                 </body>
                 </html>
             `);
