@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.2 Cursos & Treinamentos)</title>
+    <title>Painel de Indicadores & Gráficos (v5.3 Cursos da Programação)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -110,7 +110,7 @@
             <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 card-a4-impresso">
                 <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
                 <div class="flex items-center gap-1.5">
-                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Desempenho & Capacitação</h2>
+                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Indicadores & Capacitação</h2>
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
                 </div>
                 <div class="flex items-center gap-2">
@@ -291,7 +291,7 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- PÁGINA 2 NA IMPRESSÃO: RECURSOS & TABELA DETALHADA DAS SEMANAS -->
+        <!-- PÁGINA 2 NA IMPRESSÃO: RECURSOS, CURSOS & DETALHAMENTO -->
         <!-- ============================================================== -->
         <div class="pagina-a4-quebra space-y-4 pt-2">
             
@@ -370,12 +370,12 @@
                 </div>
             </div>
 
-            <!-- NOVO BLOCO: CAPACITAÇÃO & CURSOS / TREINAMENTOS -->
+            <!-- BLOCO DE CAPACITAÇÃO: CURSOS / TREINAMENTOS DA PROGRAMAÇÃO -->
             <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-3 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
                         <h3 id="lbl_titulo_bloco_treinos" class="text-xs font-black uppercase text-purple-900 dark:text-purple-300">
-                            🎓 Painel de Cursos & Treinamentos
+                            🎓 Painel de Cursos Concluídos na Programação
                         </h3>
                         <button type="button" onclick="editarTexto('lbl_titulo_bloco_treinos')" class="btn-edit-title">✏️</button>
                     </div>
@@ -385,11 +385,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                     <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
                         <div class="flex items-center gap-1">
-                            <span id="lbl_card_treino_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Total de Cursos Concluídos</span>
+                            <span id="lbl_card_treino_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Cursos Validados (Feitos)</span>
                             <button type="button" onclick="editarTexto('lbl_card_treino_total')" class="btn-edit-title">✏️</button>
                         </div>
                         <h4 id="cardTreinoTotal" class="text-xl font-black text-purple-700 dark:text-purple-400">0</h4>
-                        <p id="cardTreinoTotalSub" class="text-[9px] text-gray-500 font-semibold">Participações validadas</p>
+                        <p id="cardTreinoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas na grade</p>
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
@@ -398,7 +398,7 @@
                             <button type="button" onclick="editarTexto('lbl_card_treino_mais')" class="btn-edit-title">✏️</button>
                         </div>
                         <h4 id="cardTreinoMaisNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                        <p id="cardTreinoMaisQtd" class="text-[9px] text-purple-700 font-bold">0 participações (0%)</p>
+                        <p id="cardTreinoMaisQtd" class="text-[9px] text-purple-700 font-bold">0 turmas (0%)</p>
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
@@ -414,7 +414,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
                     <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
                         <div class="flex items-center gap-1 mb-1">
-                            <h4 id="lbl_grafico_treinos_mensal" class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">📈 Carga de Cursos por Mês</h4>
+                            <h4 id="lbl_grafico_treinos_mensal" class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">📈 Cursos Concluídos por Mês</h4>
                             <button type="button" onclick="editarTexto('lbl_grafico_treinos_mensal')" class="btn-edit-title">✏️</button>
                         </div>
                         <div class="relative chart-wrapper h-48 w-full flex items-center justify-center">
@@ -424,7 +424,7 @@
 
                     <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-1.5 card-a4-impresso">
                         <div class="flex items-center gap-1">
-                            <h4 id="lbl_tabela_treinos" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Ranking de Cursos Concluídos</h4>
+                            <h4 id="lbl_tabela_treinos" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Cursos Realizados</h4>
                             <button type="button" onclick="editarTexto('lbl_tabela_treinos')" class="btn-edit-title">✏️</button>
                         </div>
                         <div class="overflow-x-auto max-h-48 overflow-y-auto">
@@ -432,7 +432,7 @@
                                 <thead>
                                     <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
                                         <th class="py-1.5 px-2">Curso / Treinamento</th>
-                                        <th class="py-1.5 px-2 text-center">Concluídos</th>
+                                        <th class="py-1.5 px-2 text-center">Feitos</th>
                                         <th class="py-1.5 px-2 text-right">% do Ano</th>
                                     </tr>
                                 </thead>
@@ -461,9 +461,9 @@
                                 <th class="py-2 px-2.5 col-total">Total</th>
                                 <th class="py-2 px-2.5 text-green-600 col-concluidas">Feitas</th>
                                 <th class="py-2 px-2.5 text-red-600 col-naorealizadas">Não Feitas</th>
-                                <th class="py-2.5 px-2.5 text-amber-600 col-extras">Extras</th>
-                                <th class="py-2.5 px-2.5 text-purple-700">Cursos</th>
-                                <th class="py-2.5 px-2.5 text-emerald-700">Recursos</th>
+                                <th class="py-2 px-2.5 text-amber-600 col-extras">Extras</th>
+                                <th class="py-2 px-2.5 text-purple-700">Cursos</th>
+                                <th class="py-2 px-2.5 text-emerald-700">Recursos</th>
                                 <th class="py-2.5 px-2.5">Status</th>
                             </tr>
                         </thead>
@@ -874,7 +874,7 @@
                         if (ext.classList.contains('task-done') || (check && check.checked)) extrasConcluidas++;
                     });
 
-                    // IDENTIFICAÇÃO DE CURSOS / TREINAMENTOS CONCLUÍDOS
+                    // IDENTIFICAÇÃO DE CURSOS / TREINAMENTOS CONCLUÍDOS DIRETO NA GRADE
                     let boxesTreinos = doc.querySelectorAll('.treinamento-box');
                     boxesTreinos.forEach(tBox => {
                         let check = tBox.querySelector('input[type="checkbox"]');
@@ -882,6 +882,7 @@
                         let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
                         let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
 
+                        // SÓ CONTA SE A CAIXINHA ESTIVER MARCADA COMO FEITA NA PROGRAMAÇÃO!
                         if (estaFeito && !ehFuturoReal) {
                             mapaCursosConcluidos[nomeTreino] = (mapaCursosConcluidos[nomeTreino] || 0) + 1;
                             mesesCursosConcluidos[mesIdx]++;
