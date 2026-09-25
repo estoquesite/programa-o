@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.44 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.45 Nuvem Estável)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -69,6 +69,8 @@
             margin-bottom: 20px;
             align-items: stretch;
         }
+        
+        /* ESTRUTURA RÍGIDA E ESTÁVEL DOS CARDS */
         .day-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -78,8 +80,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            height: 500px !important;
-            max-height: 500px !important;
+            height: 480px !important;
+            max-height: 480px !important;
         }
         .day-content {
             display: flex;
@@ -90,7 +92,7 @@
         .tasks-container {
             flex-grow: 1;
             overflow-y: auto;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             padding-right: 2px;
         }
         .day-title {
@@ -102,7 +104,7 @@
             border: 1px solid #a3e4d7;
             border-radius: 6px;
             padding: 5px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             flex-shrink: 0;
         }
@@ -114,15 +116,15 @@
         .day-options-header {
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             font-size: 9px;
             font-weight: 700;
             color: #2e7d32;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             background: #f1f8e9;
-            padding: 4px;
+            padding: 2px;
             border-radius: 4px;
-            border: 1px solid #c8e6c9;
+            flex-shrink: 0;
         }
         .task-box {
             font-weight: 600;
@@ -140,6 +142,8 @@
             flex-shrink: 0;
         }
         .task-box:active { cursor: grabbing; }
+        
+        /* ÁREA DE RECURSOS TRAVADA E ALINHADA NA BASE */
         .day-resources {
             display: flex;
             flex-direction: column;
@@ -147,9 +151,10 @@
             border-top: 2px dashed #c8e6c9;
             padding-top: 6px;
             margin-top: auto; 
-            height: 125px;
+            height: 110px;
             flex-shrink: 0;
             background: #ffffff;
+            justify-content: flex-start;
         }
         .resources-title {
             font-size: 8px;
@@ -170,6 +175,7 @@
             justify-content: space-between;
             align-items: center;
             cursor: grab;
+            flex-shrink: 0;
         }
         .resource-tag:active { cursor: grabbing; }
         .item-controls {
@@ -467,7 +473,7 @@
             <button onclick="salvarTreinamentoAnual()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg text-xs transition">💾 Salvar Treinamento no Calendário Anual</button>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.44) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.45) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -524,7 +530,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.44 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.45 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -736,7 +742,7 @@
             }
         }
 
-        // VERIFICAÇÃO INTELIGENTE: Treinamentos + Feriados + 5S no último dia útil do mês
+        // VERIFICAÇÃO INTELIGENTE: Injeta Treinamentos e Avaliação 5S no último dia útil do mês
         function verificarEventosAutomaticos(datasDaSemana) {
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
 
@@ -815,10 +821,9 @@
                     const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
                     card.querySelector('.day-title').innerHTML = `${nomes[idx]}<br><small>${String(dt.getDate()).padStart(2,'0')}/${nomesMeses[dt.getMonth()]}</small>`;
                     
-                    // Se for feriado nacional oficial, aplica verde suave e folhinha
                     if (feriadosNacionais.includes(iso)) {
                         const cbFeriado = card.querySelector('.check-feriado');
-                        if (cbFeriado) {
+                        if (cbFeriado && !cbFeriado.checked) {
                             cbFeriado.checked = true;
                             alternarStatusDia(cbFeriado, 'feriado');
                         }
@@ -885,7 +890,6 @@
         async function guardarEstadoDOM() { localStorage.setItem(getWeekKey(document.getElementById('inputAno').value, document.getElementById('inputNumSemana').value), document.getElementById('weekGridContainer').innerHTML); await salvarNaNuvem(); }
         async function limparTudo() { if (confirm("Redefinir?")) { localStorage.removeItem(getWeekKey(document.getElementById('inputAno').value, document.getElementById('inputNumSemana').value)); await salvarNaNuvem(); location.reload(); } }
 
-        // MARCAÇÃO VISUAL DE FERIADO (VERDE SUAVE + FOLHINHA 🌿) E EMENDA (AMARELO SUAVE + 📌)
         function alternarStatusDia(checkbox, tipo) {
             const card = checkbox.closest('.day-card');
             const title = card.querySelector('.day-title');
@@ -895,7 +899,7 @@
             if (tipo === 'feriado' && checkbox.checked) cbEmenda.checked = false;
             if (tipo === 'emenda' && checkbox.checked) cbFeriado.checked = false;
 
-            let htmlOriginal = title.innerHTML.split('<br>')[0]; // Pega o nome do dia original (ex: Segunda)
+            let htmlOriginal = title.innerHTML.split('<br>')[0].replace(/🌿|📌|\(FERIADO\)|\(EMENDA\)/g, '').trim();
             let dataSub = title.querySelector('small') ? title.querySelector('small').outerHTML : '';
 
             if (cbFeriado.checked) {
@@ -914,9 +918,20 @@
             guardarEstadoDOM();
         }
 
+        function reativarEventosDragDrop() {
+            document.querySelectorAll('.task-box, .resource-tag').forEach(item => {
+                item.setAttribute('draggable', 'true');
+                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            });
+            document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
+                cont.setAttribute('ondragover', 'permitirDrop(event)');
+                cont.setAttribute('ondrop', 'soltarItem(event)');
+            });
+        }
+
         function imprimirProgramacao() {
             const w = window.open('', '_blank', 'width=900,height=700');
-            w.document.write(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:sans-serif;padding:20px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.day-card{border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:8px;height:480px!important;display:flex;flex-direction:column;}.day-title{background:#e8f5e9;padding:4px;text-align:center;font-weight:bold;font-size:12px;}.tasks-container{flex-grow:1;}.task-box{background:#f1f8e9;padding:4px;font-size:9px;margin-bottom:3px;border-left:2px solid #2e7d32;}.day-resources{border-top:2px dashed #c8e6c9;padding-top:6px;height:125px;margin-top:auto;}.resource-tag{background:#e8f5e9;padding:3px;font-size:9px;margin-bottom:2px;}.print-hidden,.day-options-header,.drag-handle,.item-controls{display:none!important;}</style></head><body><h2 style="text-align:center;color:#1b5e20;">Programação Semanal</h2><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
+            w.document.write(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:sans-serif;padding:20px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.day-card{border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:8px;height:480px!important;display:flex;flex-direction:column;}.day-title{background:#e8f5e9;padding:4px;text-align:center;font-weight:bold;font-size:12px;}.tasks-container{flex-grow:1;}.task-box{background:#f1f8e9;padding:4px;font-size:9px;margin-bottom:3px;border-left:2px solid #2e7d32;}.day-resources{border-top:2px dashed #c8e6c9;padding-top:6px;height:110px;margin-top:auto;}.resource-tag{background:#e8f5e9;padding:3px;font-size:9px;margin-bottom:2px;}.print-hidden,.day-options-header,.drag-handle,.item-controls{display:none!important;}</style></head><body><h2 style="text-align:center;color:#1b5e20;">Programação Semanal</h2><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
             w.document.close();
         }
     </script>
