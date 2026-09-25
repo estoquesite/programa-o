@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v3.9 Recursos & Tarefas)</title>
+    <title>Painel de Indicadores & Gráficos (v4.0 Recursos com Filtro Ativo)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -53,15 +53,12 @@
                 max-width: 100% !important;
                 margin: 0 !important;
             }
-            .overflow-x-auto, .max-h-72, .max-h-40 {
+            .overflow-x-auto, .max-h-72, .max-h-56, .max-h-40 {
                 max-height: none !important;
                 overflow: visible !important;
             }
             canvas {
                 max-height: 250px !important;
-            }
-            .page-break {
-                page-break-before: always;
             }
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -83,25 +80,21 @@
             </div>
         </div>
 
-        <!-- PAINEL DE CONTROLE DE MULTI-SELEÇÃO (ANOS, MESES E SEMANAS) -->
+        <!-- PAINEL DE CONTROLE: ANO, MESES, SEMANAS E RECURSOS -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
             
-            <!-- LINHA 1: ESCOLHA LIVRE DE ANO -->
+            <!-- LINHA 1: ESCOLHA DE ANO -->
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
                     <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
                         <button type="button" onclick="alterarAnoPasso(-1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition" title="Ano anterior">◀</button>
-                        
                         <select id="selectAnoDinamico" onchange="selecionarAnoPorSelect(this.value)" class="text-xs p-1.5 bg-transparent border-0 font-extrabold text-green-900 dark:text-green-300 cursor-pointer">
                         </select>
-
-                        <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white" title="Digitar qualquer ano">
-                        
+                        <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white">
                         <button type="button" onclick="alterarAnoPasso(1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition" title="Próximo ano">▶</button>
                     </div>
-
-                    <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Atual</button>
+                    <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Vigente</button>
                 </div>
 
                 <div class="flex items-center gap-1.5">
@@ -110,22 +103,21 @@
                 </div>
             </div>
 
-            <!-- LINHA 2: QUADRADINHOS PARA MARCAR QUALQUER MÊS LIVREMENTE -->
+            <!-- LINHA 2: CHECKBOXES DOS 12 MESES -->
             <div class="space-y-1.5">
                 <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Selecione os Meses Desejados:</span>
-                    <span id="labelContadorMeses" class="text-[10px] font-extrabold text-green-700 dark:text-green-400 uppercase">12 Meses Marcados</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Filtrar Meses:</span>
+                    <span id="labelContadorMeses" class="text-[10px] font-extrabold text-green-700 dark:text-green-400 uppercase">12 Meses</span>
                 </div>
-                
                 <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 text-xs font-bold" id="containerCheckboxesMeses">
                 </div>
             </div>
 
-            <!-- LINHA 3: QUADRADINHOS PARA MARCAR/DESMARCAR SEMANAS ESPECÍFICAS -->
+            <!-- LINHA 3: CHECKBOXES DE SEMANAS (EXPANSÍVEL) -->
             <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Semanas Disponíveis:</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Filtrar Semanas:</span>
                         <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-400 uppercase">0 Semanas</span>
                     </div>
                     <div class="flex items-center gap-1.5">
@@ -139,33 +131,43 @@
                 </div>
             </div>
 
-            <!-- LINHA 4: CANAIS COM CHECKBOXES INTERATIVOS -->
+            <!-- LINHA 4: NOVO - FILTRO DEDICADO DE RECURSOS ESPECÍFICOS -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">🚙 Selecionar Recursos a Exibir:</span>
+                        <span id="labelContadorRecursosFiltro" class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase">Todos Selecionados</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="marcarTodosRecursosFiltro(true)" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todos Recursos</button>
+                        <button type="button" onclick="marcarTodosRecursosFiltro(false)" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar Recursos</button>
+                    </div>
+                </div>
+                <!-- Checkboxes dinâmicos com todos os recursos encontrados (CARRO, EMPILHADEIRA, ETC) -->
+                <div id="containerFiltroRecursos" class="flex flex-wrap gap-2 text-xs font-bold pt-1">
+                    <!-- Gerado automaticamente com os veículos/recursos salvos -->
+                </div>
+            </div>
+
+            <!-- LINHA 5: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
                         <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
                         <span>Total Planeado</span>
                     </label>
-
                     <label class="flex items-center gap-1.5 cursor-pointer bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 px-2.5 py-1.5 rounded-xl border border-green-200 dark:border-green-900">
                         <input type="checkbox" id="checkCanalConcluidas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-green-600 cursor-pointer">
-                        <span>Realizadas (Concluídas)</span>
+                        <span>Realizadas</span>
                     </label>
-
                     <label class="flex items-center gap-1.5 cursor-pointer bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-2.5 py-1.5 rounded-xl border border-red-200 dark:border-red-900">
                         <input type="checkbox" id="checkCanalNaoRealizadas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-red-600 cursor-pointer">
-                        <span>Não Realizadas (Pendentes)</span>
+                        <span>Não Realizadas</span>
                     </label>
-
                     <label class="flex items-center gap-1.5 cursor-pointer bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-900">
                         <input type="checkbox" id="checkCanalExtras" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                        <span>Demandas Extras</span>
+                        <span>Extras</span>
                     </label>
-                </div>
-
-                <div class="flex items-center gap-1.5">
-                    <button onclick="alternarTodosCanais(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded-lg text-[10px] font-bold">Todos Canais</button>
-                    <button onclick="alternarTodosCanais(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded-lg text-[10px] font-bold">Nenhum Canal</button>
                 </div>
             </div>
         </div>
@@ -199,37 +201,32 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- NOVO: BLOCO DEDICADO A INDICADORES DE RECURSOS -->
-        <!-- ========================================== -->
+        <!-- BLOCO DEDICADO A INDICADORES DE RECURSOS (COM REGRA DE NÃO CONTAR FUTURO) -->
         <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                 <div>
                     <h3 class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
-                        <span>🚙</span> Painel de Utilização de Recursos (Equipamentos & Veículos)
+                        <span>🚙</span> Painel de Utilização de Recursos (Filtrados por Semanas Concluídas)
                     </h3>
-                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Métricas de mobilização, veículos mais requisitados e equipamentos ociosos no período selecionado.</p>
+                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Calculado estritamente pelas semanas ativas selecionadas acima. Semanas futuras não entram na contagem.</p>
                 </div>
                 <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2 py-0.5 rounded-full" id="tagTotalAlocacoes">0 Alocações</span>
             </div>
 
             <!-- 3 CARDS DE RECURSOS: TOTAL, MAIS UTILIZADO, MENOS UTILIZADO -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <!-- Total de Recursos Alocados -->
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
                     <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total de Recursos Alocados</span>
                     <h4 id="cardRecursoTotal" class="text-2xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
-                    <p class="text-[10px] text-gray-500 font-semibold">Mobilizações registadas nos dias úteis</p>
+                    <p class="text-[10px] text-gray-500 font-semibold">Uso real nas semanas ativas</p>
                 </div>
 
-                <!-- Recurso Mais Utilizado -->
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
                     <span class="text-[10px] font-bold uppercase text-green-600 tracking-wider">🏆 Recurso Mais Utilizado</span>
                     <h4 id="cardRecursoMaisNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
                     <p id="cardRecursoMaisQtd" class="text-[10px] text-green-700 font-bold">0 utilizações (0%)</p>
                 </div>
 
-                <!-- Recurso Menos Utilizado -->
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
                     <span class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">📉 Recurso Menos Utilizado</span>
                     <h4 id="cardRecursoMenosNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
@@ -239,17 +236,15 @@
 
             <!-- GRÁFICO RANKING DE RECURSOS + TABELA DE RECURSOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
-                <!-- Gráfico de Ranking de Recursos -->
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                    <h4 class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300 mb-2">📊 Ranking de Recursos Mais Utilizados</h4>
+                    <h4 class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300 mb-2">📊 Ranking de Utilização (Recursos Selecionados)</h4>
                     <div class="relative h-60 w-full">
                         <canvas id="graficoRecursosCanvas"></canvas>
                     </div>
                 </div>
 
-                <!-- Tabela com a lista de cada recurso e sua frequência -->
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2">
-                    <h4 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhe de Recursos</h4>
+                    <h4 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhe dos Recursos Filtrados</h4>
                     <div class="overflow-x-auto max-h-56 overflow-y-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
@@ -257,11 +252,10 @@
                                     <th class="py-2 px-3">Recurso / Equipamento</th>
                                     <th class="py-2 px-3 text-center">Total Usos</th>
                                     <th class="py-2 px-3 text-center">Média / Semana</th>
-                                    <th class="py-2 px-3 text-right">% do Volume</th>
+                                    <th class="py-2 px-3 text-right">% do Período</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaRecursosCorpo">
-                                <!-- Preenchido dinamicamente -->
                             </tbody>
                         </table>
                     </div>
@@ -269,9 +263,8 @@
             </div>
         </div>
 
-        <!-- GRÁFICOS INTERATIVOS OPERACIONAIS (LINHA E BARRAS) -->
+        <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <!-- Gráfico Curva Mensal -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho por Canal)</h3>
@@ -281,7 +274,6 @@
                 </div>
             </div>
 
-            <!-- Gráfico Comparativo por Semana -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Quantidade por Semana (Volume Selecionado)</h3>
@@ -292,11 +284,11 @@
             </div>
         </div>
 
-        <!-- TABELA DINÂMICA COM QUADRADINHO EM CADA SEMANA -->
+        <!-- TABELA DETALHADA COM CHECKBOX EM CADA LINHA -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento Semanal de Execução</h3>
-                <span class="text-[11px] text-gray-400">Desmarcar uma semana na tabela atualiza os indicadores em tempo real.</span>
+                <span class="text-[11px] text-gray-400">Desmarcar uma semana aqui recalcula as tarefas e os recursos instantaneamente.</span>
             </div>
             <div class="overflow-x-auto max-h-72 overflow-y-auto">
                 <table class="w-full text-left text-xs">
@@ -317,7 +309,6 @@
                         </tr>
                     </thead>
                     <tbody id="tabelaIndicadoresCorpo">
-                        <!-- Preenchido via JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -338,6 +329,7 @@
 
         let mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
         let semanasDesmarcadas = new Set();
+        let recursosDesmarcados = new Set(); // Guarda recursos que o usuário desmarcou no filtro
 
         function limparSimbolosTexto(texto) {
             if (!texto) return "";
@@ -376,21 +368,15 @@
         }
 
         function alternarMesIndividual(idx, marcar) {
-            if (marcar) {
-                mesesSelecionados.add(idx);
-            } else {
-                mesesSelecionados.delete(idx);
-            }
+            if (marcar) mesesSelecionados.add(idx);
+            else mesesSelecionados.delete(idx);
             renderizarCheckboxesMeses();
             carregarIndicadores();
         }
 
         function marcarTodosMeses(marcar) {
-            if (marcar) {
-                mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
-            } else {
-                mesesSelecionados.clear();
-            }
+            if (marcar) mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+            else mesesSelecionados.clear();
             renderizarCheckboxesMeses();
             carregarIndicadores();
         }
@@ -458,15 +444,13 @@
             popularSelectAnos(ano);
             document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
             semanasDesmarcadas.clear();
+            recursosDesmarcados.clear();
             carregarIndicadores();
         }
 
         function alternarSemanaIndividual(numSemana, marcar) {
-            if (marcar) {
-                semanasDesmarcadas.delete(numSemana);
-            } else {
-                semanasDesmarcadas.add(numSemana);
-            }
+            if (marcar) semanasDesmarcadas.delete(numSemana);
+            else semanasDesmarcadas.add(numSemana);
             carregarIndicadores();
         }
 
@@ -476,6 +460,24 @@
             } else {
                 if (cacheDadosProcessados && cacheDadosProcessados.todasSemanasDetectadas) {
                     cacheDadosProcessados.todasSemanasDetectadas.forEach(num => semanasDesmarcadas.add(num));
+                }
+            }
+            carregarIndicadores();
+        }
+
+        // Funções para o novo filtro de Recursos específicos
+        function alternarRecursoFiltro(nomeRecurso, marcar) {
+            if (marcar) recursosDesmarcados.delete(nomeRecurso);
+            else recursosDesmarcados.add(nomeRecurso);
+            carregarIndicadores();
+        }
+
+        function marcarTodosRecursosFiltro(marcar) {
+            if (marcar) {
+                recursosDesmarcados.clear();
+            } else {
+                if (cacheDadosProcessados && cacheDadosProcessados.todosRecursosNomes) {
+                    cacheDadosProcessados.todosRecursosNomes.forEach(n => recursosDesmarcados.add(n));
                 }
             }
             carregarIndicadores();
@@ -529,9 +531,9 @@
             let totalExtrasAno = 0;
             let totalExtrasConcluidasAno = 0;
 
-            // Estatísticas de Recursos
-            let mapaRecursos = {}; // { 'CARRO': 25, 'EMPILHADEIRA G4': 18, ... }
+            let mapaRecursos = {};
             let totalRecursosGeral = 0;
+            let todosRecursosNomes = new Set();
 
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
@@ -555,19 +557,18 @@
 
                 todasSemanasDetectadas.push(numSemana);
 
-                if (!mesesSelecionados.has(mesIdx)) {
-                    return;
-                }
+                // 1. Respeita o filtro de meses
+                if (!mesesSelecionados.has(mesIdx)) return;
 
+                // Cria o checkbox na caixinha de semanas
                 const isSemanaMarcada = !semanasDesmarcadas.has(numSemana);
                 const labelSem = document.createElement('label');
                 labelSem.className = `flex items-center gap-1 p-1 rounded border cursor-pointer ${isSemanaMarcada ? 'bg-blue-50 border-blue-200 text-blue-900 font-bold dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300' : 'bg-gray-100 border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700'}`;
                 labelSem.innerHTML = `<input type="checkbox" ${isSemanaMarcada ? 'checked' : ''} onchange="alternarSemanaIndividual(${numSemana}, this.checked)" class="w-3 h-3 accent-blue-600"> S${numSemana}`;
                 boxCheckSemanas.appendChild(labelSem);
 
-                if (!isSemanaMarcada) {
-                    return;
-                }
+                // 2. Se a semana foi desmarcada manualmente, ela sai de TUDO (tarefas e recursos)
+                if (!isSemanaMarcada) return;
 
                 let htmlCard = semanasSalvas[key];
                 const parser = new DOMParser();
@@ -582,9 +583,13 @@
                     if (ext.classList.contains('task-done')) extrasConcluidas++;
                 });
 
-                // CONTABILIZAÇÃO DE RECURSOS NESTA SEMANA
+                // REGRA DO FUTURO:
+                // Se a semana ainda não aconteceu cronologicamente, ela não pode computar atraso de tarefas nem inflar recursos como realizados
+                let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
+
+                // CONTABILIZAÇÃO DE RECURSOS NESTA SEMANA (Só conta se NÃO for futuro, idêntico às tarefas)
                 let tagsRecursos = doc.querySelectorAll('.resource-tag');
-                let recursosNestaSemanaQtd = tagsRecursos.length;
+                let recursosNestaSemanaQtd = 0;
 
                 tagsRecursos.forEach(tag => {
                     let descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
@@ -592,15 +597,19 @@
                     let nomeRecurso = limparSimbolosTexto(nomeBruto).toUpperCase();
                     
                     if (nomeRecurso && nomeRecurso.length > 1) {
-                        mapaRecursos[nomeRecurso] = (mapaRecursos[nomeRecurso] || 0) + 1;
-                        totalRecursosGeral++;
+                        todosRecursosNomes.add(nomeRecurso);
+                        
+                        // Só soma no cálculo se o recurso NÃO foi desmarcado no filtro e a semana não for futura
+                        if (!recursosDesmarcados.has(nomeRecurso) && !ehFuturoReal) {
+                            mapaRecursos[nomeRecurso] = (mapaRecursos[nomeRecurso] || 0) + 1;
+                            totalRecursosGeral++;
+                            recursosNestaSemanaQtd++;
+                        }
                     }
                 });
 
                 let planeadas = tarefasNormais.length + tarefasExtras.length;
                 let executadas = concluidas.length;
-                
-                let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
                 let naoRealizadas = ehFuturoReal ? 0 : Math.max(0, planeadas - executadas);
                 let extrasCount = tarefasExtras.length;
 
@@ -646,7 +655,10 @@
             document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume (${totalExtrasConcluidasAno} feitas)`;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeralConcluida}%`;
 
-            // Processamento dos Indicadores de Recursos
+            // Renderiza os botões/checkboxes de Recursos disponíveis para o usuário filtrar
+            renderizarFiltroDeRecursos(todosRecursosNomes);
+
+            // Processa o ranking e estatísticas de recursos
             processarIndicadoresDeRecursos(mapaRecursos, totalRecursosGeral, semanasLista.length);
 
             cacheDadosProcessados = {
@@ -654,6 +666,7 @@
                 semanasLista,
                 mesesDados,
                 todasSemanasDetectadas,
+                todosRecursosNomes,
                 mapaRecursos,
                 totalRecursosGeral
             };
@@ -661,7 +674,35 @@
             atualizarVisualizacao();
         }
 
-        // Função responsável por calcular campeão, menor uso e gráfico de recursos
+        // Renderiza os quadradinhos de recursos para poder filtrar
+        function renderizarFiltroDeRecursos(setNomes) {
+            const cont = document.getElementById('containerFiltroRecursos');
+            cont.innerHTML = '';
+            
+            let nomesArray = Array.from(setNomes).sort();
+            if (nomesArray.length === 0) {
+                cont.innerHTML = '<span class="text-xs text-gray-400 italic">Nenhum recurso registado neste período.</span>';
+                document.getElementById('labelContadorRecursosFiltro').innerText = "0 Recursos";
+                return;
+            }
+
+            let ativosCount = 0;
+            nomesArray.forEach(nome => {
+                const isChecked = !recursosDesmarcados.has(nome);
+                if (isChecked) ativosCount++;
+
+                const label = document.createElement('label');
+                label.className = `flex items-center gap-1.5 px-2.5 py-1 rounded-xl border cursor-pointer transition ${isChecked ? 'bg-emerald-50 border-emerald-300 text-emerald-900 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300' : 'bg-gray-100 border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700'}`;
+                label.innerHTML = `
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="alternarRecursoFiltro('${nome.replace(/'/g, "\\'")}', this.checked)" class="w-3.5 h-3.5 accent-emerald-600 cursor-pointer">
+                    <span class="text-xs font-bold">${nome}</span>
+                `;
+                cont.appendChild(label);
+            });
+
+            document.getElementById('labelContadorRecursosFiltro').innerText = `${ativosCount} de ${nomesArray.length} Ativo(s)`;
+        }
+
         function processarIndicadoresDeRecursos(mapa, total, totalSemanasAtivas) {
             document.getElementById('cardRecursoTotal').innerText = total;
             document.getElementById('tagTotalAlocacoes').innerText = `${total} Alocações de Recursos`;
@@ -672,17 +713,15 @@
             })).sort((a, b) => b.qtd - a.qtd);
 
             if (recursosOrdenados.length > 0) {
-                // Mais Utilizado
                 let mais = recursosOrdenados[0];
                 let percMais = total > 0 ? Math.round((mais.qtd / total) * 100) : 0;
                 document.getElementById('cardRecursoMaisNome').innerText = mais.nome;
-                document.getElementById('cardRecursoMaisQtd').innerText = `${mais.qtd} vezes (${percMais}% da frota)`;
+                document.getElementById('cardRecursoMaisQtd').innerText = `${mais.qtd} vezes (${percMais}% do uso)`;
 
-                // Menos Utilizado
                 let menos = recursosOrdenados[recursosOrdenados.length - 1];
                 let percMenos = total > 0 ? Math.round((menos.qtd / total) * 100) : 0;
                 document.getElementById('cardRecursoMenosNome').innerText = menos.nome;
-                document.getElementById('cardRecursoMenosQtd').innerText = `${menos.qtd} vezes (${percMenos}% da frota)`;
+                document.getElementById('cardRecursoMenosQtd').innerText = `${menos.qtd} vezes (${percMenos}% do uso)`;
             } else {
                 document.getElementById('cardRecursoMaisNome').innerText = "Nenhum";
                 document.getElementById('cardRecursoMaisQtd').innerText = "0 utilizações";
@@ -690,12 +729,11 @@
                 document.getElementById('cardRecursoMenosQtd').innerText = "0 utilizações";
             }
 
-            // Tabela Detalhada de Recursos
             const tbodyRecursos = document.getElementById('tabelaRecursosCorpo');
             tbodyRecursos.innerHTML = '';
 
             if (recursosOrdenados.length === 0) {
-                tbodyRecursos.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 italic">Nenhum recurso alocado nas semanas selecionadas.</td></tr>`;
+                tbodyRecursos.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 italic">Nenhum recurso alocado nas semanas e filtros selecionados.</td></tr>`;
             } else {
                 recursosOrdenados.forEach((r, idx) => {
                     let perc = total > 0 ? Math.round((r.qtd / total) * 100) : 0;
@@ -718,7 +756,6 @@
                 });
             }
 
-            // Gráfico Horizontal de Recursos
             renderizarGraficoRecursos(recursosOrdenados);
         }
 
@@ -741,21 +778,14 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Barra horizontal para melhor leitura de nomes de recursos
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: { precision: 0, font: { size: 10 } }
-                        },
-                        y: {
-                            ticks: { font: { size: 10, weight: 'bold' } }
-                        }
+                        x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } },
+                        y: { ticks: { font: { size: 10, weight: 'bold' } } }
                     },
-                    plugins: {
-                        legend: { display: false }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
         }
