@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.60 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.61 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -202,6 +202,36 @@
             font-size: 11px;
         }
         .btn-delete-item:hover { background-color: rgba(198, 40, 40, 0.1); }
+        .actions-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .btn-action {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        .btn-action:hover { background-color: #115293; }
+        .btn-save-nuvem {
+            background-color: #2e7d32;
+        }
+        .btn-save-nuvem:hover {
+            background-color: #1b5e20;
+        }
         .dragging { opacity: 0.4; }
     </style>
 </head>
@@ -284,7 +314,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.60) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.61) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -326,7 +356,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.60 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.61 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -349,10 +379,19 @@
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // Função corrigida: transforma em maiúsculas preservando perfeitamente todos os acentos portugueses
         function aplicarCorrecao(texto) {
             if (!texto) return "";
-            return texto.trim().toLocaleUpperCase('pt-PT');
+            const mapaAcentos = {
+                'á': 'Á', 'à': 'À', 'â': 'Â', 'ã': 'Ã', 'ä': 'Ä',
+                'é': 'É', 'è': 'È', 'ê': 'Ê', 'ë': 'Ë',
+                'í': 'Í', 'ì': 'Ì', 'î': 'Î', 'ï': 'Ï',
+                'ó': 'Ó', 'ò': 'Ò', 'ô': 'Ô', 'õ': 'Õ', 'ö': 'Ö',
+                'ú': 'Ú', 'ù': 'Ù', 'û': 'Û', 'ü': 'Ü',
+                'ç': 'Ç', 'ñ': 'Ñ'
+            };
+            let limpo = texto.trim();
+            let convertido = limpo.split('').map(char => mapaAcentos[char] || char).join('');
+            return convertido.toLocaleUpperCase('pt-PT');
         }
 
         function getWeekKey() {
@@ -981,192 +1020,6 @@
 
             forcarRecursosFixos();
             reativarEventosDragDrop();
-        }
-
-        function forcarRecursosFixos() {
-            document.querySelectorAll('.day-card').forEach(card => {
-                const recursosCont = card.querySelector('.day-resources');
-                if (!recursosCont) return;
-                
-                if (card.querySelector('.tasks-container').innerText.includes('bloqueado')) return;
-                
-                const textosExistentes = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
-                
-                if (!textosExistentes.includes('CARRO')) {
-                    adicionarTagRecurso(recursosCont, 'CARRO');
-                }
-                if (!textosExistentes.includes('EMPILHADEIRA G4')) {
-                    adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
-                }
-            });
-        }
-
-        function adicionarTagRecurso(container, nome) {
-            const handleHtml = `<span class="drag-handle">⠿</span>`;
-            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-            const div = document.createElement('div');
-            div.className = 'resource-tag';
-            div.setAttribute('draggable', 'true');
-            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            div.innerHTML = `<span>${handleHtml} <span class="item-text">${nome}</span></span>${controlsHtml}`;
-            container.appendChild(div);
-        }
-
-        function alternarDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
-        }
-
-        function preencherPredefinido() {
-            let val = document.getElementById('selectFrequentes').value;
-            if (val) {
-                document.getElementById('inputDesc').value = val;
-                if (/recurso|empilhadeira|caminhão|carro/i.test(val)) {
-                    document.getElementById('inputTipo').value = 'resource';
-                } else { document.getElementById('inputTipo').value = 'task'; }
-            }
-        }
-
-        async function adicionarItemPorData() {
-            const dataStr = document.getElementById('inputDataEvento').value;
-            const tipo = document.getElementById('inputTipo').value;
-            let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
-            const semanaInteira = document.getElementById('checkSemanaInteira').checked;
-
-            if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
-
-            const nomesDiasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-
-            if (semanaInteira) {
-                document.querySelectorAll('.day-card').forEach(card => {
-                    if (!card.querySelector('.tasks-container').innerText.includes('bloqueado')) {
-                        inserirItemNoCard(card, tipo, desc);
-                    }
-                });
-            } else {
-                const dataObj = new Date(dataStr + 'T00:00:00');
-                const diaSemanaNum = dataObj.getDay();
-                if (diaSemanaNum === 0 || diaSemanaNum === 6) { alert("Selecione um dia útil (Segunda a Sexta)."); return; }
-
-                const card = document.querySelector(`.day-card[data-dia-nome="${nomesDiasMap[diaSemanaNum]}"]`);
-                if (!card) { alert("Dia não visível."); return; }
-                if (card.querySelector('.tasks-container').innerText.includes('bloqueado')) {
-                    alert("Este dia está marcado como Feriado ou Emenda e não pode receber tarefas.");
-                    return;
-                }
-
-                inserirItemNoCard(card, tipo, desc);
-            }
-
-            document.getElementById('inputDesc').value = '';
-            document.getElementById('selectFrequentes').value = '';
-            document.getElementById('checkSemanaInteira').checked = false;
-            await salvarNaNuvem();
-        }
-
-        function inserirItemNoCard(card, tipo, desc) {
-            const handleHtml = `<span class="drag-handle">⠿</span>`;
-            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-
-            const div = document.createElement('div');
-            div.className = tipo === 'task' ? 'task-box' : 'resource-tag';
-            div.setAttribute('draggable', 'true');
-            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
-
-            if (tipo === 'task') { card.querySelector('.tasks-container').appendChild(div); }
-            else { card.querySelector('.day-resources').appendChild(div); }
-        }
-
-        async function editarItem(botao) {
-            const itemBox = botao.closest('.task-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
-            if (!itemBox) return;
-            const itemSpan = itemBox.querySelector('.item-text') || itemBox.querySelector('strong');
-            let novoTexto = prompt("Editar descrição:", itemSpan ? itemSpan.innerText : "");
-            if (novoTexto !== null && novoTexto.trim() !== "") {
-                if (itemSpan) itemSpan.innerText = aplicarCorrecao(novoTexto);
-                await salvarNaNuvem();
-            }
-        }
-
-        async function removerElemento(botao) {
-            const itemBox = botao.closest('.task-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
-            if (itemBox) {
-                itemBox.remove();
-                await salvarNaNuvem();
-            }
-        }
-
-        async function guardarEstadoDOM() {
-            await salvarNaNuvem();
-        }
-
-        async function limparTudo() {
-            if (confirm("Deseja apagar totalmente e redefinir a programação desta semana na nuvem?")) {
-                if (dadosGlobaisNuvem.semanas) {
-                    delete dadosGlobaisNuvem.semanas[getWeekKey()];
-                    await salvarNaNuvem();
-                }
-                atualizarDatasSemana();
-                alert("🗑️ Semana redefinida com sucesso!");
-            }
-        }
-
-        function ouvirVoz() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { alert("Reconhecimento de voz não suportado."); return; }
-            const recognition = new SpeechRecognition(); recognition.lang = 'pt-PT';
-            const btnVoz = document.getElementById('btn-voz');
-
-            recognition.onstart = () => { btnVoz.classList.add('animate-pulse', 'bg-amber-500'); };
-            recognition.onresult = (event) => {
-                let textoVoz = aplicarCorrecao(event.results[0][0].transcript);
-                document.getElementById('inputDesc').value = textoVoz;
-                adicionarItemPorData();
-            };
-            recognition.onerror = recognition.onend = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
-            recognition.start();
-        }
-
-        function imprimirProgramacao() {
-            const janelaImpressao = window.open('', '_blank', 'width=900,height=700');
-            janelaImpressao.document.write(`
-                <!DOCTYPE html>
-                <html lang="pt-PT">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Impressão - Programação Semanal</title>
-                    <style>
-                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background: #fff; color: #333; }
-                        .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; align-items: stretch; }
-                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; height: 480px !important; }
-                        .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 6px; flex-shrink: 0; }
-                        .tasks-container { flex-grow: 1; margin-bottom: 8px; overflow: hidden; }
-                        .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
-                        .treinamento-box { font-weight: 600; color: #1b5e20 !important; background-color: #e8f5e9 !important; padding: 5px 6px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; border-left: 2px solid #2e7d32 !important; }
-                        .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: auto; height: 125px; flex-shrink: 0; }
-                        .resources-title { font-size: 8px; font-weight: 800; color: #2e7d32; text-transform: uppercase; margin-bottom: 3px; }
-                        .resource-tag { background: #e8f5e9; color: #1b5e20; padding: 3px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-                        .flex.items-center.justify-between.gap-1.mb-2, .drag-handle, .item-controls { display: none !important; }
-                        .header { text-align: center; margin-bottom: 15px; position: relative; }
-                        h2 { color: #1b5e20; font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
-                        .week-badge { position: absolute; top: 0; right: 5px; background-color: #1b5e20; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h2>Programação Semanal</h2>
-                        <div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div>
-                    </div>
-                    <div class="week-grid">
-                        ${document.getElementById('conteudo-site').querySelector('.week-grid').innerHTML}
-                    </div>
-                    <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }<\/script>
-                </body>
-                </html>
-            `);
-            janelaImpressao.document.close();
         }
     </script>
 </body>
