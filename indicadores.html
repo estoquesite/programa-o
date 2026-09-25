@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Integrado de Indicadores (v3.4 Multicanal)</title>
+    <title>Painel Integrado de Indicadores (v3.6 Multi-Ano & Períodos)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,6 +34,11 @@
             max-width: 1150px;
             margin: 0 auto;
         }
+        .btn-periodo.active, .btn-ano.active {
+            background-color: #15803d !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
         @media print {
             .print-hidden {
                 display: none !important;
@@ -61,22 +66,51 @@
             </div>
         </div>
 
-        <!-- FILTROS & SELEÇÃO DE CANAIS / CAMADAS -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+        <!-- BARRA INTELIGENTE DE SELEÇÃO: ANOS E PERÍODOS -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+            
+            <!-- LINHA 1: SELETOR DE ANO ELEGANTE -->
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <div>
-                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Ano & Painel de Controle de Visualização</h3>
-                    <p class="text-[11px] text-gray-500">Marque ou desmarque os canais para isolar ou cruzar indicadores nos gráficos e na tabela.</p>
-                </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
-                    <input type="number" id="inputAnoIndicador" value="2026" onchange="carregarIndicadores()" class="w-20 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
+                    <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
+                    <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
+                        <button type="button" onclick="mudarAno(2025)" id="btnAno2025" class="btn-ano px-3 py-1 rounded-lg text-xs font-bold text-gray-600 dark:text-gray-300 transition hover:bg-gray-200 dark:hover:bg-gray-800">2025</button>
+                        <button type="button" onclick="mudarAno(2026)" id="btnAno2026" class="btn-ano active px-3 py-1 rounded-lg text-xs font-bold text-gray-600 dark:text-gray-300 transition hover:bg-gray-200 dark:hover:bg-gray-800">2026</button>
+                        <button type="button" onclick="mudarAno(2027)" id="btnAno2027" class="btn-ano px-3 py-1 rounded-lg text-xs font-bold text-gray-600 dark:text-gray-300 transition hover:bg-gray-200 dark:hover:bg-gray-800">2027</button>
+                        <input type="number" id="inputAnoIndicador" value="2026" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md font-bold text-center dark:text-white" title="Outro ano">
+                    </div>
+                </div>
+
+                <!-- LINHA 1.2: ATALHOS DE PERÍODOS (SEM POLUIÇÃO DE 12 CAIXINHAS) -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold">
+                    <button type="button" onclick="definirPeriodo('ano_todo')" id="btnPerAnoTodo" class="btn-periodo active px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">Ano Todo</button>
+                    <button type="button" onclick="definirPeriodo('1_semestre')" id="btnPer1Sem" class="btn-periodo px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">1º Sem (Jan-Jun)</button>
+                    <button type="button" onclick="definirPeriodo('2_semestre')" id="btnPer2Sem" class="btn-periodo px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">2º Sem (Jul-Dez)</button>
+                    
+                    <!-- Dropdown para mês avulso sem encher a tela -->
+                    <select id="selectMesAvulso" onchange="definirPeriodoMes(this.value)" class="p-1 text-xs bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg font-bold text-gray-700 dark:text-gray-300">
+                        <option value="">Por Mês...</option>
+                        <option value="1">Janeiro</option>
+                        <option value="2">Fevereiro</option>
+                        <option value="3">Março</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Maio</option>
+                        <option value="6">Junho</option>
+                        <option value="7">Julho</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Setembro</option>
+                        <option value="10">Outubro</option>
+                        <option value="11">Novembro</option>
+                        <option value="12">Dezembro</option>
+                    </select>
+
+                    <button type="button" onclick="definirPeriodo('ate_hoje')" id="btnPerHoje" class="btn-periodo px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 hover:bg-blue-200 transition">⚡ Até Hoje</button>
                 </div>
             </div>
 
-            <!-- CANAIS COM CHECKBOXES INTERATIVOS -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-bold">
+            <!-- LINHA 2: CANAIS COM CHECKBOXES INTERATIVOS -->
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
                         <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
                         <span>Total Planeado</span>
@@ -99,8 +133,8 @@
                 </div>
 
                 <div class="flex items-center gap-1.5">
-                    <button onclick="alternarTodosCanais(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-[11px] font-bold">Exibir Todos</button>
-                    <button onclick="alternarTodosCanais(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-[11px] font-bold">Limpar Todos</button>
+                    <button onclick="alternarTodosCanais(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded-lg text-[10px] font-bold">Todos</button>
+                    <button onclick="alternarTodosCanais(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded-lg text-[10px] font-bold">Nenhum</button>
                 </div>
             </div>
         </div>
@@ -110,7 +144,7 @@
             <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
                 <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Itens</span>
                 <h3 id="cardTotalPlaneadas" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
-                <p class="text-[10px] text-gray-500 font-semibold">Rotina + Extras</p>
+                <p class="text-[10px] text-gray-500 font-semibold" id="cardSubInfoEscopo">Período Selecionado</p>
             </div>
             <div id="cardBoxConcluidas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
                 <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Concluídas</span>
@@ -130,7 +164,7 @@
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1">
                 <span class="text-[10px] font-bold uppercase text-purple-500 tracking-wider">Aproveitamento</span>
                 <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
-                <p class="text-[10px] text-gray-500 font-semibold">Eficiência no ano</p>
+                <p class="text-[10px] text-gray-500 font-semibold" id="cardSubLabelAno">Ano 2026</p>
             </div>
         </div>
 
@@ -139,7 +173,7 @@
             <!-- Gráfico Curva Mensal -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Taxas Reais por Canal)</h3>
+                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho por Canal)</h3>
                 </div>
                 <div class="relative h-64 w-full">
                     <canvas id="graficoAnualCanvas"></canvas>
@@ -190,6 +224,56 @@
         let graficoSemanalInstance = null;
         let cacheDadosProcessados = null;
 
+        let periodoAtual = 'ano_todo'; // 'ano_todo', '1_semestre', '2_semestre', 'mes_X', 'ate_hoje'
+        let mesSelecionado = null;
+
+        function calcularNumeroSemanaAtual() {
+            const hoje = new Date();
+            let dataCalculo = new Date(hoje);
+            const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function mudarAno(ano) {
+            ano = parseInt(ano);
+            document.getElementById('inputAnoIndicador').value = ano;
+            
+            document.querySelectorAll('.btn-ano').forEach(btn => btn.classList.remove('active'));
+            let btnFixo = document.getElementById(`btnAno${ano}`);
+            if (btnFixo) btnFixo.classList.add('active');
+
+            document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
+            carregarIndicadores();
+        }
+
+        function definirPeriodo(tipo) {
+            periodoAtual = tipo;
+            mesSelecionado = null;
+            document.getElementById('selectMesAvulso').value = "";
+
+            document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
+            if (tipo === 'ano_todo') document.getElementById('btnPerAnoTodo').classList.add('active');
+            if (tipo === '1_semestre') document.getElementById('btnPer1Sem').classList.add('active');
+            if (tipo === '2_semestre') document.getElementById('btnPer2Sem').classList.add('active');
+            if (tipo === 'ate_hoje') document.getElementById('btnPerHoje').classList.add('active');
+
+            carregarIndicadores();
+        }
+
+        function definirPeriodoMes(mesNum) {
+            if (!mesNum) {
+                definirPeriodo('ano_todo');
+                return;
+            }
+            periodoAtual = 'mes';
+            mesSelecionado = parseInt(mesNum) - 1; // 0-indexado
+            document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
+            carregarIndicadores();
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             await carregarIndicadoresDaNuvem();
         });
@@ -225,9 +309,11 @@
         }
 
         function carregarIndicadores() {
-            const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value);
+            const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             const semanasSalvas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
-            
+            const anoRealHoje = new Date().getFullYear();
+            const semanaAtualReal = calcularNumeroSemanaAtual();
+
             let totalPlaneadasAno = 0;
             let totalConcluidasAno = 0;
             let totalNaoRealizadasAno = 0;
@@ -235,8 +321,16 @@
             let totalExtrasConcluidasAno = 0;
 
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
-            
             let semanasLista = [];
+
+            // Identifica limites do período escolhido
+            let rotuloEscopo = "Ano Completo";
+            if (periodoAtual === '1_semestre') rotuloEscopo = "1º Semestre";
+            if (periodoAtual === '2_semestre') rotuloEscopo = "2º Semestre";
+            if (periodoAtual === 'ate_hoje') rotuloEscopo = `Até Semana ${semanaAtualReal}`;
+            if (periodoAtual === 'mes' && mesSelecionado !== null) rotuloEscopo = `Mês: ${nomesMesesCurtos[mesSelecionado]}`;
+
+            document.getElementById('cardSubInfoEscopo').innerText = rotuloEscopo;
 
             let chavesOrdenadas = Object.keys(semanasSalvas)
                 .filter(key => key.includes(`_semana_`) && key.includes(`_${anoSelecionado}_`))
@@ -249,8 +343,15 @@
             chavesOrdenadas.forEach(key => {
                 let partes = key.split('_');
                 let numSemana = parseInt(partes[partes.length - 1]);
-                let htmlCard = semanasSalvas[key];
+                let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
 
+                // FILTRAGEM INTELIGENTE CONFORME O PERÍODO ESCOLHIDO
+                if (periodoAtual === '1_semestre' && mesIdx > 5) return;
+                if (periodoAtual === '2_semestre' && mesIdx < 6) return;
+                if (periodoAtual === 'mes' && mesIdx !== mesSelecionado) return;
+                if (periodoAtual === 'ate_hoje' && anoSelecionado === anoRealHoje && numSemana > semanaAtualReal) return;
+
+                let htmlCard = semanasSalvas[key];
                 const parser = new DOMParser();
                 let doc = parser.parseFromString(htmlCard, 'text/html');
 
@@ -265,7 +366,10 @@
 
                 let planeadas = tarefasNormais.length + tarefasExtras.length;
                 let executadas = concluidas.length;
-                let naoRealizadas = Math.max(0, planeadas - executadas);
+                
+                // Se a semana for futura em relação ao ano real, ela não conta como atraso/não realizada
+                let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
+                let naoRealizadas = ehFuturoReal ? 0 : Math.max(0, planeadas - executadas);
                 let extrasCount = tarefasExtras.length;
 
                 totalPlaneadasAno += planeadas;
@@ -274,7 +378,6 @@
                 totalExtrasAno += extrasCount;
                 totalExtrasConcluidasAno += extrasConcluidas;
 
-                let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                 mesesDados[mesIdx].planeadas += planeadas;
                 mesesDados[mesIdx].concluidas += executadas;
                 mesesDados[mesIdx].naoRealizadas += naoRealizadas;
@@ -286,7 +389,8 @@
                     executadas,
                     naoRealizadas,
                     extrasCount,
-                    extrasConcluidas
+                    extrasConcluidas,
+                    ehFuturoReal
                 });
             });
 
@@ -296,13 +400,14 @@
             document.getElementById('cardTotalNaoRealizadas').innerText = totalNaoRealizadasAno;
             document.getElementById('cardTotalExtras').innerText = totalExtrasAno;
 
-            let taxaGeralConcluida = totalPlaneadasAno > 0 ? Math.round((totalConcluidasAno / totalPlaneadasAno) * 100) : 0;
-            let taxaGeralNaoRealizada = totalPlaneadasAno > 0 ? Math.round((totalNaoRealizadasAno / totalPlaneadasAno) * 100) : 0;
+            let baseCalculoAproveitamento = (totalConcluidasAno + totalNaoRealizadasAno);
+            let taxaGeralConcluida = baseCalculoAproveitamento > 0 ? Math.round((totalConcluidasAno / baseCalculoAproveitamento) * 100) : (totalPlaneadasAno > 0 && totalConcluidasAno > 0 ? 100 : 0);
+            let taxaGeralNaoRealizada = baseCalculoAproveitamento > 0 ? Math.round((totalNaoRealizadasAno / baseCalculoAproveitamento) * 100) : 0;
             let taxaGeralExtras = totalPlaneadasAno > 0 ? Math.round((totalExtrasAno / totalPlaneadasAno) * 100) : 0;
 
-            document.getElementById('cardSubTaxaConcluidas').innerText = `${taxaGeralConcluida}% do total`;
+            document.getElementById('cardSubTaxaConcluidas').innerText = `${taxaGeralConcluida}% de taxa`;
             document.getElementById('cardSubTaxaNaoRealizadas').innerText = `${taxaGeralNaoRealizada}% pendente`;
-            document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume geral (${totalExtrasConcluidasAno} feitas)`;
+            document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume (${totalExtrasConcluidasAno} feitas)`;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeralConcluida}%`;
 
             cacheDadosProcessados = {
@@ -314,7 +419,6 @@
             atualizarVisualizacao();
         }
 
-        // Função responsável por sincronizar checkboxes com cards, tabelas e gráficos
         function atualizarVisualizacao() {
             if (!cacheDadosProcessados) return;
 
@@ -323,24 +427,21 @@
             const mostrarNaoRealizadas = document.getElementById('checkCanalNaoRealizadas').checked;
             const mostrarExtras = document.getElementById('checkCanalExtras').checked;
 
-            // Opacidade visual nos Cards Superiores conforme seleção
             document.getElementById('cardBoxTotal').style.opacity = mostrarTotal ? "1" : "0.35";
             document.getElementById('cardBoxConcluidas').style.opacity = mostrarConcluidas ? "1" : "0.35";
             document.getElementById('cardBoxNaoRealizadas').style.opacity = mostrarNaoRealizadas ? "1" : "0.35";
             document.getElementById('cardBoxExtras').style.opacity = mostrarExtras ? "1" : "0.35";
 
-            // Controla visibilidade das colunas da tabela
             document.querySelectorAll('.col-total').forEach(el => el.style.display = mostrarTotal ? '' : 'none');
             document.querySelectorAll('.col-concluidas').forEach(el => el.style.display = mostrarConcluidas ? '' : 'none');
             document.querySelectorAll('.col-naorealizadas').forEach(el => el.style.display = mostrarNaoRealizadas ? '' : 'none');
             document.querySelectorAll('.col-extras').forEach(el => el.style.display = mostrarExtras ? '' : 'none');
 
-            // Renderiza o corpo da tabela
             const tbody = document.getElementById('tabelaIndicadoresCorpo');
             tbody.innerHTML = '';
 
             if (cacheDadosProcessados.semanasLista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400 italic">Nenhum dado encontrado para o ano ${cacheDadosProcessados.anoSelecionado}.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400 italic">Nenhum dado registado para este filtro em ${cacheDadosProcessados.anoSelecionado}.</td></tr>`;
             } else {
                 cacheDadosProcessados.semanasLista.forEach(s => {
                     let percentualExec = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
@@ -349,7 +450,9 @@
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">Semana ${s.numSemana}</td>
+                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">
+                            Semana ${s.numSemana} ${s.ehFuturoReal ? '<span class="text-[9px] text-blue-500 font-normal">(Programada)</span>' : ''}
+                        </td>
                         <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
                         <td class="py-2.5 px-3 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
                         <td class="py-2.5 px-3 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
@@ -368,7 +471,6 @@
                 });
             }
 
-            // Atualiza os Gráficos
             renderizarGraficosComFiltros(mostrarTotal, mostrarConcluidas, mostrarNaoRealizadas, mostrarExtras);
         }
 
@@ -376,7 +478,6 @@
             const meses = cacheDadosProcessados.mesesDados;
             const semanas = cacheDadosProcessados.semanasLista;
 
-            // 1. DATASETS PARA O GRÁFICO ANUAL (LINHAS)
             let datasetsAnual = [];
 
             if (mostrarConcluidas) {
@@ -464,7 +565,6 @@
                 }
             });
 
-            // 2. DATASETS PARA O GRÁFICO SEMANAL (BARRAS)
             let datasetsSemanal = [];
             let labelsSemanais = semanas.map(s => `S${s.numSemana}`);
 
