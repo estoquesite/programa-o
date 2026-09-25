@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.70 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.72 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -129,6 +129,22 @@
             flex-shrink: 0;
         }
         .task-box:active { cursor: grabbing; }
+        .tarefa-extra-box {
+            font-weight: 600;
+            color: #9a3412;
+            background-color: #ffedd5;
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            border-left: 2px solid #c2410c;
+            cursor: grab;
+            flex-shrink: 0;
+        }
+        .tarefa-extra-box:active { cursor: grabbing; }
         .treinamento-box {
             font-weight: 600;
             color: #1b5e20;
@@ -143,6 +159,13 @@
             border-left: 2px solid #2e7d32;
             flex-shrink: 0;
             cursor: grab;
+        }
+        .task-done {
+            opacity: 0.6;
+            text-decoration: line-through;
+            background-color: #e2e8f0 !important;
+            border-left-color: #94a3b8 !important;
+            color: #64748b !important;
         }
         .day-resources {
             position: absolute;
@@ -245,7 +268,7 @@
         <!-- CALENDÁRIO SEMANAL -->
         <div class="week-grid" id="weekGridContainer"></div>
 
-        <!-- BARRA DE AÇÕES DA SEMANA (LOGO ABAIXO DO CALENDÁRIO) -->
+        <!-- BARRA DE AÇÕES DA SEMANA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
             <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar Semana</button>
@@ -253,7 +276,7 @@
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
         </div>
 
-        <!-- ADICIONAR NOVO ITEM COM A OPÇÃO "SEMANA INTEIRA" -->
+        <!-- ADICIONAR NOVO ITEM COM A OPÇÃO "SEMANA INTEIRA" E TAREFA EXTRA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Adicionar Nova Tarefa ou Recurso por Data</h3>
             <div>
@@ -276,6 +299,7 @@
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo de Entrada</label>
                     <select id="inputTipo" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
                         <option value="task">Tarefa (Caixa Verde)</option>
+                        <option value="extra">⚡ Tarefa Extra / Fora de Rotina (Caixa Laranja)</option>
                         <option value="resource">Recurso / Equipamento</option>
                     </select>
                 </div>
@@ -296,7 +320,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.70) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.72) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -382,7 +406,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.70 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.72 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -630,7 +654,10 @@
                         divTreino.setAttribute('draggable', 'true');
                         divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
                         divTreino.innerHTML = `
-                            <span class="${identificadorUnico}"><span class="drag-handle">⠿</span> 🎓 <strong>${t.nome}</strong><br><small>📍 ${t.local} \vert{} 👤 ${t.pessoa}</small></span>
+                            <span class="${identificadorUnico}">
+                                <input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
+                                <span class="drag-handle">⠿</span> 🎓 <strong>${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
+                            </span>
                             <span class="item-controls">
                                 <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
                                 <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
@@ -734,14 +761,26 @@
             const resCont = card.querySelector('.day-resources');
 
             tasksCont.innerHTML = `
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
             `;
             resCont.innerHTML = `
                 <div class="resources-title">Recursos</div>
                 <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
             `;
+            guardarEstadoDOM();
+        }
+
+        // Função que lida com o estado visual do checkbox de concluído
+        function alternarConclusaoTarefa(checkbox) {
+            const taskBox = checkbox.closest('.task-box') || checkbox.closest('.tarefa-extra-box') || checkbox.closest('.treinamento-box');
+            if (!taskBox) return;
+            if (checkbox.checked) {
+                taskBox.classList.add('task-done');
+            } else {
+                taskBox.classList.remove('task-done');
+            }
             guardarEstadoDOM();
         }
 
@@ -901,7 +940,7 @@
                     divAPC.setAttribute('draggable', 'true');
                     divAPC.setAttribute('ondragstart', 'iniciarArrasto(event)');
                     divAPC.innerHTML = `
-                        <span><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
+                        <span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
                         <span class="item-controls">
                             <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
                             <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
@@ -918,7 +957,7 @@
                     div5S.setAttribute('draggable', 'true');
                     div5S.setAttribute('ondragstart', 'iniciarArrasto(event)');
                     div5S.innerHTML = `
-                        <span><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
+                        <span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
                         <span class="item-controls">
                             <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
                             <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
@@ -958,7 +997,7 @@
         async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
 
         function reativarEventosDragDrop() {
-            document.querySelectorAll('.task-box, .resource-tag, .treinamento-box').forEach(item => {
+            document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
                 item.setAttribute('draggable', 'true');
                 item.setAttribute('ondragstart', 'iniciarArrasto(event)');
             });
@@ -1019,8 +1058,8 @@
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
                         <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
                         </div>
                     </div>
                     <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
@@ -1033,8 +1072,8 @@
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
                         <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
                         </div>
                     </div>
                     <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
@@ -1047,8 +1086,8 @@
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
                         <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
                         </div>
                     </div>
                     <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
@@ -1061,8 +1100,8 @@
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
                         <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
                         </div>
                     </div>
                     <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
@@ -1075,8 +1114,8 @@
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
                         <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span></div>
                         </div>
                     </div>
                     <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
@@ -1135,19 +1174,34 @@
                 const handle = `<span class="drag-handle">⠿</span>`;
                 const controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span>`;
                 const div = document.createElement('div');
-                div.className = tipo === 'task' ? 'task-box' : 'resource-tag';
-                div.setAttribute('draggable', 'true');
-                div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                div.innerHTML = `<span>${handle} <span class="item-text">${desc}</span></span>${controls}`;
-                if (tipo === 'task') card.querySelector('.tasks-container').appendChild(div);
-                else card.querySelector('.day-resources').appendChild(div);
+                
+                if (tipo === 'extra') {
+                    div.className = 'tarefa-extra-box';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-orange-600 cursor-pointer" onchange="alternarConclusaoTarefa(this)">⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.tasks-container').appendChild(div);
+                } else if (tipo === 'task') {
+                    div.className = 'task-box';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.tasks-container').appendChild(div);
+                } else {
+                    div.className = 'resource-tag';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span>${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.day-resources').appendChild(div);
+                }
+
                 await salvarNaNuvem();
                 alert("✅ Adicionado com sucesso!");
             }
         }
 
         async function editarItem(botao) {
-            const box = botao.closest('.task-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
+            const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
             if (!box) return;
             const span = box.querySelector('.item-text') || box.querySelector('strong');
             let novo = prompt("Editar descrição:", span ? span.innerText : "");
@@ -1158,7 +1212,7 @@
         }
 
         async function removerElemento(botao) {
-            const box = botao.closest('.task-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
+            const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
             if (box) { box.remove(); await salvarNaNuvem(); }
         }
 
@@ -1179,7 +1233,7 @@
 
         function imprimirProgramacao() {
             const w = window.open('', '_blank', 'width=900,height=700');
-            w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',Tahoma,sans-serif;padding:20px;background:#fff;color:#333;text-align:center;}.print-container{max-width:1100px;margin:0 auto;}.header-print{display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:20px;border-bottom:2px solid #1b5e20;padding-bottom:12px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;text-align:left;}.day-card{background:#fff;border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:10px;display:flex;flex-direction:column;height:480px!important;position:relative;}.day-title{font-size:14px;font-weight:bold;color:#1b5e20;text-align:center;background:#e8f5e9!important;border:1px solid #a3e4d7!important;border-radius:4px;padding:4px;margin-bottom:6px;flex-shrink:0;}.day-content{display:flex;flex-direction:column;flex-grow:1;overflow:hidden;padding-bottom:95px;}.tasks-container{flex-grow:1;overflow:hidden;}.task-box,.treinamento-box{font-weight:600;color:#1b5e20!important;background:#f1f8e9!important;padding:4px 6px;border-radius:4px;margin-bottom:4px;font-size:10px;border-left:2px solid #2e7d32!important;}.day-resources{position:absolute;bottom:10px;left:10px;right:10px;display:flex;flex-direction:column;gap:3px;border-top:2px dashed #c8e6c9;padding-top:6px;height:85px;background:#fff;}.resources-title{font-size:8px;font-weight:800;color:#2e7d32;text-transform:uppercase;margin-bottom:2px;}.resource-tag{background:#e8f5e9!important;color:#1b5e20!important;padding:3px 5px;border-radius:3px;font-size:10px;font-weight:600;}.flex.items-center.justify-between.gap-1.mb-2,.drag-handle,.item-controls,button{display:none!important;}h2{color:#1b5e20;text-transform:uppercase;margin:0;font-size:22px;}.week-badge{background:#1b5e20;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:bold;text-transform:uppercase;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style></head><body><div class="print-container"><div class="header-print"><h2>Programação Semanal</h2><div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div></div><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div></div><script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>`);
+            w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',Tahoma,sans-serif;padding:20px;background:#fff;color:#333;text-align:center;}.print-container{max-width:1100px;margin:0 auto;}.header-print{display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:20px;border-bottom:2px solid #1b5e20;padding-bottom:12px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;text-align:left;}.day-card{background:#fff;border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:10px;display:flex;flex-direction:column;height:480px!important;position:relative;}.day-title{font-size:14px;font-weight:bold;color:#1b5e20;text-align:center;background:#e8f5e9!important;border:1px solid #a3e4d7!important;border-radius:4px;padding:4px;margin-bottom:6px;flex-shrink:0;}.day-content{display:flex;flex-direction:column;flex-grow:1;overflow:hidden;padding-bottom:95px;}.tasks-container{flex-grow:1;overflow:hidden;}.task-box,.tarefa-extra-box,.treinamento-box{font-weight:600;color:#1b5e20!important;background:#f1f8e9!important;padding:4px 6px;border-radius:4px;margin-bottom:4px;font-size:10px;border-left:2px solid #2e7d32!important;}.tarefa-extra-box{color:#9a3412!important;background:#ffedd5!important;border-left-color:#c2410c!important;}.day-resources{position:absolute;bottom:10px;left:10px;right:10px;display:flex;flex-direction:column;gap:3px;border-top:2px dashed #c8e6c9;padding-top:6px;height:85px;background:#fff;}.resources-title{font-size:8px;font-weight:800;color:#2e7d32;text-transform:uppercase;margin-bottom:2px;}.resource-tag{background:#e8f5e9!important;color:#1b5e20!important;padding:3px 5px;border-radius:3px;font-size:10px;font-weight:600;}.flex.items-center.justify-between.gap-1.mb-2,.drag-handle,.item-controls,button,input[type="checkbox"]{display:none!important;}h2{color:#1b5e20;text-transform:uppercase;margin:0;font-size:22px;}.week-badge{background:#1b5e20;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:bold;text-transform:uppercase;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style></head><body><div class="print-container"><div class="header-print"><h2>Programação Semanal</h2><div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div></div><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div></div><script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>`);
             w.document.close();
         }
     </script>
