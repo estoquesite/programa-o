@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.40 Nuvem Completa)</title>
+    <title>Programação Semanal Interativa (v3.42 Nuvem Definitiva)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -435,7 +435,7 @@
             </div>
         </div>
 
-        <!-- MÓDULO: CADASTRO DE TREINAMENTOS ANUAIS (INVERTIDO + PERÍODO DE DIAS + EDITAR) -->
+        <!-- MÓDULO: CADASTRO DE TREINAMENTOS ANUAIS -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">🎓 Cadastro de Treinamentos Anuais (Vários Dias)</h3>
@@ -466,7 +466,7 @@
             <button onclick="salvarTreinamentoAnual()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg text-xs transition">💾 Salvar Treinamento no Calendário Anual</button>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.40) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.42) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -523,7 +523,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.40 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.42 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -668,13 +668,10 @@
             
             localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
             await salvarNaNuvem();
-            
-            // Distribui o treinamento para as respectivas semanas na base
-            distribuirTreinamentoNasSemanas(dataInicioStr, dataFimStr, `🎓 ${curso} (${participantes})`);
 
             document.getElementById('inputNomeCurso').value = '';
             document.getElementById('inputParticipantes').value = '';
-            alert("✅ Treinamento guardado com sucesso e alocado nas respectivas semanas!");
+            alert("✅ Treinamento guardado com sucesso no calendário anual!");
             atualizarDatasSemana();
         }
 
@@ -724,56 +721,7 @@
             }
         }
 
-        // CORREÇÃO CRUCIAL: Distribui o treinamento diretamente na semana correspondente à data informada
-        function distribuirTreinamentoNasSemanas(inicioStr, fimStr, textoFormatado) {
-            let curr = new Date(inicioStr + 'T00:00:00');
-            let end = new Date(fimStr + 'T00:00:00');
-            if (curr > end) return;
-
-            let cacheSemanasAfetadas = {};
-
-            while (curr <= end) {
-                let dNum = curr.getDay();
-                if (dNum !== 0 && dNum !== 6) { // Dias úteis
-                    let ano = curr.getFullYear();
-                    let semanaNum = getWeekNumber(curr);
-                    let wKey = getWeekKey(ano, semanaNum);
-
-                    if (!cacheSemanasAfetadas[wKey]) {
-                        cacheSemanasAfetadas[wKey] = [];
-                    }
-                    cacheSemanasAfetadas[wKey].push({
-                        dataIso: `${ano}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`,
-                        texto: textoFormatado
-                    });
-                }
-                curr.setDate(curr.getDate() + 1);
-            }
-
-            // Aplica em cada semana respectiva salva no localStorage ou DOM
-            for (let wKey in cacheSemanasAfetadas) {
-                let htmlSalvo = localStorage.getItem(wKey);
-                
-                // Se a semana atual for a que está na tela, injeta direto no DOM
-                if (wKey === getWeekKey(document.getElementById('inputAno').value, document.getElementById('inputNumSemana').value)) {
-                    cacheSemanasAfetadas[wKey].forEach(item => {
-                        const dObj = new Date(item.dataIso + 'T00:00:00');
-                        const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-                        const card = document.querySelector(`.day-card[data-dia-nome="${nomes[dObj.getDay()]}"]`);
-                        if (card) {
-                            let containerTasks = card.querySelector('.tasks-container');
-                            let jaExiste = [...containerTasks.querySelectorAll('.item-text')].some(el => el.innerText.trim() === item.texto);
-                            if (!jaExiste) inserirItemNoCard(card, 'task', item.texto);
-                        }
-                    });
-                    guardarEstadoDOM();
-                } else {
-                    // Se for outra semana, cria um elemento temporário ou atualiza o storage daquela semana
-                    // Vamos simplificar garantindo que ao abrir a semana, o 'verificarTreinamentosAnuais' cuide disso
-                }
-            }
-        }
-
+        // VERIFICAÇÃO RIGOROSA: Injeta o treinamento APENAS se a data do dia na semana corresponder ao período do curso cadastrado
         function verificarTreinamentosAnuais() {
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
             let anoAtual = document.getElementById('inputAno').value;
@@ -789,6 +737,7 @@
                     
                     for (let k in treinamentos) {
                         let item = treinamentos[k];
+                        // Só injeta se a data exata do dia cair dentro do intervalo de início e fim do curso
                         if (isoDt >= item.dataInicio && isoDt <= item.dataFim) {
                             let textoFormatado = `🎓 ${item.curso} (${item.participantes})`;
                             if (card) {
@@ -804,13 +753,8 @@
             });
         }
 
-        function definirSemanaAtualComRegraSexta() {
-            const hoje = new Date(); document.getElementById('inputAno').value = hoje.getFullYear();
-            let calc = new Date(hoje);
-            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) calc.setDate(hoje.getDate() + 3);
-            const weekNo = getWeekNumber(calc);
-            document.getElementById('inputNumSemana').value = weekNo;
-            atualizarDatasSemana();
+        function definirSemanaAtual() {
+            definirSemanaAtualComRegraSexta();
         }
 
         function sincronizarSemanaPelaData(dataStr) {
@@ -834,18 +778,18 @@
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 1;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
-            const key = getWeekKey(ano, semana);
-            const salvo = localStorage.getItem(key);
-            if (salvo) { document.getElementById('weekGridContainer').innerHTML = salvo; reativarEventosDragDrop(); }
-            forcarRecursosFixos();
-            verificarTreinamentosAnuais();
-
-            const datas = getDateRangeOfWeek(semana, ano);
+            
+            // Recria a estrutura limpa dos cards antes de aplicar os salvos e treinamentos
             const nomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            const datas = getDateRangeOfWeek(semana, ano);
+
+            // Garante que os títulos e datas fiquem corretos
             datas.forEach((dt, idx) => {
                 const card = document.querySelector(`.day-card[data-dia-nome="${nomes[idx]}"]`);
                 if (card) {
                     const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+                    card.querySelector('.day-title').innerHTML = `${nomes[idx]}<br><small>${String(dt.getDate()).padStart(2,'0')}/${nomesMeses[dt.getMonth()]}</small>`;
+                    
                     if (feriadosNacionais.includes(iso)) {
                         card.style.backgroundColor = "#e8f5e9";
                         card.style.borderColor = "#2e7d32";
@@ -855,9 +799,11 @@
                         card.style.backgroundColor = ""; card.style.borderColor = "";
                         card.querySelector('.day-resources').style.display = 'flex';
                     }
-                    card.querySelector('.day-title').innerHTML = `${nomes[idx]}<br><small>${String(dt.getDate()).padStart(2,'0')}/${nomesMeses[dt.getMonth()]}</small>`;
                 }
             });
+
+            forcarRecursosFixos();
+            verificarTreinamentosAnuais();
             guardarEstadoDOM();
         }
 
