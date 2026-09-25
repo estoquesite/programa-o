@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.47 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.48 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -432,7 +432,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.47) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.48) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -474,7 +474,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.47 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.48 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -554,11 +554,6 @@
                     if (dadosGlobaisNuvem.historico) {
                         localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
                     }
-                    if (dadosGlobaisNuvem.semanas) {
-                        for (let k in dadosGlobaisNuvem.semanas) {
-                            localStorage.setItem(k, dadosGlobaisNuvem.semanas[k]);
-                        }
-                    }
                     if (dadosGlobaisNuvem.treinamentos) {
                         localStorage.setItem("modulo_treinamentos_dados_nuvem", JSON.stringify(dadosGlobaisNuvem.treinamentos));
                     }
@@ -577,19 +572,17 @@
             let historicoLocal = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
             let treinosLocal = JSON.parse(localStorage.getItem("modulo_treinamentos_dados_nuvem")) || [];
             let feriadosLocal = JSON.parse(localStorage.getItem("modulo_feriados_dados_nuvem")) || [];
-            let semanasLocal = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i);
-                if (key.startsWith('prog_grid_')) {
-                    semanasLocal[key] = localStorage.getItem(key);
-                }
-            }
+            
+            // Pega as semanas salvas diretamente na nuvem atual se existirem
+            let semanasNuvem = dadosGlobaisNuvem.semanas || {};
+            let currentWeekKey = getWeekKey();
+            semanasNuvem[currentWeekKey] = document.getElementById('weekGridContainer').innerHTML;
 
             dadosGlobaisNuvem = {
                 historico: historicoLocal,
                 treinamentos: treinosLocal,
                 feriados: feriadosLocal,
-                semanas: semanasLocal
+                semanas: semanasNuvem
             };
 
             try {
@@ -603,7 +596,6 @@
 
         async function sincronizarComNuvemManual() {
             await sincronizarComNuvem();
-            localStorage.removeItem(getWeekKey());
             atualizarDatasSemana();
             alert("✅ Sincronizado com sucesso!");
         }
@@ -887,7 +879,7 @@
                             const semanaTreino = obterNumeroSemanaDaData(t.inicio);
                             const anoTreino = new Date(t.inicio + 'T00:00:00').getFullYear();
 
-                            // Rigor absoluto: Só injeta se a data exata do treino corresponder à semana e ano da tela
+                            // Rigor absoluto: Só injeta se a data exata do treinamento corresponder estritamente à semana e ano da tela
                             if (semanaTreino === semanaAtualTela && anoTreino === anoAtualTela) {
                                 if (dataStrCard === t.inicio) {
                                     const identificadorUnico = `treino_id_${t.id}`;
@@ -1090,15 +1082,12 @@
             return dias;
         }
 
-        function atualizarDatasSemana() {
+        async function atualizarDatasSemana() {
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
 
-            // CORREÇÃO CRUCIAL: Limpa o cache estático da semana e reconstrói a estrutura padrão limpa antes de injetar
-            localStorage.removeItem(getWeekKey());
-            
-            // Restaura o layout padrão limpo dos 5 dias da semana antes de re-injetar os dados reais
+            // Restaura o layout padrão limpo dos 5 dias da semana antes de re-injetar os dados vindos direto da nuvem
             document.getElementById('weekGridContainer').innerHTML = `
                 <!-- Segunda -->
                 <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
@@ -1197,6 +1186,12 @@
                 </div>
             `;
 
+            // Se existir HTML salvo na nuvem para esta semana específica, carrega ele limpinho
+            let semanaKey = getWeekKey();
+            if (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey]) {
+                document.getElementById('weekGridContainer').innerHTML = dadosGlobaisNuvem.semanas[semanaKey];
+            }
+
             const datas = getDateRangeOfWeek(semana, ano);
             const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
 
@@ -1212,7 +1207,7 @@
 
             injetarDadosNasDatas(datas);
             forcarRecursosFixos();
-            guardarEstadoDOM();
+            reativarEventosDragDrop();
         }
 
         function forcarRecursosFixos() {
@@ -1326,16 +1321,15 @@
         }
 
         async function guardarEstadoDOM() {
-            const key = getWeekKey();
-            const html = document.getElementById('weekGridContainer').innerHTML;
-            localStorage.setItem(key, html);
             await salvarNaNuvem();
         }
 
         async function limparTudo() {
             if (confirm("Deseja redefinir a programação desta semana?")) {
-                localStorage.removeItem(getWeekKey());
-                await salvarNaNuvem();
+                if (dadosGlobaisNuvem.semanas) {
+                    delete dadosGlobaisNuvem.semanas[getWeekKey()];
+                    await salvarNaNuvem();
+                }
                 location.reload();
             }
         }
