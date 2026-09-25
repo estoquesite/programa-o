@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.89 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.90 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -403,7 +403,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.89 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.90 Nuvem</span>
         </div>
     </div>
 
@@ -471,7 +471,6 @@
                 if (cb.checked) concluidas++;
             });
 
-            // Atualiza o estado da caixinha master de cada dia em tempo real
             document.querySelectorAll('.day-card').forEach(card => {
                 const masterCheck = card.querySelector('.check-concluir-dia');
                 if (!masterCheck) return;
@@ -581,49 +580,43 @@
             document.body.removeChild(a);
         }
 
-        // Esta função varre tanto as semanas novas quanto as salvas antigas e garante que TODAS tenham o botão 'Dia' e caixas individuais
+        // Função universal que repara o HTML garantindo que TODO dia tenha a barra com ✔️ Dia, Feriado e Emenda
         function garantirCaixinhasEmHtmlSalvo(htmlString) {
             if (!htmlString) return htmlString;
             let parser = new DOMParser();
             let doc = parser.parseFromString(htmlString, 'text/html');
 
-            // Garante que cada day-card tenha a barra de controle atualizada com a caixinha "Dia", sem perder feriado e emenda
             let cards = doc.querySelectorAll('.day-card');
             cards.forEach(card => {
                 let dayContent = card.querySelector('.day-content');
                 if (dayContent) {
-                    let barExists = dayContent.querySelector('.flex.items-center.justify-between');
-                    let barraHTML = `
-                        <div class="flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0">
-                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
-                                <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
-                            </label>
-                            <div class="flex items-center gap-1.5">
-                                <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" onchange="alternarBloqueioDia(this)"> Feriado</label>
-                                <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" onchange="alternarBloqueioDia(this)"> Emenda</label>
-                            </div>
+                    let barraVelha = dayContent.querySelector('.flex.items-center.justify-between');
+                    let fChecked = false;
+                    let eChecked = false;
+
+                    if (barraVelha) {
+                        let cf = barraVelha.querySelector('.check-feriado');
+                        let ce = barraVelha.querySelector('.check-emenda');
+                        if (cf && cf.checked) fChecked = true;
+                        if (ce && ce.checked) eChecked = true;
+                        barraVelha.remove();
+                    }
+
+                    let barraDiv = doc.createElement('div');
+                    barraDiv.className = 'flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0';
+                    barraDiv.innerHTML = `
+                        <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
+                            <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" ${fChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Feriado</label>
+                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" ${eChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
                     `;
-                    
-                    if (barExists) {
-                        // Preserva o status do feriado ou da emenda se já estavam marcados no HTML salvo
-                        let fChecked = barExists.querySelector('.check-feriado') ? barExists.querySelector('.check-feriado').checked : false;
-                        let eChecked = barExists.querySelector('.check-emenda') ? barExists.querySelector('.check-emenda').checked : false;
-
-                        barExists.outerHTML = barraHTML;
-                        let novaBarra = dayContent.querySelector('.flex.items-center.justify-between');
-                        if (novaBarra) {
-                            if (fChecked) novaBarra.querySelector('.check-feriado').checked = true;
-                            if (eChecked) novaBarra.querySelector('.check-emenda').checked = true;
-                        }
-                    } else {
-                        // Se não existia barra nenhuma, insere no topo do day-content
-                        dayContent.insertAdjacentHTML('afterbegin', barraHTML);
-                    }
+                    dayContent.insertBefore(barraDiv, dayContent.firstChild);
                 }
             });
             
-            // Garante os checkboxes individuais dentro das caixinhas de tarefa
             let caixas = doc.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
             caixas.forEach(box => {
                 if (!box.querySelector('input[type="checkbox"].task-check')) {
@@ -639,6 +632,37 @@
                 }
             });
             return doc.body.innerHTML;
+        }
+
+        // Inspeção ao vivo no DOM exibido: se faltar o botão Dia em qualquer card, força a criação imediata
+        function forcarCaixinhasDiaNoDOM() {
+            document.querySelectorAll('.day-card').forEach(card => {
+                let dayContent = card.querySelector('.day-content');
+                if (dayContent && !card.querySelector('.check-concluir-dia')) {
+                    let barra = dayContent.querySelector('.flex.items-center.justify-between');
+                    let fChecked = false;
+                    let eChecked = false;
+                    if (barra) {
+                        let cf = barra.querySelector('.check-feriado');
+                        let ce = barra.querySelector('.check-emenda');
+                        if (cf && cf.checked) fChecked = true;
+                        if (ce && ce.checked) eChecked = true;
+                        barra.remove();
+                    }
+                    const novaBarra = document.createElement('div');
+                    novaBarra.className = 'flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0';
+                    novaBarra.innerHTML = `
+                        <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
+                            <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" ${fChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Feriado</label>
+                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" ${eChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Emenda</label>
+                        </div>
+                    `;
+                    dayContent.insertBefore(novaBarra, dayContent.firstChild);
+                }
+            });
         }
 
         async function sincronizarComNuvem() {
@@ -988,6 +1012,7 @@
             let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
             if (historico[id]) {
                 document.getElementById('weekGridContainer').innerHTML = garantirCaixinhasEmHtmlSalvo(historico[id].html);
+                forcarCaixinhasDiaNoDOM();
                 await guardarEstadoDOM();
                 reativarEventosDragDrop();
                 atualizarIndicadorProgresso();
@@ -1274,6 +1299,9 @@
                 let htmlNuvemCorrigido = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[semanaKey]);
                 document.getElementById('weekGridContainer').innerHTML = htmlNuvemCorrigido;
             }
+
+            // Garante ao vivo que todos os cards em tela tenham a barra ✔️ Dia
+            forcarCaixinhasDiaNoDOM();
 
             const datas = getDateRangeOfWeek(semana, ano);
             datas.forEach((dataObj, index) => {
