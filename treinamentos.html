@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Treinamentos (v1.0)</title>
+    <title>Módulo de Treinamentos (v1.1 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -37,17 +37,18 @@
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
 
     <div class="container space-y-6">
-        <!-- CABEÇALHO -->
-        <div class="text-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <h2 class="text-2xl font-black uppercase text-green-800 dark:text-green-400">🎓 Gestão de Treinamentos</h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Registo e alocação automática por período</p>
+        <!-- CABEÇALHO COM BOTÃO DE VOLTAR AO ÍNDICE -->
+        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar ao Menu</a>
+            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">🎓 Gestão de Treinamentos</h2>
+            <button onclick="sincronizarTreinamentos()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Sincronizar</button>
         </div>
 
-        <!-- FORMULÁRIO DE CADASTRO -->
+        <!-- FORMULÁRIO DE CADASTRO / EDIÇÃO -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-            <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Novo Registo de Treinamento</h3>
+            <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Registar ou Editar Treinamento</h3>
             
-            <input type="hidden" id="editIndex" value="">
+            <input type="hidden" id="editId" value="">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -76,7 +77,7 @@
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">✓ Guardar e Distribuir Treinamento</button>
+                <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">✓ Guardar Treinamento (OK)</button>
                 <button onclick="limparFormulario()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-bold">Limpar</button>
             </div>
         </div>
@@ -91,25 +92,61 @@
     </div>
 
     <script>
-        const CHAVE_TREINAMENTOS = "modulo_treinamentos_dados_v1";
+        // CONFIGURAÇÃO SUPABASE (mesma chave para conversarem na nuvem)
+        const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const CHAVE_LOCAL_TREINOS = "modulo_treinamentos_dados_nuvem";
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('treinamentoInicio').valueAsDate = new Date();
             document.getElementById('treinamentoFim').valueAsDate = new Date();
-            renderizarListaTreinamentos();
+            await sincronizarTreinamentos();
         });
 
-        function obterTreinamentos() {
-            return JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || [];
+        async function sincronizarTreinamentos() {
+            try {
+                let { data, error } = await supabaseClient
+                    .from('app_dados_programacao')
+                    .select('conteudo')
+                    .eq('id', '1')
+                    .single();
+
+                if (data && data.conteudo && data.conteudo.treinamentos) {
+                    localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(data.conteudo.treinamentos));
+                }
+            } catch (e) {
+                console.error("Erro ao sincronizar treinamentos:", e);
+            }
+            renderizarListaTreinamentos();
         }
 
-        function salvarTreinamento() {
+        async function salvarNaNuvemGeral(novosTreinamentos) {
+            try {
+                let { data } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
+                let conteudo = data ? (data.conteudo || {}) : {};
+                conteudo.treinamentos = novosTreinamentos;
+
+                await supabaseClient
+                    .from('app_dados_programacao')
+                    .upsert({ id: '1', conteudo: conteudo });
+            } catch (err) {
+                console.error("Erro ao salvar na nuvem:", err);
+            }
+        }
+
+        function obterTreinamentos() {
+            return JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+        }
+
+        async function salvarTreinamento() {
             const inicio = document.getElementById('treinamentoInicio').value;
             const fim = document.getElementById('treinamentoFim').value;
             const nome = document.getElementById('treinamentoNome').value.trim().toUpperCase();
             const local = document.getElementById('treinamentoLocal').value.trim().toUpperCase();
             const pessoa = document.getElementById('treinamentoPessoa').value.trim().toUpperCase();
-            const editIdx = document.getElementById('editIndex').value;
+            const editId = document.getElementById('editId').value;
 
             if (!inicio || !fim || !nome || !local || !pessoa) {
                 alert("Por favor, preencha todos os campos do treinamento.");
@@ -122,19 +159,27 @@
             }
 
             let treinamentos = obterTreinamentos();
-            const novoItem = { inicio, fim, nome, local, pessoa };
+            const itemObj = {
+                id: editId !== "" ? editId : 'treino_' + Date.now(),
+                inicio, fim, nome, local, pessoa
+            };
 
-            if (editIdx !== "") {
-                treinamentos[parseInt(editIdx)] = novoItem;
-                document.getElementById('editIndex').value = "";
+            if (editId !== "") {
+                const index = treinamentos.findIndex(t => t.id === editId);
+                if (index !== -1) {
+                    treinamentos[index] = itemObj;
+                }
+                document.getElementById('editId').value = "";
             } else {
-                treinamentos.push(novoItem);
+                treinamentos.push(itemObj);
             }
 
-            localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
+            localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(treinamentos));
+            await salvarNaNuvemGeral(treinamentos);
+
             limparFormulario();
             renderizarListaTreinamentos();
-            alert("✅ Treinamento guardado com sucesso!");
+            alert("✅ Treinamento guardado e sincronizado com sucesso!");
         }
 
         function limparFormulario() {
@@ -143,7 +188,7 @@
             document.getElementById('treinamentoNome').value = '';
             document.getElementById('treinamentoLocal').value = '';
             document.getElementById('treinamentoPessoa').value = '';
-            document.getElementById('editIndex').value = '';
+            document.getElementById('editId').value = '';
         }
 
         function renderizarListaTreinamentos() {
@@ -156,7 +201,7 @@
                 return;
             }
 
-            treinamentos.forEach((t, idx) => {
+            treinamentos.forEach((t) => {
                 const div = document.createElement('div');
                 div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs gap-2';
                 div.innerHTML = `
@@ -166,31 +211,34 @@
                         <small class="text-gray-400 block mt-0.5">Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</small>
                     </div>
                     <div class="flex gap-1.5 self-end sm:self-center">
-                        <button onclick="editarTreinamento(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
-                        <button onclick="apagarTreinamento(${idx})" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
+                        <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
+                        <button onclick="apagarTreinamento('${t.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        function editarTreinamento(idx) {
+        function editarTreinamento(id) {
             let treinamentos = obterTreinamentos();
-            let t = treinamentos[idx];
-            document.getElementById('treinamentoInicio').value = t.inicio;
-            document.getElementById('treinamentoFim').value = t.fim;
-            document.getElementById('treinamentoNome').value = t.nome;
-            document.getElementById('treinamentoLocal').value = t.local;
-            document.getElementById('treinamentoPessoa').value = t.pessoa;
-            document.getElementById('editIndex').value = idx;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            let t = treinamentos.find(item => item.id === id);
+            if (t) {
+                document.getElementById('treinamentoInicio').value = t.inicio;
+                document.getElementById('treinamentoFim').value = t.fim;
+                document.getElementById('treinamentoNome').value = t.nome;
+                document.getElementById('treinamentoLocal').value = t.local;
+                document.getElementById('treinamentoPessoa').value = t.pessoa;
+                document.getElementById('editId').value = t.id;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
-        function apagarTreinamento(idx) {
+        async function apagarTreinamento(id) {
             if (confirm("Tem certeza que deseja apagar este registo de treinamento?")) {
                 let treinamentos = obterTreinamentos();
-                treinamentos.splice(idx, 1);
-                localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
+                treinamentos = treinamentos.filter(item => item.id !== id);
+                localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(treinamentos));
+                await salvarNaNuvemGeral(treinamentos);
                 renderizarListaTreinamentos();
             }
         }
