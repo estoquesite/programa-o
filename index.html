@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.45 Nuvem Estável)</title>
+    <title>Programação Semanal Interativa (v3.46 Nuvem Definitiva)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -69,8 +69,6 @@
             margin-bottom: 20px;
             align-items: stretch;
         }
-        
-        /* ESTRUTURA RÍGIDA E ESTÁVEL DOS CARDS */
         .day-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -80,8 +78,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            height: 480px !important;
-            max-height: 480px !important;
+            height: 500px !important;
+            max-height: 500px !important;
         }
         .day-content {
             display: flex;
@@ -92,7 +90,7 @@
         .tasks-container {
             flex-grow: 1;
             overflow-y: auto;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             padding-right: 2px;
         }
         .day-title {
@@ -116,14 +114,15 @@
         .day-options-header {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             font-size: 9px;
             font-weight: 700;
             color: #2e7d32;
             margin-bottom: 6px;
             background: #f1f8e9;
-            padding: 2px;
+            padding: 4px;
             border-radius: 4px;
+            border: 1px solid #c8e6c9;
             flex-shrink: 0;
         }
         .task-box {
@@ -142,8 +141,6 @@
             flex-shrink: 0;
         }
         .task-box:active { cursor: grabbing; }
-        
-        /* ÁREA DE RECURSOS TRAVADA E ALINHADA NA BASE */
         .day-resources {
             display: flex;
             flex-direction: column;
@@ -473,7 +470,7 @@
             <button onclick="salvarTreinamentoAnual()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg text-xs transition">💾 Salvar Treinamento no Calendário Anual</button>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.45) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.46) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -530,7 +527,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.45 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.46 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -742,7 +739,6 @@
             }
         }
 
-        // VERIFICAÇÃO INTELIGENTE: Injeta Treinamentos e Avaliação 5S no último dia útil do mês
         function verificarEventosAutomaticos(datasDaSemana) {
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
 
