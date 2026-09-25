@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.59 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.60 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -284,7 +284,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.59) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.60) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -326,7 +326,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.59 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.60 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -349,7 +349,7 @@
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // Função corrigida: transforma em maiúsculas preservando totalmente os acentos portugueses
+        // Função corrigida: transforma em maiúsculas preservando perfeitamente todos os acentos portugueses
         function aplicarCorrecao(texto) {
             if (!texto) return "";
             return texto.trim().toLocaleUpperCase('pt-PT');
@@ -714,7 +714,7 @@
                 
                 const contem = palavrasChave.some(p => {
                     const regex = new RegExp("\\b" + p + "\\b", "i");
-                    return regex.test(linhaUp.toUpperCase()) || linhaUp.toUpperCase().includes(p);
+                    return regex.test(linhaUp) || linhaUp.includes(p);
                 });
 
                 if (contem && !jaAdicionadas.has(linhaUp)) {
