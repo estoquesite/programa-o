@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.77 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.74 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -179,6 +179,7 @@
             padding-top: 6px;
             height: 90px;
             background: #ffffff;
+            overflow-y: auto;
         }
         .resources-title {
             font-size: 8px;
@@ -199,6 +200,7 @@
             justify-content: space-between;
             align-items: center;
             cursor: grab;
+            flex-shrink: 0;
         }
         .resource-tag:active { cursor: grabbing; }
         .item-controls {
@@ -234,6 +236,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="container">
         <div class="header">
             <div class="flex justify-between items-center mb-2 px-2">
@@ -244,8 +247,8 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- TOPO: ANO, SEMANA E ATALHOS -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-2xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
+        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
                     <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
@@ -256,19 +259,18 @@
                     <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-14 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
                 </div>
             </div>
-            <div class="flex gap-1.5 items-center flex-wrap">
-                <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-lg text-[11px] font-bold hover:bg-blue-200">🔄 Atual</button>
-                <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded-lg text-[11px] font-bold shadow-sm">📁 Histórico</button>
-                <a href="indicadores.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg text-[11px] font-bold shadow-sm transition">📊 Indicadores</a>
-                <button onclick="abrirModalTreinamentos()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg text-[11px] font-bold shadow-sm">🎓 Treinamentos</button>
-                <button onclick="abrirModalFeriados()" class="bg-teal-600 hover:bg-teal-700 text-white px-2 py-1 rounded-lg text-[11px] font-bold shadow-sm">🍃 Feriados</button>
+            <div class="flex gap-1.5 items-center">
+                <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded-lg text-xs font-bold hover:bg-blue-200">🔄 Atual</button>
+                <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📁 Histórico</button>
+                <button onclick="abrirModalTreinamentos()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🎓 Treinamentos</button>
+                <button onclick="abrirModalFeriados()" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🍃 Feriados</button>
             </div>
         </div>
 
         <!-- CALENDÁRIO SEMANAL -->
         <div class="week-grid" id="weekGridContainer"></div>
 
-        <!-- BOTÕES DE AÇÃO -->
+        <!-- BARRA DE AÇÕES DA SEMANA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
             <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar Semana</button>
@@ -298,9 +300,9 @@
                 <div>
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo de Entrada</label>
                     <select id="inputTipo" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
-                        <option value="task">🟢 Tarefa Normal (Caixa Verde)</option>
-                        <option value="resource">📦 Recurso / Equipamento</option>
+                        <option value="task">Tarefa (Caixa Verde)</option>
                         <option value="extra">⚡ Tarefa Extra / Fora de Rotina (Caixa Laranja)</option>
+                        <option value="resource">Recurso / Equipamento</option>
                     </select>
                 </div>
             </div>
@@ -314,7 +316,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR DE SCRIPT -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -332,24 +334,28 @@
         </div>
     </div>
 
-    <!-- MODAL HISTÓRICO -->
+    <!-- MODAL DE HISTÓRICO -->
     <div id="modalHistorico" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
                 <h3 class="text-sm font-bold uppercase text-purple-800 dark:text-purple-300">📁 Histórico de Semanas</h3>
                 <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
-            <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">💾 Salvar Programação Atual no Histórico</button>
+            <div class="space-y-2">
+                <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">💾 Salvar Programação Atual no Histórico</button>
+            </div>
             <div id="listaHistoricoSemanas" class="max-h-60 overflow-y-auto space-y-2 pt-2"></div>
-            <div class="flex justify-end pt-2"><button onclick="fecharModalHistorico()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
+            <div class="flex justify-end pt-2">
+                <button onclick="fecharModalHistorico()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL TREINAMENTOS -->
+    <!-- MODAL POP-UP DE TREINAMENTOS -->
     <div id="modalTreinamentos" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xl w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-                <h3 class="text-sm font-bold uppercase text-emerald-800 dark:text-emerald-300">🎓 Gestão de Treinamentos (Rápido)</h3>
+                <h3 class="text-sm font-bold uppercase text-emerald-800 dark:text-emerald-300">🎓 Gestão de Treinamentos</h3>
                 <button onclick="fecharModalTreinamentos()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -359,19 +365,21 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome</label><input type="text" id="popTreinoNome" placeholder="EX: SEGURANÇA..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Local</label><input type="text" id="popTreinoLocal" placeholder="EX: SALA..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
-                <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Participante</label><input type="text" id="popTreinoPessoa" placeholder="EX: MARIANA..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
+                <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Participante</label><input type="text" id="popTreinoPessoa" placeholder="EX: PESSOA..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
             </div>
-            <button onclick="salvarTreinamentoPop()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Treinamento</button>
+            <div class="flex gap-2">
+                <button onclick="salvarTreinamentoPop()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Treinamento</button>
+            </div>
             <div id="popListaTreinamentos" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
             <div class="flex justify-end pt-2"><button onclick="fecharModalTreinamentos()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
     </div>
 
-    <!-- MODAL FERIADOS -->
+    <!-- MODAL POP-UP DE FERIADOS -->
     <div id="modalFeriados" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xl w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-                <h3 class="text-sm font-bold uppercase text-teal-800 dark:text-teal-300">🍃 Feriados e Emendas (Rápido)</h3>
+                <h3 class="text-sm font-bold uppercase text-teal-800 dark:text-teal-300">🍃 Feriados e Emendas</h3>
                 <button onclick="fecharModalFeriados()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -379,13 +387,23 @@
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo</label><select id="popFeriadoTipo" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"><option value="feriado">Feriado</option><option value="emenda">Emenda</option></select></div>
             </div>
             <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição</label><input type="text" id="popFeriadoDesc" placeholder="EX: FERIADO MUNICIPAL..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
-            <button onclick="salvarFeriadoPop()" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
+            <div class="flex gap-2">
+                <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
+            </div>
             <div id="popListaFeriados" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
             <div class="flex justify-end pt-2"><button onclick="fecharModalFeriados()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
     </div>
 
-    <!-- SCRIPT DE CONTROLE -->
+    <!-- BARRA INFERIOR FIXA -->
+    <div class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
+        <div class="flex items-center gap-2">
+            <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
+            <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.74 Nuvem</span>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
@@ -395,6 +413,8 @@
         const CHAVE_LOCAL_TREINOS = "modulo_treinamentos_dados_nuvem";
         const CHAVE_LOCAL_FERIADOS = "modulo_feriados_dados_nuvem";
         const nomesMeses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+        let elementoArrastado = null;
+        let deferredPrompt = null;
         let dadosGlobaisNuvem = {};
 
         let itensFrequentesPadrao = [
@@ -425,16 +445,36 @@
             return `prog_grid_${ano}_semana_${semana}`;
         }
 
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
         async function sincronizarComNuvem() {
             try {
-                let { data } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
+                let { data, error } = await supabaseClient
+                    .from('app_dados_programacao')
+                    .select('conteudo')
+                    .eq('id', '1')
+                    .single();
+
                 if (data && data.conteudo) {
                     dadosGlobaisNuvem = data.conteudo;
-                    if (dadosGlobaisNuvem.historico) localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
-                    if (dadosGlobaisNuvem.treinamentos) localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
-                    if (dadosGlobaisNuvem.feriados) localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dadosGlobaisNuvem.feriados));
-                } else { dadosGlobaisNuvem = {}; }
-            } catch(e) { console.error("Erro ao buscar da nuvem:", e); }
+                    if (dadosGlobaisNuvem.historico) {
+                        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
+                    }
+                    if (dadosGlobaisNuvem.treinamentos) {
+                        localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
+                    }
+                    if (dadosGlobaisNuvem.feriados) {
+                        localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dadosGlobaisNuvem.feriados));
+                    }
+                } else {
+                    dadosGlobaisNuvem = {};
+                }
+            } catch(e) {
+                console.error("Erro ao buscar da nuvem:", e);
+            }
         }
 
         async function salvarNaNuvem() {
@@ -443,24 +483,44 @@
             let currentWeekKey = getWeekKey();
             semanasNuvem[currentWeekKey] = document.getElementById('weekGridContainer').innerHTML;
 
+            let treinosLocal = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            let feriadosLocal = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+
             dadosGlobaisNuvem = {
                 historico: historicoLocal,
-                treinamentos: JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [],
-                feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
+                treinamentos: treinosLocal,
+                feriados: feriadosLocal,
                 semanas: semanasNuvem
             };
 
             try {
-                let { error } = await supabaseClient.from('app_dados_programacao').upsert({ id: '1', conteudo: dadosGlobaisNuvem });
+                let { error } = await supabaseClient
+                    .from('app_dados_programacao')
+                    .upsert({ id: '1', conteudo: dadosGlobaisNuvem });
                 if (error) throw error;
                 return true;
-            } catch (err) { console.error("Erro ao gravar na nuvem:", err); return false; }
+            } catch (err) {
+                console.error("Erro ao gravar na nuvem:", err);
+                return false;
+            }
         }
 
         async function salvarProgramacaoManualNuvem() {
             let sucesso = await salvarNaNuvem();
-            if (sucesso) alert("✅ Programação salva com sucesso na nuvem!");
-            else alert("❌ Erro ao salvar na nuvem.");
+            if (sucesso) {
+                alert("✅ Programação salva com sucesso na nuvem!");
+            } else {
+                alert("❌ Erro ao salvar na nuvem.");
+            }
+        }
+
+        async function resetTotalNuvem() {
+            if (confirm("⚠️ ATENÇÃO: Deseja apagar TODO o cache de semanas gravadas na nuvem e começar totalmente do zero?")) {
+                dadosGlobaisNuvem.semanas = {};
+                await salvarNaNuvem();
+                atualizarDatasSemana();
+                alert("🔄 Nuvem limpa com sucesso!");
+            }
         }
 
         async function sincronizarComNuvemManual() {
@@ -473,11 +533,33 @@
             document.getElementById('popTreinoInicio').valueAsDate = new Date();
             document.getElementById('popTreinoFim').valueAsDate = new Date();
             document.getElementById('popFeriadoData').valueAsDate = new Date();
+            
             await sincronizarComNuvem();
+
+            const manifestObj = {
+                "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
+                "display": "standalone", "background_color": "#f9f9f9", "theme_color": "#1b5e20",
+                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", "sizes": "512x512", "type": "image/png"}]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
+            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+
+            if (localStorage.getItem('dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
             carregarFrequentes();
             definirSemanaAtualComRegraSexta();
             document.getElementById('inputDataEvento').valueAsDate = new Date();
         });
+
+        function instalarApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            } else {
+                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
+            }
+        }
 
         function abrirModalHistorico() { renderizarListaHistorico(); document.getElementById('modalHistorico').classList.remove('hidden'); }
         function fecharModalHistorico() { document.getElementById('modalHistorico').classList.add('hidden'); }
@@ -486,17 +568,215 @@
         function abrirModalFeriados() { renderizarPopFeriados(); document.getElementById('modalFeriados').classList.remove('hidden'); }
         function fecharModalFeriados() { document.getElementById('modalFeriados').classList.add('hidden'); }
 
+        function renderizarPopTreinamentos() {
+            const container = document.getElementById('popListaTreinamentos');
+            container.innerHTML = '';
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            if (lista.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum treinamento registado.</p>';
+                return;
+            }
+            lista.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
+                div.innerHTML = `
+                    <div><span class="font-bold text-emerald-800 dark:text-emerald-300">🎓 ${t.nome} (${t.pessoa})</span><br><small class="text-gray-400">${t.inicio.split('-').reverse().join('/')}</small></div>
+                    <button onclick="enviarTreinamentoParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded font-bold">✅ OK (Enviar)</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function salvarTreinamentoPop() {
+            const inicio = document.getElementById('popTreinoInicio').value;
+            const fim = document.getElementById('popTreinoFim').value;
+            const nome = aplicarCorrecao(document.getElementById('popTreinoNome').value);
+            const local = aplicarCorrecao(document.getElementById('popTreinoLocal').value);
+            const pessoa = aplicarCorrecao(document.getElementById('popTreinoPessoa').value);
+
+            if (!inicio || !fim || !nome || !local || !pessoa) { alert("Preencha todos os campos."); return; }
+
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            lista.push({ id: 'treino_' + Date.now(), inicio, fim, nome, local, pessoa });
+            localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista));
+            await salvarNaNuvem();
+            renderizarPopTreinamentos();
+            alert("✅ Treinamento guardado!");
+        }
+
+        async function enviarTreinamentoParaProgramacao(id) {
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            let t = lista.find(item => item.id === id);
+            if (!t) return;
+
+            const dObj = new Date(t.inicio + 'T00:00:00');
+            const ano = dObj.getFullYear();
+            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+            const dayNum = d.getUTCDay() || 7; 
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+            document.getElementById('inputAno').value = ano;
+            document.getElementById('inputNumSemana').value = semanaNo;
+            atualizarDatasSemana();
+
+            const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+            const diaSemanaNum = dObj.getDay();
+
+            if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
+                const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
+                if (cardDia) {
+                    const tasksCont = cardDia.querySelector('.tasks-container');
+                    const identificadorUnico = `treino_id_${t.id}`;
+                    if (!tasksCont.innerHTML.includes(identificadorUnico)) {
+                        const divTreino = document.createElement('div');
+                        divTreino.className = 'treinamento-box';
+                        divTreino.setAttribute('draggable', 'true');
+                        divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                        divTreino.innerHTML = `
+                            <span class="${identificadorUnico} flex items-center gap-1.5">
+                                <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
+                                <span class="drag-handle">⠿</span> 🎓 <strong>${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
+                            </span>
+                            <span class="item-controls">
+                                <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                                <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                            </span>
+                        `;
+                        tasksCont.appendChild(divTreino);
+                        await salvarNaNuvem();
+                        fecharModalTreinamentos();
+                        alert(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
+                    } else { alert("⚠️ Este treinamento já consta nesta semana."); }
+                }
+            } else { alert("⚠️ A data deste treinamento cai em fim de semana."); }
+        }
+
+        function renderizarPopFeriados() {
+            const container = document.getElementById('popListaFeriados');
+            container.innerHTML = '';
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            if (lista.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum feriado registado.</p>';
+                return;
+            }
+            lista.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
+                div.innerHTML = `
+                    <div><span class="font-bold text-teal-800 dark:text-teal-300">🍃 ${f.desc}</span><br><small class="text-gray-400">${f.data.split('-').reverse().join('/')}</small></div>
+                    <button onclick="enviarFeriadoParaProgramacao('${f.id}')" class="bg-teal-700 hover:bg-teal-800 text-white px-2 py-1 rounded font-bold">✅ OK (Enviar)</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function salvarFeriadoPop() {
+            const data = document.getElementById('popFeriadoData').value;
+            const tipo = document.getElementById('popFeriadoTipo').value;
+            const desc = aplicarCorrecao(document.getElementById('popFeriadoDesc').value);
+
+            if (!data || !desc) { alert("Preencha todos os campos."); return; }
+
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            lista.push({ id: 'feriado_custom_' + Date.now(), data, tipo, desc });
+            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
+            await salvarNaNuvem();
+            renderizarPopFeriados();
+            alert("✅ Feriado guardado!");
+        }
+
+        async function enviarFeriadoParaProgramacao(id) {
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            let f = lista.find(item => item.id === id);
+            if (!f) return;
+
+            const dObj = new Date(f.data + 'T00:00:00');
+            const ano = dObj.getFullYear();
+            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+            const dayNum = d.getUTCDay() || 7; 
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+            document.getElementById('inputAno').value = ano;
+            document.getElementById('inputNumSemana').value = semanaNo;
+            atualizarDatasSemana();
+
+            const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+            const diaSemanaNum = dObj.getDay();
+
+            if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
+                const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
+                if (cardDia) {
+                    const tasksCont = cardDia.querySelector('.tasks-container');
+                    const tituloFeriado = f.tipo === 'feriado' ? '🍃 FERIADO' : '📌 EMENDA';
+
+                    tasksCont.innerHTML = `
+                        <div style="background-color: ${f.tipo === 'feriado' ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${f.tipo === 'feriado' ? '#2e7d32' : '#00897b'}; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm">
+                            <span style="color: ${f.tipo === 'feriado' ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 13px;">${tituloFeriado}</span>
+                            <div style="color: ${f.tipo === 'feriado' ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${f.desc}</div>
+                            <button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button>
+                        </div>
+                    `;
+                    cardDia.querySelector('.day-resources').innerHTML = '';
+                    await salvarNaNuvem();
+                    fecharModalFeriados();
+                    alert(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
+                }
+            } else { alert("⚠️ A data deste evento cai em fim de semana."); }
+        }
+
+        function restaurarDiaNormal(botao) {
+            const card = botao.closest('.day-card');
+            if (!card) return;
+            card.querySelector('.check-feriado').checked = false;
+            card.querySelector('.check-emenda').checked = false;
+            
+            const tasksCont = card.querySelector('.tasks-container');
+            const resCont = card.querySelector('.day-resources');
+
+            tasksCont.innerHTML = `
+                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+            `;
+            resCont.innerHTML = `
+                <div class="resources-title">Recursos</div>
+                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+            `;
+            guardarEstadoDOM();
+        }
+
+        function alternarConclusaoTarefa(checkbox) {
+            const taskBox = checkbox.closest('.task-box') || checkbox.closest('.tarefa-extra-box') || checkbox.closest('.treinamento-box') || checkbox.closest('.resource-tag');
+            if (!taskBox) return;
+            if (checkbox.checked) {
+                taskBox.classList.add('task-done');
+            } else {
+                taskBox.classList.remove('task-done');
+            }
+            guardarEstadoDOM();
+        }
+
         function renderizarListaHistorico() {
             const container = document.getElementById('listaHistoricoSemanas');
             container.innerHTML = '';
             let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
             let chaves = Object.keys(historico);
-            if (chaves.length === 0) { container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada.</p>'; return; }
+            if (chaves.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada.</p>';
+                return;
+            }
             chaves.forEach(key => {
                 let item = historico[key];
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
-                div.innerHTML = `<div><span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span><small class="text-gray-400">${item.dataSalvo}</small></div><button onclick="carregarSemanaHistorico('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Carregar</button>`;
+                div.innerHTML = `
+                    <div><span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span><small class="text-gray-400">${item.dataSalvo}</small></div>
+                    <button onclick="carregarSemanaHistorico('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Carregar</button>
+                `;
                 container.appendChild(div);
             });
         }
@@ -517,163 +797,208 @@
             const ano = document.getElementById('inputAno').value;
             const idHistorico = `Semana_${numSemana}_${ano}`;
             let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            historico[idHistorico] = { id: idHistorico, titulo: `Semana ${numSemana} (${ano})`, dataSalvo: new Date().toLocaleDateString('pt-PT'), html: document.getElementById('weekGridContainer').innerHTML };
+            historico[idHistorico] = {
+                id: idHistorico, titulo: `Semana ${numSemana} (${ano})`,
+                dataSalvo: new Date().toLocaleDateString('pt-PT'), html: document.getElementById('weekGridContainer').innerHTML
+            };
             localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
             await salvarNaNuvem();
             alert("✅ Programação guardada no histórico!");
             renderizarListaHistorico();
         }
 
-        function renderizarPopTreinamentos() {
-            const container = document.getElementById('popListaTreinamentos');
-            container.innerHTML = '';
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            if (lista.length === 0) { container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum treinamento registado.</p>'; return; }
-            lista.forEach(t => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
-                div.innerHTML = `<div><span class="font-bold text-emerald-800 dark:text-emerald-300">🎓 ${t.nome} (${t.pessoa})</span><br><small class="text-gray-400">${t.inicio.split('-').reverse().join('/')}</small></div><button onclick="enviarTreinamentoParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded font-bold">✅ OK (Enviar)</button>`;
-                container.appendChild(div);
+        function carregarFrequentes() {
+            let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
+            const select = document.getElementById('selectFrequentes');
+            select.innerHTML = '<option value="">-- Escolher item frequente --</option>';
+            salvos.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item; opt.innerText = item;
+                select.appendChild(opt);
             });
         }
 
-        async function salvarTreinamentoPop() {
-            const inicio = document.getElementById('popTreinoInicio').value;
-            const fim = document.getElementById('popTreinoFim').value;
-            const nome = aplicarCorrecao(document.getElementById('popTreinoNome').value);
-            const local = aplicarCorrecao(document.getElementById('popTreinoLocal').value);
-            const pessoa = aplicarCorrecao(document.getElementById('popTreinoPessoa').value);
-            if (!inicio || !fim || !nome || !local || !pessoa) { alert("Preencha todos os campos."); return; }
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            lista.push({ id: 'treino_' + Date.now(), inicio, fim, nome, local, pessoa });
-            localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista));
-            await salvarNaNuvem();
-            renderizarPopTreinamentos();
-            alert("✅ Treinamento guardado!");
+        function preencherPredefinido() {
+            const select = document.getElementById('selectFrequentes');
+            const inputDesc = document.getElementById('inputDesc');
+            if (select.value) { inputDesc.value = select.value; }
         }
 
-        async function enviarTreinamentoParaProgramacao(id) {
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            let t = lista.find(item => item.id === id);
-            if (!t) return;
-            const dObj = new Date(t.inicio + 'T00:00:00');
-            const ano = dObj.getFullYear();
-            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const semanaNo = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
-
-            document.getElementById('inputAno').value = ano;
-            document.getElementById('inputNumSemana').value = semanaNo;
-            atualizarDatasSemana();
-
-            const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const diaSemanaNum = dObj.getDay();
-            if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
-                const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
-                if (cardDia) {
-                    const tasksCont = cardDia.querySelector('.tasks-container');
-                    const divTreino = document.createElement('div');
-                    divTreino.className = 'treinamento-box';
-                    divTreino.setAttribute('draggable', 'true');
-                    divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    divTreino.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> 🎓 <strong>${t.nome}</strong><br><small class="pl-5">📍 ${t.local} | 👤 ${t.pessoa}</small></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-                    tasksCont.appendChild(divTreino);
-                    await salvarNaNuvem();
-                    fecharModalTreinamentos();
-                    alert(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
+        async function adicionarNovoFrequente() {
+            const novo = prompt("Digite o nome da nova tarefa ou recurso frequente:");
+            if (novo && novo.trim() !== "") {
+                const itemMaiusculo = aplicarCorrecao(novo);
+                let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
+                if (!salvos.includes(itemMaiusculo)) {
+                    salvos.push(itemMaiusculo);
+                    localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
+                    carregarFrequentes();
+                    document.getElementById('selectFrequentes').value = itemMaiusculo;
+                    preencherPredefinido();
                 }
-            } else { alert("⚠️ A data deste treinamento cai em fim de semana."); }
+            }
         }
 
-        function renderizarPopFeriados() {
-            const container = document.getElementById('popListaFeriados');
-            container.innerHTML = '';
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            if (lista.length === 0) { container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum feriado registado.</p>'; return; }
-            lista.forEach(f => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
-                div.innerHTML = `<div><span class="font-bold text-teal-800 dark:text-teal-300">🍃 ${f.desc}</span><br><small class="text-gray-400">${f.data.split('-').reverse().join('/')}</small></div><button onclick="enviarFeriadoParaProgramacao('${f.id}')" class="bg-teal-700 hover:bg-teal-800 text-white px-2 py-1 rounded font-bold">✅ OK (Enviar)</button>`;
-                container.appendChild(div);
-            });
-        }
-
-        async function salvarFeriadoPop() {
-            const data = document.getElementById('popFeriadoData').value;
-            const tipo = document.getElementById('popFeriadoTipo').value;
-            const desc = aplicarCorrecao(document.getElementById('popFeriadoDesc').value);
-            if (!data || !desc) { alert("Preencha todos os campos."); return; }
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            lista.push({ id: 'feriado_custom_' + Date.now(), data, tipo, desc });
-            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
-            await salvarNaNuvem();
-            renderizarPopFeriados();
-            alert("✅ Feriado guardado!");
-        }
-
-        async function enviarFeriadoParaProgramacao(id) {
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            let f = lista.find(item => item.id === id);
-            if (!f) return;
-            const dObj = new Date(f.data + 'T00:00:00');
-            const ano = dObj.getFullYear();
-            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const semanaNo = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
-
-            document.getElementById('inputAno').value = ano;
-            document.getElementById('inputNumSemana').value = semanaNo;
-            atualizarDatasSemana();
-
-            const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const diaSemanaNum = dObj.getDay();
-            if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
-                const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
-                if (cardDia) {
-                    const tasksCont = cardDia.querySelector('.tasks-container');
-                    const tituloFeriado = f.tipo === 'feriado' ? '🍃 FERIADO' : '📌 EMENDA';
-                    tasksCont.innerHTML = `<div style="background-color: ${f.tipo === 'feriado' ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${f.tipo === 'feriado' ? '#2e7d32' : '#00897b'}; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm"><span style="color: ${f.tipo === 'feriado' ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 13px;">${tituloFeriado}</span><div style="color: ${f.tipo === 'feriado' ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${f.desc}</div><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover Feriado / Deletar</button></div>`;
-                    cardDia.querySelector('.day-resources').innerHTML = '';
-                    await salvarNaNuvem();
-                    fecharModalFeriados();
-                    alert(`✅ ${f.desc} aplicado na Semana ${semanaNo}!`);
+        function gerenciarFrequentes() {
+            let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
+            let listaStr = salvos.map((item, idx) => `${idx + 1}.${item}`).join('\n');
+            let escolha = prompt(`Itens Frequentes:\n\n${listaStr}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
+            if (escolha !== null && !isNaN(escolha)) {
+                let index = parseInt(escolha) - 1;
+                if (index >= 0 && index < salvos.length) {
+                    let itemSelecionado = salvos[index];
+                    let acao = prompt(`Item: "${itemSelecionado}"\n\n1 - Editar nome\n2 - Apagar item`, "1");
+                    if (acao === "1") {
+                        let novoNome = prompt("Novo nome:", itemSelecionado);
+                        if (novoNome && novoNome.trim() !== "") {
+                            salvos[index] = aplicarCorrecao(novoNome);
+                            localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
+                            carregarFrequentes();
+                        }
+                    } else if (acao === "2") {
+                        salvos.splice(index, 1);
+                        localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
+                        carregarFrequentes();
+                    }
                 }
-            } else { alert("⚠️ A data deste evento cai em fim de semana."); }
+            }
         }
 
-        function restaurarDiaNormal(botao) {
-            const card = botao.closest('.day-card');
-            if (!card) return;
+        function adicionarNovaPalavraChave() {
+            const nova = prompt("Palavra-chave para o analisador:");
+            if (nova && nova.trim() !== "") {
+                let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
+                chaves.push(aplicarCorrecao(nova));
+                localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
+                alert("Palavra adicionada!");
+            }
+        }
+
+        function gerenciarPalavrasChave() {
+            let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
+            let escolha = prompt(`Palavras-Chave:\n${chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}\n\nNúmero para APAGAR:`);
+            if (escolha !== null && !isNaN(escolha)) {
+                let index = parseInt(escolha) - 1;
+                if (index >= 0 && index < chaves.length) {
+                    chaves.splice(index, 1);
+                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
+                    alert("Apagada!");
+                }
+            }
+        }
+
+        function alternarBloqueioDia(checkbox) {
+            const card = checkbox.closest('.day-card');
+            const isFeriado = card.querySelector('.check-feriado').checked;
+            const isEmenda = card.querySelector('.check-emenda').checked;
             const tasksCont = card.querySelector('.tasks-container');
             const resCont = card.querySelector('.day-resources');
-            tasksCont.innerHTML = `
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-            `;
-            resCont.innerHTML = `
-                <div class="resources-title">Recursos</div>
-                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-            `;
+
+            if (isFeriado) {
+                tasksCont.innerHTML = `<div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm"><span style="color: #1b5e20; font-weight: 900; font-size: 14px;">🍃 FERIADO</span><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+                resCont.innerHTML = ``;
+            } else if (isEmenda) {
+                tasksCont.innerHTML = `<div style="background-color: #e0f2f1; border: 1px solid #b2dfdb; border-left: 4px solid #00897b; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm"><span style="color: #004d40; font-weight: 900; font-size: 14px;">📌 EMENDA</span><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+                resCont.innerHTML = ``;
+            } else {
+                restaurarDiaNormal(checkbox);
+            }
             guardarEstadoDOM();
         }
 
-        function alternarConclusaoTarefa(checkbox) {
-            const taskBox = checkbox.closest('.task-box') || checkbox.closest('.tarefa-extra-box') || checkbox.closest('.treinamento-box');
-            if (!taskBox) return;
-            if (checkbox.checked) taskBox.classList.add('task-done');
-            else taskBox.classList.remove('task-done');
-            guardarEstadoDOM();
+        function injetarRotinasFixas(datasDaSemana) {
+            const nomesDiasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            datasDaSemana.forEach((dataObj, index) => {
+                const diaNome = nomesDiasMap[index];
+                const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
+                if (!card) return;
+                const tasksCont = card.querySelector('.tasks-container');
+                if (!tasksCont || tasksCont.innerText.includes("bloqueado") || tasksCont.innerText.includes("FERIADO") || tasksCont.innerText.includes("EMENDA")) return;
+
+                if (diaNome === "Quarta" && !tasksCont.innerText.includes("APC")) {
+                    const divAPC = document.createElement('div');
+                    divAPC.className = 'task-box';
+                    divAPC.setAttribute('draggable', 'true');
+                    divAPC.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    divAPC.innerHTML = `
+                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
+                        <span class="item-controls">
+                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                        </span>
+                    `;
+                    tasksCont.appendChild(divAPC);
+                }
+
+                const ano = dataObj.getFullYear(), mes = dataObj.getMonth(), dia = dataObj.getDate();
+                const ultimoDiaDoMes = new Date(ano, mes + 1, 0).getDate();
+                if (dia >= ultimoDiaDoMes - 6 && !tasksCont.innerText.includes("5S")) {
+                    const div5S = document.createElement('div');
+                    div5S.className = 'task-box';
+                    div5S.setAttribute('draggable', 'true');
+                    div5S.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div5S.innerHTML = `
+                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
+                        <span class="item-controls">
+                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                        </span>
+                    `;
+                    tasksCont.appendChild(div5S);
+                }
+            });
+        }
+
+        function analisarScript() {
+            const textoScript = document.getElementById('inputScriptTexto').value;
+            const containerSugestoes = document.getElementById('resultadoSugestoes');
+            containerSugestoes.innerHTML = '';
+            if (!textoScript.trim()) return;
+            const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
+            const linhas = textoScript.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2);
+            let jaAdicionadas = new Set();
+            linhas.forEach(linha => {
+                let linhaUp = aplicarCorrecao(linha);
+                if (palavrasChave.some(p => linhaUp.includes(p)) && !jaAdicionadas.has(linhaUp)) {
+                    jaAdicionadas.add(linhaUp);
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border text-xs';
+                    div.innerHTML = `<span>💬 "${linhaUp}"</span><button onclick="usarSugestao(this)" data-texto="${linhaUp.replace(/"/g, '&quot;')}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
+                    containerSugestoes.appendChild(div);
+                }
+            });
+        }
+
+        function usarSugestao(botao) {
+            document.getElementById('inputDesc').value = aplicarCorrecao(botao.getAttribute('data-texto'));
+        }
+
+        function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
+        function permitirDrop(e) { e.preventDefault(); }
+        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
+
+        function reativarEventosDragDrop() {
+            document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
+                item.setAttribute('draggable', 'true');
+                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            });
+            document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
+                cont.setAttribute('ondragover', 'permitirDrop(event)');
+                cont.setAttribute('ondrop', 'soltarItem(event)');
+            });
         }
 
         function definirSemanaAtualComRegraSexta() {
             const hoje = new Date(); 
             document.getElementById('inputAno').value = hoje.getFullYear();
             let dataCalculo = new Date(hoje);
-            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) dataCalculo.setDate(hoje.getDate() + 3);
+            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) {
+                dataCalculo.setDate(hoje.getDate() + 3);
+            }
             const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
             const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            document.getElementById('inputNumSemana').value = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            document.getElementById('inputNumSemana').value = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
             atualizarDatasSemana();
         }
 
@@ -683,7 +1008,8 @@
             document.getElementById('inputAno').value = dataObj.getFullYear();
             const d = new Date(Date.UTC(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate()));
             const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            document.getElementById('inputNumSemana').value = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            document.getElementById('inputNumSemana').value = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
             atualizarDatasSemana();
         }
 
@@ -704,58 +1030,35 @@
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
 
-            document.getElementById('weekGridContainer').innerHTML = `
+            const baseCardHTML = `
                 <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
                     <div class="day-title">Segunda<br><small>--/---</small></div>
                     <div class="day-content">
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[11px] flex-shrink-0">
+                            <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Feriado</label>
+                            <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
+                        </div>
                         <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         </div>
                     </div>
-                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
-                </div>
-                <div class="day-card" data-dia-idx="2" data-dia-nome="Terça">
-                    <div class="day-title">Terça<br><small>--/---</small></div>
-                    <div class="day-content">
-                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                        </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
-                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
-                </div>
-                <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta">
-                    <div class="day-title">Quarta<br><small>--/---</small></div>
-                    <div class="day-content">
-                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                        </div>
-                    </div>
-                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
-                </div>
-                <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta">
-                    <div class="day-title">Quinta<br><small>--/---</small></div>
-                    <div class="day-content">
-                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                        </div>
-                    </div>
-                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
-                </div>
-                <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta">
-                    <div class="day-title">Sexta<br><small>--/---</small></div>
-                    <div class="day-content">
-                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                        </div>
-                    </div>
-                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)"><div class="resources-title">Recursos</div></div>
                 </div>
             `;
+
+            // Monta os 5 dias da semana com a estrutura padrão
+            const diasNomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            let gridHTML = "";
+            diasNomes.forEach((dia, idx) => {
+                gridHTML += baseCardHTML.replace('data-dia-idx="1"', `data-dia-idx="${idx+1}"`).replace('data-dia-nome="Segunda"', `data-dia-nome="${dia}"`).replace('Segunda<br>', `${dia}<br>`);
+            });
+
+            document.getElementById('weekGridContainer').innerHTML = gridHTML;
 
             let semanaKey = getWeekKey();
             if (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey]) {
@@ -763,11 +1066,10 @@
             }
 
             const datas = getDateRangeOfWeek(semana, ano);
-            const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
             datas.forEach((dataObj, index) => {
-                const card = document.querySelector(`.day-card[data-dia-nome="${nomesDias[index]}"]`);
+                const card = document.querySelector(`.day-card[data-dia-nome="${diasNomes[index]}"]`);
                 if (card) {
-                    card.querySelector('.day-title').innerHTML = `${nomesDias[index]}<br><small>${String(dataObj.getDate()).padStart(2,'0')}/${nomesMeses[dataObj.getMonth()]}</small>`;
+                    card.querySelector('.day-title').innerHTML = `${diasNomes[index]}<br><small>${String(dataObj.getDate()).padStart(2,'0')}/${nomesMeses[dataObj.getMonth()]}</small>`;
                 }
             });
 
@@ -779,7 +1081,7 @@
         function forcarRecursosFixos() {
             document.querySelectorAll('.day-card').forEach(card => {
                 const recursosCont = card.querySelector('.day-resources');
-                if (!recursosCont) return;
+                if (!recursosCont || card.querySelector('.tasks-container').innerText.includes("bloqueado")) return;
                 const textos = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
                 if (!textos.includes('CARRO')) adicionarTagRecurso(recursosCont, 'CARRO');
                 if (!textos.includes('EMPILHADEIRA G4')) adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
@@ -791,7 +1093,7 @@
             div.className = 'resource-tag';
             div.setAttribute('draggable', 'true');
             div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            div.innerHTML = `<span><span class="drag-handle">⠿</span> <span class="item-text">${nome}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+            div.innerHTML = `<span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">${nome}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
             container.appendChild(div);
         }
 
@@ -801,35 +1103,37 @@
             let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
 
             if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
+
             const dObj = new Date(dataStr + 'T00:00:00');
             const diaNum = dObj.getDay();
-            if (diaNum === 0 || diaNum === 6) { alert("Selecione um dia útil."); return; }
+            if (diaNum === 0 || diaNum === 6) { alert("Selecione um dia útil (Segunda a Sexta)."); return; }
 
             const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
             const card = document.querySelector(`.day-card[data-dia-nome="${nomes[diaNum]}"]`);
 
             if (card) {
                 const handle = `<span class="drag-handle">⠿</span>`;
-                const controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span>`;
+                const checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
+                const controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
                 const div = document.createElement('div');
 
                 if (tipo === 'extra') {
                     div.className = 'tarefa-extra-box';
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-orange-600 cursor-pointer" onchange="alternarConclusaoTarefa(this)">⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    div.innerHTML = `<span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-orange-600 cursor-pointer" onchange="alternarConclusaoTarefa(this)">⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.tasks-container').appendChild(div);
                 } else if (tipo === 'task') {
                     div.className = 'task-box';
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.tasks-container').appendChild(div);
                 } else {
                     div.className = 'resource-tag';
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span>${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.day-resources').appendChild(div);
                 }
 
@@ -865,155 +1169,9 @@
             }
         }
 
-        function reativarEventosDragDrop() {
-            document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
-                item.setAttribute('draggable', 'true');
-                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            });
-            document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
-                cont.setAttribute('ondragover', 'permitirDrop(event)');
-                cont.setAttribute('ondrop', 'soltarItem(event)');
-            });
-        }
-
-        let elementoArrastado = null;
-        function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
-        function permitirDrop(e) { e.preventDefault(); }
-        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
-
-        function preencherPredefinido() {
-            const select = document.getElementById('selectFrequentes');
-            const inputDesc = document.getElementById('inputDesc');
-            if (select.value) inputDesc.value = select.value;
-        }
-
-        function carregarFrequentes() {
-            let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-            const select = document.getElementById('selectFrequentes');
-            select.innerHTML = '<option value="">-- Escolher item frequente --</option>';
-            salvos.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item; opt.innerText = item;
-                select.appendChild(opt);
-            });
-        }
-
-        async function adicionarNovoFrequente() {
-            const novo = prompt("Digite o nome da nova tarefa ou recurso frequente:");
-            if (novo && novo.trim() !== "") {
-                const itemMaiusculo = aplicarCorrecao(novo);
-                let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-                if (!salvos.includes(itemMaiusculo)) {
-                    salvos.push(itemMaiusculo);
-                    localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                    carregarFrequentes();
-                    document.getElementById('selectFrequentes').value = itemMaiusculo;
-                    preencherPredefinido();
-                }
-            }
-        }
-
-        function gerenciarFrequentes() {
-            let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-            let listaStr = salvos.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
-            let escolha = prompt(`Itens Frequentes:\n\n${listaStr}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
-            if (escolha !== null && !isNaN(escolha)) {
-                let index = parseInt(escolha) - 1;
-                if (index >= 0 && index < salvos.length) {
-                    let itemSelecionado = salvos[index];
-                    let acao = prompt(`Item: "${itemSelecionado}"\n\n1 - Editar nome\n2 - Apagar item`, "1");
-                    if (acao === "1") {
-                        let novoNome = prompt("Novo nome:", itemSelecionado);
-                        if (novoNome && novoNome.trim() !== "") {
-                            salvos[index] = aplicarCorrecao(novoNome);
-                            localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                            carregarFrequentes();
-                        }
-                    } else if (acao === "2") {
-                        salvos.splice(index, 1);
-                        localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                        carregarFrequentes();
-                    }
-                }
-            }
-        }
-
-        function analisarScript() {
-            const textoScript = document.getElementById('inputScriptTexto').value;
-            const containerSugestoes = document.getElementById('resultadoSugestoes');
-            containerSugestoes.innerHTML = '';
-            if (!textoScript.trim()) return;
-            const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            const linhas = textoScript.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2);
-            let jaAdicionadas = new Set();
-            linhas.forEach(linha => {
-                let linhaUp = aplicarCorrecao(linha);
-                if (palavrasChave.some(p => linhaUp.includes(p)) && !jaAdicionadas.has(linhaUp)) {
-                    jaAdicionadas.add(linhaUp);
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border text-xs';
-                    div.innerHTML = `<span>💬 "${linhaUp}"</span><button onclick="usarSugestao(this)" data-texto="${linhaUp.replace(/"/g, '&quot;')}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
-                    containerSugestoes.appendChild(div);
-                }
-            });
-        }
-
-        function usarSugestao(botao) {
-            document.getElementById('inputDesc').value = aplicarCorrecao(botao.getAttribute('data-texto'));
-        }
-
-        function adicionarNovaPalavraChave() {
-            const nova = prompt("Palavra-chave para o analisador:");
-            if (nova && nova.trim() !== "") {
-                let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-                chaves.push(aplicarCorrecao(nova));
-                localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                alert("Palavra adicionada!");
-            }
-        }
-
-        function gerenciarPalavrasChave() {
-            let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            let escolha = prompt(`Palavras-Chave:\n${chaves.map((item, idx) => `${idx + 1}.${item}`).join('\n')}\n\nNúmero para APAGAR:`);
-            if (escolha !== null && !isNaN(escolha)) {
-                let index = parseInt(escolha) - 1;
-                if (index >= 0 && index < chaves.length) {
-                    chaves.splice(index, 1);
-                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    alert("Apagada!");
-                }
-            }
-        }
-
-        function injetarRotinasFixas(datasDaSemana) {
-            const nomesDiasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
-            datasDaSemana.forEach((dataObj, index) => {
-                const diaNome = nomesDiasMap[index];
-                const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
-                if (!card) return;
-                const tasksCont = card.querySelector('.tasks-container');
-                if (!tasksCont || tasksCont.innerText.includes("bloqueado") || tasksCont.innerText.includes("FERIADO") || tasksCont.innerText.includes("EMENDA")) return;
-
-                if (diaNome === "Quarta" && !tasksCont.innerText.includes("APC")) {
-                    const divAPC = document.createElement('div');
-                    divAPC.className = 'task-box';
-                    divAPC.setAttribute('draggable', 'true');
-                    divAPC.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    divAPC.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-                    tasksCont.appendChild(divAPC);
-                }
-
-                const ano = dataObj.getFullYear(), mes = dataObj.getMonth(), dia = dataObj.getDate();
-                const ultimoDiaDoMes = new Date(ano, mes + 1, 0).getDate();
-                if (dia >= ultimoDiaDoMes - 6 && !tasksCont.innerText.includes("5S")) {
-                    const div5S = document.createElement('div');
-                    div5S.className = 'task-box';
-                    div5S.setAttribute('draggable', 'true');
-                    div5S.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div5S.innerHTML = `<span><input type="checkbox" class="task-check mr-1.5 w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-                    tasksCont.appendChild(div5S);
-                }
-            });
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
         }
 
         function imprimirProgramacao() {
