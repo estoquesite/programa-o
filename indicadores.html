@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v4.6 Gavetas Retráteis)</title>
+    <title>Painel de Indicadores & Gráficos (v4.7 Filtro Visual de Recursos)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -90,7 +90,7 @@
         <!-- PAINEL DE CONTROLE DE FILTROS COM GAVETAS RETRÁTEIS -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
             
-            <!-- LINHA 1: ESCOLHA LIVRE DE ANO -->
+            <!-- LINHA 1: ESCOLHA DE ANO -->
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
@@ -119,7 +119,6 @@
                         <button type="button" onclick="alternarGaveta('boxContainerMesesCheck', 'btnToggleMeses')" id="btnToggleMeses" class="text-xs text-green-700 dark:text-green-400 font-bold underline ml-1">Mostrar caixas ▾</button>
                     </div>
                 </div>
-                <!-- CAIXA ESCONDIDA DOS MESES -->
                 <div id="boxContainerMesesCheck" class="hidden p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 text-xs font-bold">
                 </div>
             </div>
@@ -139,12 +138,30 @@
                         <button type="button" onclick="alternarGaveta('gridUniversalSemanas', 'btnToggleSemanas')" id="btnToggleSemanas" class="text-xs text-blue-700 dark:text-blue-400 font-bold underline ml-1">Mostrar caixas ▾</button>
                     </div>
                 </div>
-                <!-- CAIXA ESCONDIDA DAS 53 SEMANAS -->
                 <div id="gridUniversalSemanas" class="hidden max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1.5 text-xs">
                 </div>
             </div>
 
-            <!-- LINHA 4: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
+            <!-- LINHA 4: NOVO - GAVETA RETRÁTIL COM ÍCONES DOS RECURSOS (CARRO, CAMINHÃO, EMPILHADEIRA) -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <span id="lbl_filtro_recursos" class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">🚜 Filtrar Recursos / Equipamentos:</span>
+                        <button type="button" onclick="editarTexto('lbl_filtro_recursos')" class="btn-edit-title">✏️</button>
+                        <span id="labelContadorRecursosFiltro" class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase ml-1">Todos Ativos</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="marcarTodosRecursosFiltro(true)" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todos</button>
+                        <button type="button" onclick="marcarTodosRecursosFiltro(false)" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
+                        <button type="button" onclick="alternarGaveta('containerFiltroRecursos', 'btnToggleRecursos')" id="btnToggleRecursos" class="text-xs text-emerald-700 dark:text-emerald-400 font-bold underline ml-1">Mostrar caixas ▾</button>
+                    </div>
+                </div>
+                <!-- CAIXA ESCONDIDA COM OS RECURSOS E SEUS ÍCONES -->
+                <div id="containerFiltroRecursos" class="hidden p-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 text-xs font-bold">
+                </div>
+            </div>
+
+            <!-- LINHA 5: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -224,7 +241,7 @@
             <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                 <div class="flex items-center gap-1.5">
                     <h3 id="lbl_titulo_bloco_recursos" class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300">
-                        🚙 Painel de Recursos
+                        🚜 Painel de Recursos & Equipamentos
                     </h3>
                     <button type="button" onclick="editarTexto('lbl_titulo_bloco_recursos')" class="btn-edit-title">✏️</button>
                 </div>
@@ -364,8 +381,20 @@
 
         let mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
         let semanasSelecionadasSet = new Set();
+        let recursosDesmarcados = new Set();
 
-        // CONTROLE DE ABRIR/FECHAR GAVETAS (SANFONAS)
+        // MAPEAMENTO INTELIGENTE DE ÍCONES / FIGURINHAS
+        function obterIconeRecurso(nome) {
+            let n = nome.toUpperCase();
+            if (n.includes('CAMINHÃO') || n.includes('CAMINHAO')) return '🚚';
+            if (n.includes('EMPILHADEIRA')) return '🚜';
+            if (n.includes('CARRO') || n.includes('VEÍCULO') || n.includes('VEICULO')) return '🚗';
+            if (n.includes('MOTO')) return '🏍️';
+            if (n.includes('VAN')) return '🚐';
+            if (n.includes('GUINCHO')) return '🏗️';
+            return '🚙'; // Ícone padrão
+        }
+
         function alternarGaveta(containerId, botaoId) {
             const box = document.getElementById(containerId);
             const btn = document.getElementById(botaoId);
@@ -402,7 +431,7 @@
             if (!texto) return "";
             return texto
                 .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2300}-\u{23FF}]/gu, '')
-                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡]/g, '')
+                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡🚗🚚🚜🏍️🏗️]/g, '')
                 .replace(/\[.*?\]/g, '')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -423,7 +452,6 @@
             return d.getMonth();
         }
 
-        // MONTA OS 12 MESES
         function renderizarCheckboxesMeses() {
             const cont = document.getElementById('boxContainerMesesCheck');
             cont.innerHTML = '';
@@ -462,7 +490,6 @@
             else el.innerText = `${qtd} Mês(es) Marcado(s)`;
         }
 
-        // MONTA AS 53 SEMANAS
         function renderizarGridUniversalSemanas() {
             const cont = document.getElementById('gridUniversalSemanas');
             cont.innerHTML = '';
@@ -563,7 +590,61 @@
             document.getElementById('inputAnoIndicador').value = ano;
             popularSelectAnos(ano);
             document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
+            recursosDesmarcados.clear();
             selecionarSemanasPredefinicao('ate_vigente');
+        }
+
+        // CONTROLES DE MARCAÇÃO DE RECURSOS
+        function alternarRecursoFiltro(nomeRecurso, marcar) {
+            if (marcar) recursosDesmarcados.delete(nomeRecurso);
+            else recursosDesmarcados.add(nomeRecurso);
+            carregarIndicadores();
+        }
+
+        function marcarTodosRecursosFiltro(marcar) {
+            if (marcar) {
+                recursosDesmarcados.clear();
+            } else {
+                if (cacheDadosProcessados && cacheDadosProcessados.todosRecursosNomes) {
+                    cacheDadosProcessados.todosRecursosNomes.forEach(n => recursosDesmarcados.add(n));
+                }
+            }
+            carregarIndicadores();
+        }
+
+        function renderizarFiltroDeRecursos(setNomes) {
+            const cont = document.getElementById('containerFiltroRecursos');
+            cont.innerHTML = '';
+            
+            let nomesArray = Array.from(setNomes).sort();
+            if (nomesArray.length === 0) {
+                cont.innerHTML = '<span class="text-xs text-gray-400 italic">Nenhum recurso registado neste período.</span>';
+                document.getElementById('labelContadorRecursosFiltro').innerText = "0 Recursos";
+                return;
+            }
+
+            let ativosCount = 0;
+            nomesArray.forEach(nome => {
+                const isChecked = !recursosDesmarcados.has(nome);
+                if (isChecked) ativosCount++;
+
+                const icone = obterIconeRecurso(nome);
+
+                const label = document.createElement('label');
+                label.className = `flex items-center gap-1.5 px-3 py-1.5 rounded-xl border cursor-pointer transition shadow-sm ${
+                    isChecked 
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-950 dark:bg-emerald-950/70 dark:border-emerald-700 dark:text-emerald-200' 
+                        : 'bg-white border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700'
+                }`;
+                label.innerHTML = `
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="alternarRecursoFiltro('${nome.replace(/'/g, "\\'")}', this.checked)" class="w-3.5 h-3.5 accent-emerald-600 cursor-pointer">
+                    <span class="text-base">${icone}</span>
+                    <span class="text-xs font-extrabold uppercase">${nome}</span>
+                `;
+                cont.appendChild(label);
+            });
+
+            document.getElementById('labelContadorRecursosFiltro').innerText = `${ativosCount} de ${nomesArray.length} Ativo(s)`;
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -613,6 +694,7 @@
 
             let mapaRecursosUtilizados = {}; 
             let totalRecursosUtilizadosGeral = 0;
+            let todosRecursosNomes = new Set();
 
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
@@ -623,7 +705,6 @@
                 let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                 let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
 
-                // Só considera ativa se a semana E o mês estiverem selecionados
                 let estaAtiva = semanasSelecionadasSet.has(numSemana) && mesesSelecionados.has(mesIdx);
 
                 let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0;
@@ -648,10 +729,13 @@
                         let nomeRecurso = limparSimbolosTexto(nomeBruto).toUpperCase();
                         
                         if (nomeRecurso && nomeRecurso.length > 1) {
+                            todosRecursosNomes.add(nomeRecurso);
+
                             let check = tag.querySelector('input[type="checkbox"]');
                             let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
-                            if (estaConcluido && !ehFuturoReal && estaAtiva) {
+                            // Respeita se o recurso está marcado E se não foi desmarcado no filtro
+                            if (estaConcluido && !ehFuturoReal && estaAtiva && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
                                 totalRecursosUtilizadosGeral++;
                                 recursosNestaSemanaFeitos++;
@@ -710,12 +794,14 @@
             document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume (${totalExtrasConcluidasAno} feitas)`;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeralConcluida}%`;
 
+            renderizarFiltroDeRecursos(todosRecursosNomes);
             processarIndicadoresDeRecursos(mapaRecursosUtilizados, totalRecursosUtilizadosGeral);
 
             cacheDadosProcessados = {
                 anoSelecionado,
                 semanasLista,
                 mesesDados,
+                todosRecursosNomes,
                 mapaRecursosUtilizados,
                 totalRecursosUtilizadosGeral
             };
@@ -739,12 +825,12 @@
             if (recursosOrdenados.length > 0 && totalUtilizados > 0) {
                 let mais = recursosOrdenados[0];
                 let percMais = Math.round((mais.utilizados / totalUtilizados) * 100);
-                document.getElementById('cardRecursoMaisNome').innerText = mais.nome;
+                document.getElementById('cardRecursoMaisNome').innerHTML = `<span class="mr-1">${obterIconeRecurso(mais.nome)}</span> ${mais.nome}`;
                 document.getElementById('cardRecursoMaisQtd').innerText = `${mais.utilizados} vezes (${percMais}%)`;
 
                 let menos = recursosOrdenados[recursosOrdenados.length - 1];
                 let percMenos = Math.round((menos.utilizados / totalUtilizados) * 100);
-                document.getElementById('cardRecursoMenosNome').innerText = menos.nome;
+                document.getElementById('cardRecursoMenosNome').innerHTML = `<span class="mr-1">${obterIconeRecurso(menos.nome)}</span> ${menos.nome}`;
                 document.getElementById('cardRecursoMenosQtd').innerText = `${menos.utilizados} vezes (${percMenos}%)`;
 
                 msgGrafico.classList.add('hidden');
@@ -767,12 +853,14 @@
             } else {
                 recursosOrdenados.forEach((r, idx) => {
                     let perc = Math.round((r.utilizados / totalUtilizados) * 100);
+                    let icone = obterIconeRecurso(r.nome);
                     
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-emerald-50/40 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-2 px-3 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                        <td class="py-2 px-3 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                             <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
+                            <span class="text-base">${icone}</span>
                             <span>${r.nome}</span>
                         </td>
                         <td class="py-2 px-3 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
@@ -793,7 +881,7 @@
 
             if (recursos.length === 0) return;
 
-            let labels = recursos.map(r => r.nome);
+            let labels = recursos.map(r => `${obterIconeRecurso(r.nome)} ${r.nome}`);
             let valoresUtilizados = recursos.map(r => r.utilizados);
 
             graficoRecursosInstance = new Chart(ctx, {
@@ -817,9 +905,7 @@
                         x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } },
                         y: { ticks: { font: { size: 10, weight: 'bold' } } }
                     },
-                    plugins: { 
-                        legend: { display: false } 
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
         }
