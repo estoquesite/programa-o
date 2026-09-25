@@ -398,12 +398,12 @@
             
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">1. Cole o Script / Transcrição do Teams:</label>
-                <textarea id="inputScriptTexto" rows="2" placeholder="Cole aqui o texto da transcrição..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
+                <textarea id="inputScriptTexto" rows="3" placeholder="Cole aqui o texto da transcrição..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
             </div>
 
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">2. Apontamentos da Sala (O que os outros falaram e não saiu no Teams):</label>
-                <textarea id="inputNotasSala" rows="2" placeholder="Ex: Fulano disse que o caminhão chega terça às 14h; Ciclano pediu empilhadeira..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
+                <textarea id="inputNotasSala" rows="3" placeholder="Ex: Fulano disse que o caminhão chega terça às 14h; Ciclano pediu empilhadeira..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
             </div>
 
             <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">🔎 Analisar Tudo e Gerar Sugestões</button>
@@ -797,7 +797,7 @@
             }
         }
 
-        // NOVO ANALISADOR APERFEIÇOADO: Agrupa e captura o bloco completo da fala, incluindo horários, nomes e o texto todo
+        // NOVO ANALISADOR ROBUSTO: Lê blocos maiores de conversação (para capturar qualquer minuto: 02:25, 15h, 16h, etc.)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const textoNotas = document.getElementById('inputNotasSala').value;
@@ -813,60 +813,41 @@
 
             const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
             
-            // Separa por parágrafos duplos ou blocos maiores de fala para não perder a linha de cima/baixo
-            const blocos = textoCombinado.split(/\n\s*\n/);
+            // Agrupa as linhas em blocos inteligentes (juntando blocos de 5 linhas para nunca perder o contexto de horários e minutos)
+            const linhas = textoCombinado.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let encontradas = 0;
+            let textosProcessados = new Set();
 
-            blocos.forEach(bloco => {
-                const blocoTrim = bloco.trim().replace(/\n/g, ' ');
-                const blocoUp = blocoTrim.toUpperCase();
-
-                if (blocoTrim.length > 0) {
-                    const contemPalavra = palavrasChave.some(p => {
-                        const regex = new RegExp(p, 'i');
-                        return regex.test(blocoUp);
-                    });
-
-                    if (contemPalavra) {
-                        encontradas++;
-                        const div = document.createElement('div');
-                        div.className = 'flex flex-col gap-1.5 bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border border-blue-200 dark:border-blue-900';
-                        div.innerHTML = `
-                            <span class="text-[11px] font-medium text-blue-900 dark:text-blue-200">💬 "${blocoTrim}"</span>
-                            <div class="flex justify-end gap-1">
-                                <button onclick="usarSugestao(this)" data-texto="${blocoTrim.replace(/"/g, '&quot;')}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar no Planejamento ➜</button>
-                                <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕ Descartar</button>
-                            </div>
-                        `;
-                        containerSugestoes.appendChild(div);
-                    }
+            for (let i = 0; i < linhas.length; i++) {
+                // Monta um bloco robusto com a linha atual e as próximas 4 linhas para abranger o minuto completo e a fala
+                let blocoContexto = "";
+                let limite = Math.min(i + 5, linhas.length);
+                for (let j = i; j < limite; j++) {
+                    blocoContexto += (blocoContexto ? " " : "") + linhas[j];
                 }
-            });
 
-            // Se por acaso o texto do Teams for linha por linha simples sem quebra dupla, faz uma varredura agrupada de blocos de 3 linhas
-            if (encontradas === 0) {
-                const linhas = textoCombinado.split('\n').filter(l => l.trim().length > 0);
-                for (let i = 0; i < linhas.length; i++) {
-                    // Pega a linha atual e a próxima para garantir o contexto completo (ex: nome em cima, fala embaixo)
-                    let blocoContexto = linhas[i];
-                    if (i + 1 < linhas.length) blocoContexto += " " + linhas[i+1];
-                    if (i + 2 < linhas.length) blocoContexto += " " + linhas[i+2];
+                const blocoUp = blocoContexto.toUpperCase();
 
-                    const blocoUp = blocoContexto.toUpperCase();
-                    if (palavrasChave.some(p => new RegExp(p, 'i').test(blocoUp))) {
-                        encontradas++;
-                        const div = document.createElement('div');
-                        div.className = 'flex flex-col gap-1.5 bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border border-blue-200 dark:border-blue-900';
-                        div.innerHTML = `
-                            <span class="text-[11px] font-medium text-blue-900 dark:text-blue-200">💬 "${blocoContexto}"</span>
-                            <div class="flex justify-end gap-1">
-                                <button onclick="usarSugestao(this)" data-texto="${blocoContexto.replace(/"/g, '&quot;')}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar no Planejamento ➜</button>
-                                <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕ Descartar</button>
-                            </div>
-                        `;
-                        containerSugestoes.appendChild(div);
-                        i += 2; // Pula as linhas já agrupadas para não duplicar
-                    }
+                // Verifica se alguma palavra-chave está neste bloco
+                const contemPalavra = palavrasChave.some(p => {
+                    const regex = new RegExp("\\b" + p + "\\b", "i");
+                    return regex.test(blocoUp) || blocoUp.includes(p);
+                });
+
+                if (contemPalavra && !textosProcessados.has(blocoContexto)) {
+                    textosProcessados.add(blocoContexto);
+                    encontradas++;
+
+                    const div = document.createElement('div');
+                    div.className = 'flex flex-col gap-1.5 bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border border-blue-200 dark:border-blue-900';
+                    div.innerHTML = `
+                        <span class="text-[11px] font-medium text-blue-900 dark:text-blue-200">💬 "${blocoContexto}"</span>
+                        <div class="flex justify-end gap-1">
+                            <button onclick="usarSugestao(this)" data-texto="${blocoContexto.replace(/"/g, '&quot;')}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar no Planejamento ➜</button>
+                            <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕ Descartar</button>
+                        </div>
+                    `;
+                    containerSugestoes.appendChild(div);
                 }
             }
 
