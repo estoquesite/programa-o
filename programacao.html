@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.82 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.83 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -234,24 +234,7 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- INDICADOR / BARRA DE PROGRESSO NO TOPO COM BOTÃO DETALHES -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <span class="text-sm">📊</span>
-                <div>
-                    <h4 class="text-xs font-bold uppercase text-green-800 dark:text-green-300">Indicador de Conclusão da Semana</h4>
-                    <span id="textoIndicadorProgresso" class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold">0 de 0 concluídas (0%)</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-28 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div id="barraProgressoIndicador" class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
-                </div>
-                <button onclick="abrirModalIndicador()" class="bg-green-700 hover:bg-green-800 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold shadow-sm transition">Ver Indicador</button>
-            </div>
-        </div>
-
-        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO -->
+        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES DE APOIO INCLUINDO INDICADOR -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
@@ -263,8 +246,9 @@
                     <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-14 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
                 </div>
             </div>
-            <div class="flex gap-1.5 items-center">
+            <div class="flex gap-1.5 items-center flex-wrap">
                 <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded-lg text-xs font-bold hover:bg-blue-200">🔄 Atual</button>
+                <button onclick="abrirModalIndicador()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📊 Indicador</button>
                 <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📁 Histórico</button>
                 <button onclick="abrirModalTreinamentos()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🎓 Treinamentos</button>
                 <button onclick="abrirModalFeriados()" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🍃 Feriados</button>
@@ -325,7 +309,7 @@
     <div id="modalIndicador" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-md w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-                <h3 class="text-sm font-bold uppercase text-green-800 dark:text-green-300">📊 Relatório do Indicador</h3>
+                <h3 class="text-sm font-bold uppercase text-amber-700 dark:text-amber-300">📊 Relatório do Indicador</h3>
                 <button onclick="fecharModalIndicador()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
             <div id="conteudoRelatorioIndicador" class="space-y-3 text-xs text-gray-700 dark:text-gray-300"></div>
@@ -389,7 +373,7 @@
             </div>
             <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição</label><input type="text" id="popFeriadoDesc" placeholder="EX: FERIADO MUNICIPAL..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
             <div class="flex gap-2">
-                <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
+                <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Guardar Feriado</button>
             </div>
             <div id="popListaFeriados" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
             <div class="flex justify-end pt-2"><button onclick="fecharModalFeriados()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
@@ -401,7 +385,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.82 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.83 Nuvem</span>
         </div>
     </div>
 
@@ -459,14 +443,7 @@
                 if (cb.checked) concluidas++;
             });
             const percentual = total > 0 ? Math.round((concluidas / total) * 100) : 0;
-            
-            const texto = document.getElementById('textoIndicadorProgresso');
-            const barra = document.getElementById('barraProgressoIndicador');
-            
-            if (texto && barra) {
-                texto.innerText = `${concluidas} de ${total} concluídas (${percentual}%)`;
-                barra.style.width = `${percentual}%`;
-            }
+            // Mantemos a lógica atualizada silenciosamente em segundo plano
         }
 
         function abrirModalIndicador() {
@@ -479,7 +456,7 @@
 
             const container = document.getElementById('conteudoRelatorioIndicador');
             container.innerHTML = `
-                <div class="bg-green-50 dark:bg-green-950/40 p-3 rounded-xl border border-green-200 dark:border-green-900 space-y-2">
+                <div class="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900 space-y-2">
                     <p><strong>Semana Atual:</strong> ${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</p>
                     <p><strong>Total de Itens:</strong> ${total}</p>
                     <p><strong>Concluídas:</strong> <span class="text-green-700 font-bold">${concluidas}</span></p>
@@ -494,7 +471,6 @@
             document.getElementById('modalIndicador').classList.add('hidden');
         }
 
-        // Função para exportar os dados da semana para Excel (CSV compatível)
         function exportarParaExcel() {
             let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
@@ -503,7 +479,6 @@
             document.querySelectorAll('.day-card').forEach(card => {
                 let diaNome = card.querySelector('.day-title').innerText.split('\n')[0].trim();
                 
-                // Tarefas normais e extras
                 card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
                     let descEl = box.querySelector('.item-text') || box.querySelector('strong');
                     let desc = descEl ? descEl.innerText.replace(/;/g, ',') : '';
@@ -512,7 +487,6 @@
                     csvContent += `${diaNome};${tipo};${desc};${status}\n`;
                 });
 
-                // Recursos
                 card.querySelectorAll('.resource-tag').forEach(tag => {
                     let descEl = tag.querySelector('.item-text');
                     let desc = descEl ? descEl.innerText.replace(/;/g, ',') : '';
