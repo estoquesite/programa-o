@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.19 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.20 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -364,8 +364,9 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Evento</label>
-                    <input type="date" id="inputDataEvento" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Evento (Atualiza a Semana Sozinha)</label>
+                    <!-- AO MUDAR A DATA DO EVENTO, O CALENDÁRIO MUDA DE SEMANA AUTOMATICAMENTE -->
+                    <input type="date" id="inputDataEvento" onchange="sincronizarSemanaPelaData(this.value)" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
                 </div>
                 <div>
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo de Entrada</label>
@@ -376,8 +377,8 @@
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item (Correção Ortográfica Automática)</label>
-                <input type="text" id="inputDesc" placeholder="Ex: inventario ou almoxarifado..." oninput="corrigirOrtografiaAutomaticamente(this)" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
+                <input type="text" id="inputDesc" placeholder="Ex: inventario..." oninput="corrigirOrtografiaAutomaticamente(this)" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
             </div>
             <div class="flex gap-2 pt-1">
                 <button onclick="adicionarItemPorData()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Adicionar (OK)</button>
@@ -385,7 +386,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.19) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.20) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -428,7 +429,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.19 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.20 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -452,7 +453,7 @@
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // DICIONÁRIO DE CORREÇÃO ORTOGRÁFICA INTELIGENTE (ADICIONE SUAS PALAVRAS AQUI)
+        // DICIONÁRIO DE CORREÇÃO ORTOGRÁFICA INTELIGENTE
         const dicionarioCorrecao = {
             "ALMOÇEGIFADO": "ALMOXARIFADO",
             "ALMOCEDIFADO": "ALMOXARIFADO",
@@ -463,17 +464,13 @@
             "CAMINHAO": "CAMINHÃO"
         };
 
-        // CORREÇÃO ORTOGRÁFICA AUTOMÁTICA
         function corrigirOrtografiaAutomaticamente(input) {
             let texto = input.value.trim().toUpperCase();
-            
-            // Verifica se alguma palavra digitada precisa de correção oficial
             for (let errada in dicionarioCorrecao) {
                 if (texto.includes(errada)) {
                     texto = texto.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
                 }
             }
-
             input.value = texto;
         }
 
@@ -562,6 +559,8 @@
                 document.documentElement.classList.add('dark');
             }
             carregarFrequentes();
+            
+            // Define o ano e a semana automaticamente com base no relógio real
             definirSemanaAtualComRegraSexta();
             document.getElementById('inputDataEvento').valueAsDate = new Date();
 
@@ -811,7 +810,7 @@
             }
         }
 
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.19)
+        // ANALISADOR INTELIGENTE DE SCRIPT (v3.20)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
@@ -931,9 +930,10 @@
             atualizarDatasSemana();
         }
 
-        // REGRA INTELIGENTE: SE FOR SEXTA-FEIRA OU FIM DE SEMANA, JÁ SELECIONA A PRÓXIMA SEMANA AUTOMATICAMENTE
+        // REGRA 1: ABRE NA SEMANA CORRETA (E PULA NA SEXTA/FDS) COM ANO AUTOMÁTICO
         function definirSemanaAtualComRegraSexta() {
-            const hoje = new Date(); const ano = hoje.getFullYear();
+            const hoje = new Date(); 
+            const ano = hoje.getFullYear();
             document.getElementById('inputAno').value = ano;
 
             let dataCalculo = new Date(hoje);
@@ -942,6 +942,22 @@
             }
 
             const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+            document.getElementById('inputNumSemana').value = weekNo;
+            atualizarDatasSemana();
+        }
+
+        // REGRA 2: SINCRONIZA O TOPO AUTOMATICAMENTE QUANDO VOCÊ ESCOLHE A DATA DO EVENTO
+        function sincronizarSemanaPelaData(dataStr) {
+            if (!dataStr) return;
+            const dataObj = new Date(dataStr + 'T00:00:00');
+            const ano = dataObj.getFullYear();
+            document.getElementById('inputAno').value = ano;
+
+            const d = new Date(Date.UTC(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate()));
             const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
             const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
@@ -1012,7 +1028,6 @@
 
             if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
 
-            // Aplica correção ortográfica antes de salvar
             for (let errada in dicionarioCorrecao) {
                 if (desc.includes(errada)) {
                     desc = desc.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
