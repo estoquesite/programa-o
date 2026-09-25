@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.84 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.85 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -234,7 +234,21 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES DE APOIO -->
+        <!-- INDICADOR / BARRA DE PROGRESSO NO TOPO -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-sm">📊</span>
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-green-800 dark:text-green-300">Indicador de Conclusão da Semana</h4>
+                    <span id="textoIndicadorProgresso" class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold">0 de 0 concluídas (0%)</span>
+                </div>
+            </div>
+            <div class="w-36 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div id="barraProgressoIndicador" class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
@@ -385,7 +399,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.84 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.85 Nuvem</span>
         </div>
     </div>
 
@@ -443,6 +457,14 @@
                 if (cb.checked) concluidas++;
             });
             const percentual = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+            
+            const texto = document.getElementById('textoIndicadorProgresso');
+            const barra = document.getElementById('barraProgressoIndicador');
+            
+            if (texto && barra) {
+                texto.innerText = `${concluidas} de ${total} concluídas (${percentual}%)`;
+                barra.style.width = `${percentual}%`;
+            }
         }
 
         function abrirModalIndicador() {
@@ -455,12 +477,19 @@
 
             const container = document.getElementById('conteudoRelatorioIndicador');
             container.innerHTML = `
-                <div class="bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900 space-y-2">
+                <div class="bg-amber-50 dark:bg-amber-950/40 p-4 rounded-xl border border-amber-200 dark:border-amber-900 space-y-3 text-xs">
+                    <p class="text-sm font-bold text-amber-900 dark:text-amber-200">📌 Relatório Detalhado</p>
                     <p><strong>Semana Atual:</strong> ${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</p>
-                    <p><strong>Total de Itens:</strong> ${total}</p>
-                    <p><strong>Concluídas:</strong> <span class="text-green-700 font-bold">${concluidas}</span></p>
-                    <p><strong>Pendentes:</strong> <span class="text-amber-600 font-bold">${pendentes}</span></p>
-                    <p><strong>Aproveitamento:</strong> <span class="text-blue-600 font-bold">${percentual}%</span></p>
+                    <p><strong>Total de Itens na Semana:</strong> ${total}</p>
+                    <p><strong>Tarefas Concluídas:</strong> <span class="text-green-700 font-bold text-sm">${concluidas}</span></p>
+                    <p><strong>Tarefas Pendentes:</strong> <span class="text-amber-600 font-bold text-sm">${pendentes}</span></p>
+                    <div class="pt-2 border-t dark:border-gray-700">
+                        <p class="font-bold mb-1">Aproveitamento Geral:</p>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div class="bg-amber-600 h-3 rounded-full" style="width: ${percentual}%"></div>
+                        </div>
+                        <p class="text-right font-bold text-amber-700 dark:text-amber-400 mt-1">${percentual}% Concluído</p>
+                    </div>
                 </div>
             `;
             document.getElementById('modalIndicador').classList.remove('hidden');
@@ -470,13 +499,11 @@
             document.getElementById('modalIndicador').classList.add('hidden');
         }
 
-        // Nova exportação para Excel formatada com colunas laterais correspondentes por dia
         function exportarParaExcel() {
             let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
             let diasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
             
-            // Coleta os itens separados por dia
             let dadosPorDia = {};
             diasMap.forEach(d => dadosPorDia[d] = { tarefas: [], recursos: [] });
 
@@ -500,14 +527,12 @@
                 });
             });
 
-            // Constrói o CSV em formato de tabela lado a lado por dia
             let csvContent = "\uFEFF";
             diasMap.forEach(d => {
                 csvContent += `${d} (Tarefas);${d} (Recursos);;`;
             });
             csvContent += "\n";
 
-            // Descobre o dia com mais linhas para alinhar a matriz
             let maxLinhas = Math.max(...diasMap.map(d => Math.max(dadosPorDia[d].tarefas.length, dadosPorDia[d].recursos.length)));
 
             for (let i = 0; i < maxLinhas; i++) {
