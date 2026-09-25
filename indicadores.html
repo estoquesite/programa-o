@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v4.7 Filtro Visual de Recursos)</title>
+    <title>Painel de Indicadores & Gráficos (v4.9 Memória Permanente)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -142,7 +142,7 @@
                 </div>
             </div>
 
-            <!-- LINHA 4: NOVO - GAVETA RETRÁTIL COM ÍCONES DOS RECURSOS (CARRO, CAMINHÃO, EMPILHADEIRA) -->
+            <!-- LINHA 4: GAVETA RETRÁTIL DE RECURSOS COM ÍCONES -->
             <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-1.5">
@@ -156,12 +156,11 @@
                         <button type="button" onclick="alternarGaveta('containerFiltroRecursos', 'btnToggleRecursos')" id="btnToggleRecursos" class="text-xs text-emerald-700 dark:text-emerald-400 font-bold underline ml-1">Mostrar caixas ▾</button>
                     </div>
                 </div>
-                <!-- CAIXA ESCONDIDA COM OS RECURSOS E SEUS ÍCONES -->
                 <div id="containerFiltroRecursos" class="hidden p-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 text-xs font-bold">
                 </div>
             </div>
 
-            <!-- LINHA 5: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
+            <!-- LINHA 5: CANAIS DE TAREFA -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -334,25 +333,20 @@
             </div>
         </div>
 
-        <!-- TABELA COM AS 53 SEMANAS DO ANO -->
+        <!-- TABELA FILTRADA APENAS COM AS SEMANAS SELECIONADAS -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-1">
-                    <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento Semanal</h3>
+                    <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento das Semanas Selecionadas</h3>
                     <button type="button" onclick="editarTexto('lbl_tabela_semanas')" class="btn-edit-title">✏️</button>
                 </div>
-                <span class="text-[11px] text-gray-400">Marque ou desmarque qualquer semana para refinar o relatório.</span>
+                <span class="text-[11px] text-gray-400">Exibindo apenas as semanas ativas marcadas no filtro superior.</span>
             </div>
             <div class="overflow-x-auto max-h-96 overflow-y-auto">
                 <table class="w-full text-left text-xs">
                     <thead>
                         <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" id="checkMasterTabela" checked onchange="marcarTodasSemanasTabela(this.checked)" class="w-3.5 h-3.5 accent-blue-600">
-                                    <span>Semana</span>
-                                </label>
-                            </th>
+                            <th class="py-2.5 px-3">Semana</th>
                             <th class="py-2.5 px-3 col-total">Total Itens</th>
                             <th class="py-2.5 px-3 text-green-600 col-concluidas">Concluídas</th>
                             <th class="py-2.5 px-3 text-red-600 col-naorealizadas">Não Realizadas</th>
@@ -383,7 +377,33 @@
         let semanasSelecionadasSet = new Set();
         let recursosDesmarcados = new Set();
 
-        // MAPEAMENTO INTELIGENTE DE ÍCONES / FIGURINHAS
+        function obterChaveStorageSemanas(ano) {
+            return `indicadores_semanas_selecionadas_${ano}`;
+        }
+
+        function salvarSemanasNaMemoria() {
+            const ano = document.getElementById('inputAnoIndicador').value || 2026;
+            const arr = Array.from(semanasSelecionadasSet);
+            localStorage.setItem(obterChaveStorageSemanas(ano), JSON.stringify(arr));
+        }
+
+        function carregarSemanasDaMemoria() {
+            const ano = document.getElementById('inputAnoIndicador').value || 2026;
+            const salvo = localStorage.getItem(obterChaveStorageSemanas(ano));
+            semanasSelecionadasSet.clear();
+
+            if (salvo) {
+                try {
+                    const arr = JSON.parse(salvo);
+                    arr.forEach(s => semanasSelecionadasSet.add(Number(s)));
+                } catch(e) {
+                    selecionarSemanasPredefinicaoInterno('ate_vigente');
+                }
+            } else {
+                selecionarSemanasPredefinicaoInterno('ate_vigente');
+            }
+        }
+
         function obterIconeRecurso(nome) {
             let n = nome.toUpperCase();
             if (n.includes('CAMINHÃO') || n.includes('CAMINHAO')) return '🚚';
@@ -392,7 +412,7 @@
             if (n.includes('MOTO')) return '🏍️';
             if (n.includes('VAN')) return '🚐';
             if (n.includes('GUINCHO')) return '🏗️';
-            return '🚙'; // Ícone padrão
+            return '🚙';
         }
 
         function alternarGaveta(containerId, botaoId) {
@@ -520,21 +540,12 @@
         function alternarSemanaManual(numSemana, marcar) {
             if (marcar) semanasSelecionadasSet.add(numSemana);
             else semanasSelecionadasSet.delete(numSemana);
+            salvarSemanasNaMemoria();
             renderizarGridUniversalSemanas();
             carregarIndicadores();
         }
 
-        function marcarTodasSemanasTabela(marcar) {
-            if (marcar) {
-                for (let s = 1; s <= 53; s++) semanasSelecionadasSet.add(s);
-            } else {
-                semanasSelecionadasSet.clear();
-            }
-            renderizarGridUniversalSemanas();
-            carregarIndicadores();
-        }
-
-        function selecionarSemanasPredefinicao(tipo) {
+        function selecionarSemanasPredefinicaoInterno(tipo) {
             const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             const semanaAtualReal = calcularNumeroSemanaAtual();
             const anoRealHoje = new Date().getFullYear();
@@ -547,6 +558,11 @@
             } else if (tipo === 'todas') {
                 for (let s = 1; s <= 53; s++) semanasSelecionadasSet.add(s);
             }
+        }
+
+        function selecionarSemanasPredefinicao(tipo) {
+            selecionarSemanasPredefinicaoInterno(tipo);
+            salvarSemanasNaMemoria();
             renderizarGridUniversalSemanas();
             carregarIndicadores();
         }
@@ -591,10 +607,11 @@
             popularSelectAnos(ano);
             document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
             recursosDesmarcados.clear();
-            selecionarSemanasPredefinicao('ate_vigente');
+            carregarSemanasDaMemoria();
+            renderizarGridUniversalSemanas();
+            carregarIndicadores();
         }
 
-        // CONTROLES DE MARCAÇÃO DE RECURSOS
         function alternarRecursoFiltro(nomeRecurso, marcar) {
             if (marcar) recursosDesmarcados.delete(nomeRecurso);
             else recursosDesmarcados.add(nomeRecurso);
@@ -650,7 +667,8 @@
         window.addEventListener('DOMContentLoaded', async () => {
             carregarTextosCustomizados();
             renderizarCheckboxesMeses();
-            selecionarSemanasPredefinicao('ate_vigente');
+            carregarSemanasDaMemoria();
+            renderizarGridUniversalSemanas();
             await carregarIndicadoresDaNuvem();
         });
 
@@ -699,13 +717,17 @@
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
 
-            for (let numSemana = 1; numSemana <= 53; numSemana++) {
+            // Apenas semanas marcadas no filtro superior serão processadas
+            let semanasOrdenadas = Array.from(semanasSelecionadasSet).sort((a,b) => a - b);
+
+            semanasOrdenadas.forEach(numSemana => {
                 let key = `prog_grid_${anoSelecionado}_semana_${numSemana}`;
                 let htmlCard = semanasSalvas[key];
                 let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                 let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
 
-                let estaAtiva = semanasSelecionadasSet.has(numSemana) && mesesSelecionados.has(mesIdx);
+                // Só considera ativa se o mês correspondente estiver marcado
+                if (!mesesSelecionados.has(mesIdx)) return;
 
                 let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0;
 
@@ -734,8 +756,8 @@
                             let check = tag.querySelector('input[type="checkbox"]');
                             let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
-                            // Respeita se o recurso está marcado E se não foi desmarcado no filtro
-                            if (estaConcluido && !ehFuturoReal && estaAtiva && !recursosDesmarcados.has(nomeRecurso)) {
+                            // Se marcado, computa no ranking de recursos
+                            if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
                                 totalRecursosUtilizadosGeral++;
                                 recursosNestaSemanaFeitos++;
@@ -749,18 +771,16 @@
                     extrasCount = tarefasExtras.length;
                 }
 
-                if (estaAtiva) {
-                    totalPlaneadasAno += planeadas;
-                    totalConcluidasAno += executadas;
-                    totalNaoRealizadasAno += naoRealizadas;
-                    totalExtrasAno += extrasCount;
-                    totalExtrasConcluidasAno += extrasConcluidas;
+                totalPlaneadasAno += planeadas;
+                totalConcluidasAno += executadas;
+                totalNaoRealizadasAno += naoRealizadas;
+                totalExtrasAno += extrasCount;
+                totalExtrasConcluidasAno += extrasConcluidas;
 
-                    mesesDados[mesIdx].planeadas += planeadas;
-                    mesesDados[mesIdx].concluidas += executadas;
-                    mesesDados[mesIdx].naoRealizadas += naoRealizadas;
-                    mesesDados[mesIdx].extras += extrasCount;
-                }
+                mesesDados[mesIdx].planeadas += planeadas;
+                mesesDados[mesIdx].concluidas += executadas;
+                mesesDados[mesIdx].naoRealizadas += naoRealizadas;
+                mesesDados[mesIdx].extras += extrasCount;
 
                 semanasLista.push({
                     numSemana,
@@ -771,13 +791,12 @@
                     extrasConcluidas,
                     recursosCount: recursosNestaSemanaFeitos,
                     temDadosSalvos: !!htmlCard,
-                    ehFuturoReal,
-                    ativa: estaAtiva
+                    ehFuturoReal
                 });
-            }
+            });
 
-            let semanasAtivasQtd = semanasLista.filter(s => s.ativa).length;
-            document.getElementById('cardSubInfoEscopo').innerText = `${semanasAtivasQtd} Semanas Analisadas`;
+            document.getElementById('cardSubInfoEscopo').innerText = `${semanasLista.length} Semanas no Período`;
+            document.getElementById('labelContadorSemanas').innerText = `${semanasSelecionadasSet.size} de 53 Marcadas`;
 
             document.getElementById('cardTotalPlaneadas').innerText = totalPlaneadasAno;
             document.getElementById('cardTotalConcluidas').innerText = totalConcluidasAno;
@@ -931,45 +950,50 @@
             const tbody = document.getElementById('tabelaIndicadoresCorpo');
             tbody.innerHTML = '';
 
-            cacheDadosProcessados.semanasLista.forEach(s => {
-                let percentualExec = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
-                let percentualNaoRealizado = s.planeadas > 0 ? Math.round((s.naoRealizadas / s.planeadas) * 100) : 0;
+            // Exibe exclusivamente as semanas selecionadas
+            if (cacheDadosProcessados.semanasLista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-gray-400 italic">Nenhuma semana selecionada no filtro. Marque as semanas desejadas acima.</td></tr>`;
+            } else {
+                cacheDadosProcessados.semanasLista.forEach(s => {
+                    let percentualExec = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
+                    let percentualNaoRealizado = s.planeadas > 0 ? Math.round((s.naoRealizadas / s.planeadas) * 100) : 0;
 
-                const tr = document.createElement('tr');
-                tr.className = `border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20 ${!s.ativa ? 'opacity-40' : ''}`;
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">
-                        <label class="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" ${s.ativa ? 'checked' : ''} onchange="alternarSemanaManual(${s.numSemana}, this.checked)" class="w-3.5 h-3.5 accent-blue-600 cursor-pointer">
-                            <span>Semana ${String(s.numSemana).padStart(2,'0')}</span>
-                            ${!s.temDadosSalvos ? '<span class="text-[9px] text-gray-400 font-normal">(Sem Registos)</span>' : ''}
-                            ${s.ehFuturoReal ? '<span class="text-[9px] text-blue-500 font-normal">(Programada)</span>' : ''}
-                        </label>
-                    </td>
-                    <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
-                    <td class="py-2.5 px-3 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
-                    <td class="py-2.5 px-3 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
-                    <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400 col-extras" style="${mostrarExtras ? '' : 'display:none;'}">⚡ ${s.extrasConcluidas} / ${s.extrasCount}</td>
-                    <td class="py-2.5 px-3 font-extrabold text-emerald-800 dark:text-emerald-400">🚙 ${s.recursosCount}</td>
-                    <td class="py-2.5 px-3">
-                        <div class="flex items-center gap-2">
-                            <div class="w-20 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
-                                <div class="bg-green-600 h-2" style="width: ${percentualExec}%" title="${percentualExec}% Concluído"></div>
-                                <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Pendente"></div>
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox" checked onchange="alternarSemanaManual(${s.numSemana}, false)" class="w-3.5 h-3.5 accent-blue-600 cursor-pointer" title="Desmarcar esta semana">
+                                <span>Semana ${String(s.numSemana).padStart(2,'0')}</span>
+                                ${!s.temDadosSalvos ? '<span class="text-[9px] text-gray-400 font-normal">(Sem Registos)</span>' : ''}
+                                ${s.ehFuturoReal ? '<span class="text-[9px] text-blue-500 font-normal">(Programada)</span>' : ''}
+                            </label>
+                        </td>
+                        <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
+                        <td class="py-2.5 px-3 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
+                        <td class="py-2.5 px-3 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
+                        <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400 col-extras" style="${mostrarExtras ? '' : 'display:none;'}">⚡ ${s.extrasConcluidas} / ${s.extrasCount}</td>
+                        <td class="py-2.5 px-3 font-extrabold text-emerald-800 dark:text-emerald-400">🚙 ${s.recursosCount}</td>
+                        <td class="py-2.5 px-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-20 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
+                                    <div class="bg-green-600 h-2" style="width: ${percentualExec}%" title="${percentualExec}% Concluído"></div>
+                                    <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Pendente"></div>
+                                </div>
+                                <span class="font-bold text-[10px] text-gray-600 dark:text-gray-300">${percentualExec}%</span>
                             </div>
-                            <span class="font-bold text-[10px] text-gray-600 dark:text-gray-300">${percentualExec}%</span>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
 
             renderizarGraficosComFiltros(mostrarTotal, mostrarConcluidas, mostrarNaoRealizadas, mostrarExtras);
         }
 
         function renderizarGraficosComFiltros(mostrarTotal, mostrarConcluidas, mostrarNaoRealizadas, mostrarExtras) {
             const meses = cacheDadosProcessados.mesesDados;
-            const semanasAtivas = cacheDadosProcessados.semanasLista.filter(s => s.ativa);
+            const semanasAtivas = cacheDadosProcessados.semanasLista;
 
             let datasetsAnual = [];
 
