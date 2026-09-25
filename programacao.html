@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.43 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.44 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -432,7 +432,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.43) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.44) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -474,7 +474,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.43 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.44 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -605,7 +605,7 @@
             await sincronizarComNuvem();
             localStorage.removeItem(getWeekKey());
             atualizarDatasSemana();
-            alert("✅ Sincronizado com sucesso! Feriados, emendas e treinamentos atualizados.");
+            alert("✅ Sincronizado com sucesso!");
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -820,12 +820,17 @@
             guardarEstadoDOM();
         }
 
-        // LEITURA AUTOMÁTICA DE FERIADOS, EMENDAS E TREINAMENTOS (COM CONTROLO DE DUPLICATAS)
+        // LEITURA INTELIGENTE DE TREINAMENTOS (COM REGISTO DE DISPENSAS PARA NÃO REAPARECER SE APAGADO)
         function injetarDadosNasDatas(datasDaSemana) {
             const nomesDiasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
 
             let treinos = JSON.parse(localStorage.getItem("modulo_treinamentos_dados_nuvem")) || [];
             let feriados = JSON.parse(localStorage.getItem("modulo_feriados_dados_nuvem")) || [];
+            
+            // Lista de IDs de treinamentos que o utilizador já dispensou/apagou nesta semana específica
+            let semanaKey = getWeekKey();
+            let dispensadosKey = `${semanaKey}_treinos_dispensados`;
+            let dispensados = JSON.parse(localStorage.getItem(dispensadosKey)) || [];
 
             datasDaSemana.forEach((dataObj, index) => {
                 const diaNome = nomesDiasMap[index];
@@ -855,13 +860,14 @@
                     }
                 });
 
-                // 2. Verificar Treinamentos (evitando duplicar se já estiver na tela)
+                // 2. Verificar Treinamentos (respeitando quem foi apagado nesta semana)
                 if (!tasksCont.innerText.includes('bloqueado')) {
                     treinos.forEach(t => {
                         if (dataStrCard >= t.inicio && dataStrCard <= t.fim) {
                             const identificadorUnico = `treino_id_${t.id}`;
-                            // Verifica se o ID específico do treinamento já existe no container do dia
-                            if (!tasksCont.innerHTML.includes(identificadorUnico)) {
+                            
+                            // Só injeta se NÃO foi apagado nesta semana e NÃO está duplicado na tela
+                            if (!dispensados.includes(t.id) && !tasksCont.innerHTML.includes(identificadorUnico)) {
                                 const divTreino = document.createElement('div');
                                 divTreino.className = 'treinamento-box';
                                 divTreino.setAttribute('data-treino-id', t.id);
@@ -869,7 +875,7 @@
                                     <span class="${identificadorUnico}">🎓 <strong>${t.nome}</strong><br><small>📍 ${t.local} | 👤 ${t.pessoa}</small></span>
                                     <span class="item-controls">
                                         <button onclick="editarTreinamentoNaProgramacao('${t.id}')" class="btn-action-item btn-edit-item" title="Editar no Módulo">✏️</button>
-                                        <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                                        <button onclick="removerTreinamentoDaSemana(this, '${t.id}')" class="btn-action-item btn-delete-item" title="Apagar desta semana">✕</button>
                                     </span>
                                 `;
                                 tasksCont.appendChild(divTreino);
@@ -880,11 +886,25 @@
             });
         }
 
+        function removerTreinamentoDaSemana(botao, treinoId) {
+            let semanaKey = getWeekKey();
+            let dispensadosKey = `${semanaKey}_treinos_dispensados`;
+            let dispensados = JSON.parse(localStorage.getItem(dispensadosKey)) || [];
+            
+            if (!dispensados.includes(treinoId)) {
+                dispensados.push(treinoId);
+                localStorage.setItem(dispensadosKey, JSON.stringify(dispensados));
+            }
+
+            botao.closest('.treinamento-box').remove();
+            guardarEstadoDOM();
+        }
+
         function editarTreinamentoNaProgramacao(id) {
             window.location.href = "treinamentos.html";
         }
 
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.43)
+        // ANALISADOR INTELIGENTE DE SCRIPT (v3.44)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
