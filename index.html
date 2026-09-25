@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.33 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.35 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -102,7 +102,7 @@
             border: 1px solid #a3e4d7;
             border-radius: 6px;
             padding: 5px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             flex-shrink: 0;
         }
@@ -252,44 +252,16 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO, SEMANA, FERIADOS E EMENDA NO TOPO -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
+        <!-- SELETOR DE ANO E SEMANA NO TOPO -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
                 <input type="number" id="inputAno" value="2026" onchange="atualizarDatasSemana()" class="w-20 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
             </div>
             <div class="flex items-center gap-2">
-                <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Semana:</label>
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Nº da Semana:</label>
                 <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
             </div>
-
-            <!-- CAIXINHA 1: FERIADOS NACIONAIS 2026 -->
-            <div class="flex items-center gap-1.5">
-                <label class="text-xs font-bold text-red-700 dark:text-red-400">🎉 Feriado:</label>
-                <select id="selectFeriados" class="text-xs p-1.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-lg font-bold text-red-800 dark:text-red-200">
-                    <option value="">-- Feriados Nacionais --</option>
-                    <option value="01/01 - Confraternização Universal">01/01 - Confraternização Universal</option>
-                    <option value="16/02 - Carnaval">16/02 - Carnaval</option>
-                    <option value="17/02 - Carnaval (Terça)">17/02 - Carnaval (Terça)</option>
-                    <option value="03/04 - Paixão de Cristo">03/04 - Paixão de Cristo</option>
-                    <option value="21/04 - Tiradentes">21/04 - Tiradentes</option>
-                    <option value="01/05 - Dia do Trabalho">01/05 - Dia do Trabalho</option>
-                    <option value="04/06 - Corpus Christi">04/06 - Corpus Christi</option>
-                    <option value="07/09 - Independência do Brasil">07/09 - Independência do Brasil</option>
-                    <option value="12/10 - N. Sra. Aparecida">12/10 - N. Sra. Aparecida</option>
-                    <option value="02/11 - Finados">02/11 - Finados</option>
-                    <option value="15/11 - Proclamação da República">15/11 - Proclamação da República</option>
-                    <option value="20/11 - Consciência Negra">20/11 - Consciência Negra</option>
-                    <option value="25/12 - Natal">25/12 - Natal</option>
-                </select>
-            </div>
-
-            <!-- CAIXINHA 2: EMENDA -->
-            <div class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/40 px-2 py-1 border border-amber-200 dark:border-amber-900 rounded-lg">
-                <input type="checkbox" id="checkEmendaTopo" class="w-4 h-4 text-amber-600 rounded focus:ring-amber-500">
-                <label for="checkEmendaTopo" class="text-xs font-bold text-amber-800 dark:text-amber-200 cursor-pointer">📌 Emenda</label>
-            </div>
-
             <div class="flex gap-2">
                 <button onclick="definirSemanaAtual()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200">
                     🔄 Atual
@@ -306,6 +278,15 @@
             <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
                 <div class="day-content">
                     <div class="day-title" id="titleSegunda">Segunda<br><small>--/---</small></div>
+                    <!-- Caixinhas de Feriado e Emenda com Tema de Folha -->
+                    <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado
+                        </label>
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda
+                        </label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -322,6 +303,14 @@
             <div class="day-card" data-dia-idx="2" data-dia-nome="Terça">
                 <div class="day-content">
                     <div class="day-title" id="titleTerca">Terça<br><small>--/---</small></div>
+                    <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado
+                        </label>
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda
+                        </label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -338,6 +327,14 @@
             <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta">
                 <div class="day-content">
                     <div class="day-title" id="titleQuarta">Quarta<br><small>--/---</small></div>
+                    <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado
+                        </label>
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda
+                        </label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -355,6 +352,14 @@
             <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta">
                 <div class="day-content">
                     <div class="day-title" id="titleQuinta">Quinta<br><small>--/---</small></div>
+                    <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado
+                        </label>
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda
+                        </label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -371,6 +376,14 @@
             <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta">
                 <div class="day-content">
                     <div class="day-title" id="titleSexta">Sexta<br><small>--/---</small></div>
+                    <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado
+                        </label>
+                        <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
+                            <input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda
+                        </label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -432,7 +445,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.33) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.35) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -475,7 +488,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.33 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.35 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -862,7 +875,34 @@
             }
         }
 
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.33)
+        // FUNÇÃO PARA BLOQUEAR/DESBLOQUEAR O DIA QUANDO MARCA FERIADO OU EMENDA
+        function alternarBloqueioDia(checkbox) {
+            const card = checkbox.closest('.day-card');
+            const isFeriado = card.querySelector('.check-feriado').checked;
+            const isEmenda = card.querySelector('.check-emenda').checked;
+            const tasksCont = card.querySelector('.tasks-container');
+            const resCont = card.querySelector('.day-resources');
+
+            if (isFeriado || isEmenda) {
+                const motivo = isFeriado ? "🍃 FERIADO NACIONAL" : "📌 EMENDA";
+                tasksCont.innerHTML = `<div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg text-center font-bold text-emerald-800 dark:text-emerald-200 text-xs my-auto">${motivo}<br><small class="font-normal">Dia bloqueado para tarefas.</small></div>`;
+                resCont.innerHTML = `<div class="resources-title">Recursos</div><div class="text-[10px] text-gray-400 italic text-center py-2">Nenhum recurso alocado.</div>`;
+            } else {
+                // Restaura o padrão se desmarcar
+                tasksCont.innerHTML = `
+                    <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                `;
+                resCont.innerHTML = `
+                    <div class="resources-title">Recursos</div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                `;
+            }
+            guardarEstadoDOM();
+        }
+
+        // ANALISADOR INTELIGENTE DE SCRIPT (v3.35)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
@@ -1059,10 +1099,10 @@
                 
                 const textosExistentes = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
                 
-                if (!textosExistentes.includes('CARRO')) {
+                if (!textosExistentes.includes('CARRO') && !recursosCont.innerText.includes('bloqueado')) {
                     adicionarTagRecurso(recursosCont, 'CARRO');
                 }
-                if (!textosExistentes.includes('EMPILHADEIRA G4')) {
+                if (!textosExistentes.includes('EMPILHADEIRA G4') && !recursosCont.innerText.includes('bloqueado')) {
                     adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
                 }
             });
@@ -1107,7 +1147,9 @@
 
             if (semanaInteira) {
                 document.querySelectorAll('.day-card').forEach(card => {
-                    inserirItemNoCard(card, tipo, desc);
+                    if (!card.querySelector('.tasks-container').innerText.includes('bloqueado')) {
+                        inserirItemNoCard(card, tipo, desc);
+                    }
                 });
             } else {
                 const dataObj = new Date(dataStr + 'T00:00:00');
@@ -1116,6 +1158,10 @@
 
                 const card = document.querySelector(`.day-card[data-dia-nome="${nomesDiasMap[diaSemanaNum]}"]`);
                 if (!card) { alert("Dia não visível."); return; }
+                if (card.querySelector('.tasks-container').innerText.includes('bloqueado')) {
+                    alert("Este dia está marcado como Feriado ou Emenda e não pode receber tarefas.");
+                    return;
+                }
 
                 inserirItemNoCard(card, tipo, desc);
             }
@@ -1198,7 +1244,7 @@
                         body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background: #fff; color: #333; }
                         .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; align-items: stretch; }
                         .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; height: 480px !important; }
-                        .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 8px; flex-shrink: 0; }
+                        .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 6px; flex-shrink: 0; }
                         .tasks-container { flex-grow: 1; margin-bottom: 8px; overflow: hidden; }
                         .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
                         .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: auto; height: 125px; flex-shrink: 0; }
