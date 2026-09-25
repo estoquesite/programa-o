@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Indicadores de Produtividade (v1.0)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #1b5e20;
+            --secondary-color: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #d0d0d0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
+
+    <div class="container space-y-6">
+        <!-- CABEÇALHO -->
+        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar ao Menu</a>
+            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores</h2>
+            <button onclick="carregarIndicadores()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar Dados</button>
+        </div>
+
+        <!-- FILTRO DE PERÍODO -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Selecionar Ano de Análise</h3>
+                <p class="text-[11px] text-gray-500">Consolida o desempenho semanal e anual com base nas tarefas marcadas.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="number" id="inputAnoIndicador" value="2026" onchange="carregarIndicadores()" class="w-20 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
+            </div>
+        </div>
+
+        <!-- CARDS DE RESUMO GERAL -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Planeadas (Ano)</span>
+                <h3 id="cardTotalPlaneadas" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Concluídas (Ano)</span>
+                <h3 id="cardTotalConcluidas" class="text-2xl font-black text-green-600 dark:text-green-400">0</h3>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Taxa de Execução</span>
+                <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
+            </div>
+        </div>
+
+        <!-- TABELA DE INDICADORES POR SEMANA -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📈 Detalhado por Semana</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
+                            <th class="py-2.5 px-3">Semana</th>
+                            <th class="py-2.5 px-3">Planeadas</th>
+                            <th class="py-2.5 px-3">Concluídas</th>
+                            <th class="py-2.5 px-3">Extras Executadas</th>
+                            <th class="py-2.5 px-3">Desempenho</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaIndicadoresCorpo">
+                        <!-- Preenchido dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await carregarIndicadoresDaNuvem();
+        });
+
+        async function carregarIndicadoresDaNuvem() {
+            try {
+                let { data } = await supabaseClient
+                    .from('app_dados_programacao')
+                    .select('conteudo')
+                    .eq('id', '1')
+                    .single();
+
+                if (data && data.conteudo) {
+                    window.dadosGlobaisNuvem = data.conteudo;
+                }
+            } catch (e) {
+                console.error("Erro ao buscar dados para indicadores:", e);
+            }
+            carregarIndicadores();
+        }
+
+        function carregarIndicadores() {
+            const anoSelecionado = document.getElementById('inputAnoIndicador').value;
+            const semanasSalvas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
+            
+            let totalPlaneadasAno = 0;
+            let totalConcluidasAno = 0;
+            let tbody = document.getElementById('tabelaIndicadoresCorpo');
+            tbody.innerHTML = '';
+
+            let encontrouAlguma = false;
+
+            // Varre todas as chaves salvas na nuvem para o ano correspondente
+            Object.keys(semanasSalvas).forEach(key => {
+                // Exemplo de chave: prog_grid_2026_semana_40
+                if (key.includes(`_semana_`) && key.includes(`_${anoSelecionado}_`)) {
+                    encontrouAlguma = true;
+                    let partes = key.split('_');
+                    let numSemana = partes[partes.length - 1];
+                    let htmlCard = semanasSalvas[key];
+
+                    // Cria um elemento temporário para ler o HTML guardado na nuvem
+                    const parser = new DOMParser();
+                    let doc = parser.parseFromString(htmlCard, 'text/html');
+
+                    let tarefasNormais = doc.querySelectorAll('.task-box, .treinamento-box');
+                    let tarefasExtras = doc.querySelectorAll('.tarefa-extra-box');
+                    let concluidas = doc.querySelectorAll('.task-done');
+
+                    let planeadas = tarefasNormais.length + tarefasExtras.length;
+                    let executadas = concluidas.length;
+                    let extrasCount = tarefasExtras.length;
+
+                    totalPlaneadasAno += planeadas;
+                    totalConcluidasAno += executadas;
+
+                    let percentual = planeadas > 0 ? Math.round((executadas / planeadas) * 100) : 0;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
+                    tr.innerHTML = `
+                        <td class="py-3 px-3 font-bold text-gray-800 dark:text-gray-200">Semana ${numSemana}</td>
+                        <td class="py-3 px-3 font-semibold text-blue-600 dark:text-blue-400">${planeadas}</td>
+                        <td class="py-3 px-3 font-semibold text-green-600 dark:text-green-400">${executadas}</td>
+                        <td class="py-3 px-3 font-semibold text-amber-600 dark:text-amber-400">${extrasCount}</td>
+                        <td class="py-3 px-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: ${percentual > 100 ? 100 : percentual}%"></div>
+                                </div>
+                                <span class="font-bold text-[11px] text-gray-600 dark:text-gray-300">${percentual}%</span>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+
+            if (!encontrouAlguma) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 italic">Nenhum dado de programação encontrado para o ano ${anoSelecionado}.</td></tr>`;
+            }
+
+            // Atualiza os cards gerais do topo
+            document.getElementById('cardTotalPlaneadas').innerText = totalPlaneadasAno;
+            document.getElementById('cardTotalConcluidas').innerText = totalConcluidasAno;
+            let taxaGeral = totalPlaneadasAno > 0 ? Math.round((totalConcluidasAno / totalPlaneadasAno) * 100) : 0;
+            document.getElementById('cardTaxaExecucao').innerText = `${taxaGeral}%`;
+        }
+    </script>
+</body>
+</html>
