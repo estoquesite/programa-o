@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Integrado de Indicadores (v3.6 Multi-Ano & Períodos)</title>
+    <title>Painel de Indicadores & Gráficos (v3.7 Multi-Ano & 12 Meses)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,10 +34,11 @@
             max-width: 1150px;
             margin: 0 auto;
         }
-        .btn-periodo.active, .btn-ano.active {
+        .btn-mes.active {
             background-color: #15803d !important;
             color: #ffffff !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-weight: 800 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         @media print {
             .print-hidden {
@@ -66,50 +67,60 @@
             </div>
         </div>
 
-        <!-- BARRA INTELIGENTE DE SELEÇÃO: ANOS E PERÍODOS -->
+        <!-- PAINEL DE CONTROLE: SELETOR LIVRE DE ANOS E TODOS OS 12 MESES -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
             
-            <!-- LINHA 1: SELETOR DE ANO ELEGANTE -->
+            <!-- LINHA 1: SELEÇÃO UNIVERSAL DE ANO -->
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
-                    <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
-                        <button type="button" onclick="mudarAno(2025)" id="btnAno2025" class="btn-ano px-3 py-1 rounded-lg text-xs font-bold text-gray-600 dark:text-gray-300 transition hover:bg-gray-200 dark:hover:bg-gray-800">2025</button>
-                        <button type="button" onclick="mudarAno(2026)" id="btnAno2026" class="btn-ano active px-3 py-1 rounded-lg text-xs font-bold text-gray-600 dark:text-gray-300 transition hover:bg-gray-200 dark:hover:bg-gray-800">2026</button>
-                        <button type="button" onclick="mudarAno(2027)" id="btnAno2027" class="btn-ano px-3 py-1 rounded-lg text-xs font-bold text-gray-600 dark:text-gray-300 transition hover:bg-gray-200 dark:hover:bg-gray-800">2027</button>
-                        <input type="number" id="inputAnoIndicador" value="2026" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md font-bold text-center dark:text-white" title="Outro ano">
+                    
+                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
+                        <button type="button" onclick="alterarAnoPasso(-1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition" title="Ano anterior">◀</button>
+                        
+                        <!-- Lista dinâmica de anos + inserção manual livre -->
+                        <select id="selectAnoDinamico" onchange="selecionarAnoPorSelect(this.value)" class="text-xs p-1.5 bg-transparent border-0 font-extrabold text-green-900 dark:text-green-300 cursor-pointer">
+                            <!-- Preenchido automaticamente com todos os anos existentes -->
+                        </select>
+
+                        <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white" title="Digitar qualquer ano">
+                        
+                        <button type="button" onclick="alterarAnoPasso(1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition" title="Próximo ano">▶</button>
                     </div>
+
+                    <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Atual</button>
                 </div>
 
-                <!-- LINHA 1.2: ATALHOS DE PERÍODOS (SEM POLUIÇÃO DE 12 CAIXINHAS) -->
-                <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold">
-                    <button type="button" onclick="definirPeriodo('ano_todo')" id="btnPerAnoTodo" class="btn-periodo active px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">Ano Todo</button>
-                    <button type="button" onclick="definirPeriodo('1_semestre')" id="btnPer1Sem" class="btn-periodo px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">1º Sem (Jan-Jun)</button>
-                    <button type="button" onclick="definirPeriodo('2_semestre')" id="btnPer2Sem" class="btn-periodo px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition">2º Sem (Jul-Dez)</button>
-                    
-                    <!-- Dropdown para mês avulso sem encher a tela -->
-                    <select id="selectMesAvulso" onchange="definirPeriodoMes(this.value)" class="p-1 text-xs bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg font-bold text-gray-700 dark:text-gray-300">
-                        <option value="">Por Mês...</option>
-                        <option value="1">Janeiro</option>
-                        <option value="2">Fevereiro</option>
-                        <option value="3">Março</option>
-                        <option value="4">Abril</option>
-                        <option value="5">Maio</option>
-                        <option value="6">Junho</option>
-                        <option value="7">Julho</option>
-                        <option value="8">Agosto</option>
-                        <option value="9">Setembro</option>
-                        <option value="10">Outubro</option>
-                        <option value="11">Novembro</option>
-                        <option value="12">Dezembro</option>
-                    </select>
-
-                    <button type="button" onclick="definirPeriodo('ate_hoje')" id="btnPerHoje" class="btn-periodo px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 hover:bg-blue-200 transition">⚡ Até Hoje</button>
+                <div class="text-[11px] text-gray-400 font-medium">
+                    Filtre qualquer mês abaixo para análise detalhada.
                 </div>
             </div>
 
-            <!-- LINHA 2: CANAIS COM CHECKBOXES INTERATIVOS -->
-            <div class="flex flex-wrap items-center justify-between gap-3">
+            <!-- LINHA 2: OS 12 MESES COMPLETOS (SEM TRIMESTRES AMARRADOS) -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Mês de Análise:</span>
+                    <span id="labelMesAtivo" class="text-[10px] font-extrabold text-green-700 dark:text-green-400 uppercase">Todos os Meses</span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-7 lg:grid-cols-13 gap-1.5 text-xs font-bold">
+                    <button type="button" onclick="selecionarMes(-1)" id="btnMesTodos" class="btn-mes active py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Todos</button>
+                    <button type="button" onclick="selecionarMes(0)" id="btnMes0" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Jan</button>
+                    <button type="button" onclick="selecionarMes(1)" id="btnMes1" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Fev</button>
+                    <button type="button" onclick="selecionarMes(2)" id="btnMes2" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Mar</button>
+                    <button type="button" onclick="selecionarMes(3)" id="btnMes3" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Abr</button>
+                    <button type="button" onclick="selecionarMes(4)" id="btnMes4" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Mai</button>
+                    <button type="button" onclick="selecionarMes(5)" id="btnMes5" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Jun</button>
+                    <button type="button" onclick="selecionarMes(6)" id="btnMes6" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Jul</button>
+                    <button type="button" onclick="selecionarMes(7)" id="btnMes7" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Ago</button>
+                    <button type="button" onclick="selecionarMes(8)" id="btnMes8" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Set</button>
+                    <button type="button" onclick="selecionarMes(9)" id="btnMes9" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Out</button>
+                    <button type="button" onclick="selecionarMes(10)" id="btnMes10" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Nov</button>
+                    <button type="button" onclick="selecionarMes(11)" id="btnMes11" class="btn-mes py-1.5 px-2 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition text-center">Dez</button>
+                </div>
+            </div>
+
+            <!-- LINHA 3: CANAIS COM CHECKBOXES INTERATIVOS -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
                         <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
@@ -170,7 +181,7 @@
 
         <!-- GRÁFICOS INTERATIVOS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <!-- Gráfico Curva Mensal -->
+            <!-- Gráfico Curva Mensal / Comparativo -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho por Canal)</h3>
@@ -218,14 +229,14 @@
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const nomesMesesCompletos = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const nomesMesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
         
         let graficoAnualInstance = null;
         let graficoSemanalInstance = null;
         let cacheDadosProcessados = null;
 
-        let periodoAtual = 'ano_todo'; // 'ano_todo', '1_semestre', '2_semestre', 'mes_X', 'ate_hoje'
-        let mesSelecionado = null;
+        let mesFiltroAtivo = -1; // -1 significa Todos os meses
 
         function calcularNumeroSemanaAtual() {
             const hoje = new Date();
@@ -237,40 +248,65 @@
             return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         }
 
+        function popularSelectAnos(anoAtualSelecionado) {
+            const select = document.getElementById('selectAnoDinamico');
+            select.innerHTML = '';
+            
+            // Varre as chaves existentes no banco para descobrir todos os anos gravados
+            let anosDetectados = new Set();
+            const semanas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
+            
+            Object.keys(semanas).forEach(k => {
+                let m = k.match(/prog_grid_(\d{4})_/);
+                if (m && m[1]) anosDetectados.add(parseInt(m[1]));
+            });
+
+            // Adiciona anos padrão se não existirem
+            anosDetectados.add(2026);
+            anosDetectados.add(2027);
+            anosDetectados.add(2028);
+            if (anoAtualSelecionado) anosDetectados.add(parseInt(anoAtualSelecionado));
+
+            let anosOrdenados = Array.from(anosDetectados).sort((a,b) => a - b);
+            anosOrdenados.forEach(a => {
+                let opt = document.createElement('option');
+                opt.value = a;
+                opt.innerText = `Ano ${a}`;
+                if (a === parseInt(anoAtualSelecionado)) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function selecionarAnoPorSelect(ano) {
+            mudarAno(parseInt(ano));
+        }
+
+        function alterarAnoPasso(delta) {
+            let anoAtual = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
+            mudarAno(anoAtual + delta);
+        }
+
         function mudarAno(ano) {
             ano = parseInt(ano);
+            if (!ano || isNaN(ano)) ano = 2026;
             document.getElementById('inputAnoIndicador').value = ano;
-            
-            document.querySelectorAll('.btn-ano').forEach(btn => btn.classList.remove('active'));
-            let btnFixo = document.getElementById(`btnAno${ano}`);
-            if (btnFixo) btnFixo.classList.add('active');
-
+            popularSelectAnos(ano);
             document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
             carregarIndicadores();
         }
 
-        function definirPeriodo(tipo) {
-            periodoAtual = tipo;
-            mesSelecionado = null;
-            document.getElementById('selectMesAvulso').value = "";
-
-            document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
-            if (tipo === 'ano_todo') document.getElementById('btnPerAnoTodo').classList.add('active');
-            if (tipo === '1_semestre') document.getElementById('btnPer1Sem').classList.add('active');
-            if (tipo === '2_semestre') document.getElementById('btnPer2Sem').classList.add('active');
-            if (tipo === 'ate_hoje') document.getElementById('btnPerHoje').classList.add('active');
-
-            carregarIndicadores();
-        }
-
-        function definirPeriodoMes(mesNum) {
-            if (!mesNum) {
-                definirPeriodo('ano_todo');
-                return;
+        function selecionarMes(mesIdx) {
+            mesFiltroAtivo = parseInt(mesIdx);
+            
+            document.querySelectorAll('.btn-mes').forEach(b => b.classList.remove('active'));
+            if (mesFiltroAtivo === -1) {
+                document.getElementById('btnMesTodos').classList.add('active');
+                document.getElementById('labelMesAtivo').innerText = "Todos os Meses";
+            } else {
+                let b = document.getElementById(`btnMes${mesFiltroAtivo}`);
+                if (b) b.classList.add('active');
+                document.getElementById('labelMesAtivo').innerText = nomesMesesCompletos[mesFiltroAtivo];
             }
-            periodoAtual = 'mes';
-            mesSelecionado = parseInt(mesNum) - 1; // 0-indexado
-            document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
             carregarIndicadores();
         }
 
@@ -292,6 +328,7 @@
             } catch (e) {
                 console.error("Erro ao buscar dados para indicadores:", e);
             }
+            popularSelectAnos(document.getElementById('inputAnoIndicador').value);
             carregarIndicadores();
         }
 
@@ -323,13 +360,7 @@
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
 
-            // Identifica limites do período escolhido
-            let rotuloEscopo = "Ano Completo";
-            if (periodoAtual === '1_semestre') rotuloEscopo = "1º Semestre";
-            if (periodoAtual === '2_semestre') rotuloEscopo = "2º Semestre";
-            if (periodoAtual === 'ate_hoje') rotuloEscopo = `Até Semana ${semanaAtualReal}`;
-            if (periodoAtual === 'mes' && mesSelecionado !== null) rotuloEscopo = `Mês: ${nomesMesesCurtos[mesSelecionado]}`;
-
+            let rotuloEscopo = mesFiltroAtivo === -1 ? `Ano Completo (${anoSelecionado})` : `Mês de ${nomesMesesCompletos[mesFiltroAtivo]}`;
             document.getElementById('cardSubInfoEscopo').innerText = rotuloEscopo;
 
             let chavesOrdenadas = Object.keys(semanasSalvas)
@@ -345,11 +376,10 @@
                 let numSemana = parseInt(partes[partes.length - 1]);
                 let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
 
-                // FILTRAGEM INTELIGENTE CONFORME O PERÍODO ESCOLHIDO
-                if (periodoAtual === '1_semestre' && mesIdx > 5) return;
-                if (periodoAtual === '2_semestre' && mesIdx < 6) return;
-                if (periodoAtual === 'mes' && mesIdx !== mesSelecionado) return;
-                if (periodoAtual === 'ate_hoje' && anoSelecionado === anoRealHoje && numSemana > semanaAtualReal) return;
+                // FILTRA PELO MÊS CLICADO (OU DEIXA PASSAR TODOS SE FOR -1)
+                if (mesFiltroAtivo !== -1 && mesIdx !== mesFiltroAtivo) {
+                    return;
+                }
 
                 let htmlCard = semanasSalvas[key];
                 const parser = new DOMParser();
@@ -367,7 +397,7 @@
                 let planeadas = tarefasNormais.length + tarefasExtras.length;
                 let executadas = concluidas.length;
                 
-                // Se a semana for futura em relação ao ano real, ela não conta como atraso/não realizada
+                // Semanas que ainda não chegaram cronologicamente não contam como "não feitas"
                 let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
                 let naoRealizadas = ehFuturoReal ? 0 : Math.max(0, planeadas - executadas);
                 let extrasCount = tarefasExtras.length;
