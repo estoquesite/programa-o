@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.74 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.75 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -400,7 +400,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.74 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.75 Nuvem</span>
         </div>
     </div>
 
@@ -637,7 +637,7 @@
                         divTreino.innerHTML = `
                             <span class="${identificadorUnico} flex items-center gap-1.5">
                                 <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
-                                <span class="drag-handle">⠿</span> 🎓 <strong>${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
+                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
                             </span>
                             <span class="item-controls">
                                 <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
@@ -1051,7 +1051,6 @@
                 </div>
             `;
 
-            // Monta os 5 dias da semana com a estrutura padrão
             const diasNomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
             let gridHTML = "";
             diasNomes.forEach((dia, idx) => {
