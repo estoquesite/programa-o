@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.83 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.84 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -234,7 +234,7 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES DE APOIO INCLUINDO INDICADOR -->
+        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES DE APOIO -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
@@ -373,7 +373,7 @@
             </div>
             <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição</label><input type="text" id="popFeriadoDesc" placeholder="EX: FERIADO MUNICIPAL..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
             <div class="flex gap-2">
-                <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Guardar Feriado</button>
+                <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
             </div>
             <div id="popListaFeriados" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
             <div class="flex justify-end pt-2"><button onclick="fecharModalFeriados()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
@@ -385,7 +385,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.83 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.84 Nuvem</span>
         </div>
     </div>
 
@@ -443,7 +443,6 @@
                 if (cb.checked) concluidas++;
             });
             const percentual = total > 0 ? Math.round((concluidas / total) * 100) : 0;
-            // Mantemos a lógica atualizada silenciosamente em segundo plano
         }
 
         function abrirModalIndicador() {
@@ -471,35 +470,61 @@
             document.getElementById('modalIndicador').classList.add('hidden');
         }
 
+        // Nova exportação para Excel formatada com colunas laterais correspondentes por dia
         function exportarParaExcel() {
             let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
-            let csvContent = "\uFEFFDia;Tipo;Descrição;Status\n";
+            let diasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            
+            // Coleta os itens separados por dia
+            let dadosPorDia = {};
+            diasMap.forEach(d => dadosPorDia[d] = { tarefas: [], recursos: [] });
 
             document.querySelectorAll('.day-card').forEach(card => {
                 let diaNome = card.querySelector('.day-title').innerText.split('\n')[0].trim();
-                
+                if (!dadosPorDia[diaNome]) dadosPorDia[diaNome] = { tarefas: [], recursos: [] };
+
                 card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
                     let descEl = box.querySelector('.item-text') || box.querySelector('strong');
-                    let desc = descEl ? descEl.innerText.replace(/;/g, ',') : '';
-                    let status = box.querySelector('input[type="checkbox"]').checked ? 'Concluído' : 'Pendente';
-                    let tipo = box.classList.contains('tarefa-extra-box') ? 'Extra' : (box.classList.contains('treinamento-box') ? 'Treinamento' : 'Tarefa');
-                    csvContent += `${diaNome};${tipo};${desc};${status}\n`;
+                    let desc = descEl ? descEl.innerText.trim() : '';
+                    let status = box.querySelector('input[type="checkbox"]').checked ? '[OK]' : '[Pendente]';
+                    let tipo = box.classList.contains('tarefa-extra-box') ? '⚡ [EXTRA]' : (box.classList.contains('treinamento-box') ? '🎓 [Treinamento]' : '🟢');
+                    dadosPorDia[diaNome].tarefas.push(`${tipo} ${desc}${status}`);
                 });
 
                 card.querySelectorAll('.resource-tag').forEach(tag => {
                     let descEl = tag.querySelector('.item-text');
-                    let desc = descEl ? descEl.innerText.replace(/;/g, ',') : '';
-                    let status = tag.querySelector('input[type="checkbox"]').checked ? 'Concluído' : 'Pendente';
-                    csvContent += `${diaNome};Recurso;${desc};${status}\n`;
+                    let desc = descEl ? descEl.innerText.trim() : '';
+                    let status = tag.querySelector('input[type="checkbox"]').checked ? '[OK]' : '[Pendente]';
+                    dadosPorDia[diaNome].recursos.push(`🚙 ${desc}${status}`);
                 });
             });
+
+            // Constrói o CSV em formato de tabela lado a lado por dia
+            let csvContent = "\uFEFF";
+            diasMap.forEach(d => {
+                csvContent += `${d} (Tarefas);${d} (Recursos);;`;
+            });
+            csvContent += "\n";
+
+            // Descobre o dia com mais linhas para alinhar a matriz
+            let maxLinhas = Math.max(...diasMap.map(d => Math.max(dadosPorDia[d].tarefas.length, dadosPorDia[d].recursos.length)));
+
+            for (let i = 0; i < maxLinhas; i++) {
+                let linha = "";
+                diasMap.forEach(d => {
+                    let t = dadosPorDia[d].tarefas[i] ? `"${dadosPorDia[d].tarefas[i]}"` : '""';
+                    let r = dadosPorDia[d].recursos[i] ? `"${dadosPorDia[d].recursos[i]}"` : '""';
+                    linha += `${t};${r};;`;
+                });
+                csvContent += linha + "\n";
+            }
 
             let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
-            a.download = `Programacao_Semana_${semana}_${ano}.csv`;
+            a.download = `Programacao_LadoALado_Semana_${semana}_${ano}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
