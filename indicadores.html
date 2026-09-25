@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v3.2)</title>
+    <title>Painel Integrado de Indicadores (v3.4 Multicanal)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,7 +31,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1050px;
+            max-width: 1150px;
             margin: 0 auto;
         }
         @media print {
@@ -50,87 +50,125 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
 
-    <div class="container space-y-6">
+    <div class="container space-y-5">
         <!-- CABEÇALHO -->
         <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
-            <h2 class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores & Desempenho</h2>
+            <h2 class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Central de Indicadores Operacionais</h2>
             <div class="flex items-center gap-2">
                 <button onclick="window.print()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">🖨️ Imprimir</button>
                 <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
             </div>
         </div>
 
-        <!-- FILTRO DE ANO -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Ano de Análise</h3>
-                <p class="text-[11px] text-gray-500">Acompanhamento de tarefas executadas, pendências e desvios.</p>
+        <!-- FILTROS & SELEÇÃO DE CANAIS / CAMADAS -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
+                <div>
+                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Ano & Painel de Controle de Visualização</h3>
+                    <p class="text-[11px] text-gray-500">Marque ou desmarque os canais para isolar ou cruzar indicadores nos gráficos e na tabela.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
+                    <input type="number" id="inputAnoIndicador" value="2026" onchange="carregarIndicadores()" class="w-20 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <input type="number" id="inputAnoIndicador" value="2026" onchange="carregarIndicadores()" class="w-20 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
+
+            <!-- CANAIS COM CHECKBOXES INTERATIVOS -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-bold">
+                    <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
+                        <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
+                        <span>Total Planeado</span>
+                    </label>
+
+                    <label class="flex items-center gap-1.5 cursor-pointer bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 px-2.5 py-1.5 rounded-xl border border-green-200 dark:border-green-900">
+                        <input type="checkbox" id="checkCanalConcluidas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-green-600 cursor-pointer">
+                        <span>Realizadas (Concluídas)</span>
+                    </label>
+
+                    <label class="flex items-center gap-1.5 cursor-pointer bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-2.5 py-1.5 rounded-xl border border-red-200 dark:border-red-900">
+                        <input type="checkbox" id="checkCanalNaoRealizadas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-red-600 cursor-pointer">
+                        <span>Não Realizadas (Pendentes)</span>
+                    </label>
+
+                    <label class="flex items-center gap-1.5 cursor-pointer bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-900">
+                        <input type="checkbox" id="checkCanalExtras" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                        <span>Demandas Extras</span>
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <button onclick="alternarTodosCanais(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-[11px] font-bold">Exibir Todos</button>
+                    <button onclick="alternarTodosCanais(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-[11px] font-bold">Limpar Todos</button>
+                </div>
             </div>
         </div>
 
-        <!-- CARDS DE RESUMO ANUAL (4 CARDS) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Planeadas</span>
+        <!-- CARDS DE RESUMO (5 CARDS) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Itens</span>
                 <h3 id="cardTotalPlaneadas" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
-                <p class="text-[10px] text-gray-500 font-semibold">100% do escopo</p>
+                <p class="text-[10px] text-gray-500 font-semibold">Rotina + Extras</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Concluídas (Realizadas)</span>
+            <div id="cardBoxConcluidas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Concluídas</span>
                 <h3 id="cardTotalConcluidas" class="text-2xl font-black text-green-600 dark:text-green-400">0</h3>
-                <p id="cardSubTaxaConcluidas" class="text-[10px] text-green-600 font-bold">0% de taxa</p>
+                <p id="cardSubTaxaConcluidas" class="text-[10px] text-green-600 font-bold">0% do total</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Não Realizadas (Pendentes)</span>
+            <div id="cardBoxNaoRealizadas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Não Realizadas</span>
                 <h3 id="cardTotalNaoRealizadas" class="text-2xl font-black text-red-600 dark:text-red-400">0</h3>
-                <p id="cardSubTaxaNaoRealizadas" class="text-[10px] text-red-600 font-bold">0% de pendência</p>
+                <p id="cardSubTaxaNaoRealizadas" class="text-[10px] text-red-600 font-bold">0% pendente</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Aproveitamento Global</span>
+            <div id="cardBoxExtras" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
+                <span class="text-[10px] font-bold uppercase text-amber-500 tracking-wider">⚡ Demandas Extras</span>
+                <h3 id="cardTotalExtras" class="text-2xl font-black text-amber-600 dark:text-amber-400">0</h3>
+                <p id="cardSubTaxaExtras" class="text-[10px] text-amber-600 font-bold">0% do volume</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1">
+                <span class="text-[10px] font-bold uppercase text-purple-500 tracking-wider">Aproveitamento</span>
                 <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
                 <p class="text-[10px] text-gray-500 font-semibold">Eficiência no ano</p>
             </div>
         </div>
 
-        <!-- GRÁFICOS: EVOLUÇÃO ANUAL + COMPARATIVO REALIZADO VS NÃO REALIZADO -->
+        <!-- GRÁFICOS INTERATIVOS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <!-- Gráfico Anual (Curva de Desempenho) -->
+            <!-- Gráfico Curva Mensal -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Realizado vs % Não Realizado)</h3>
+                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Taxas Reais por Canal)</h3>
                 </div>
-                <div class="relative h-60 w-full">
+                <div class="relative h-64 w-full">
                     <canvas id="graficoAnualCanvas"></canvas>
                 </div>
             </div>
 
-            <!-- Gráfico Semanal Comparativo (Barras Duplas: Realizado x Não Realizado) -->
+            <!-- Gráfico Comparativo por Semana -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Quantidade por Semana (Realizadas vs Não Realizadas)</h3>
+                    <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Quantidade por Semana (Volume Selecionado)</h3>
                 </div>
-                <div class="relative h-60 w-full">
+                <div class="relative h-64 w-full">
                     <canvas id="graficoSemanalCanvas"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- TABELA DETALHADA POR SEMANA -->
+        <!-- TABELA DINÂMICA COM COLUNAS ATIVAS/INATIVAS -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento por Semana</h3>
+            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento Semanal Conforme Filtro Ativo</h3>
             <div class="overflow-x-auto max-h-72 overflow-y-auto">
                 <table class="w-full text-left text-xs">
                     <thead>
                         <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
                             <th class="py-2.5 px-3">Semana</th>
-                            <th class="py-2.5 px-3">Planeadas</th>
-                            <th class="py-2.5 px-3 text-green-600">Concluídas</th>
-                            <th class="py-2.5 px-3 text-red-600">Não Realizadas</th>
-                            <th class="py-2.5 px-3 text-amber-600">Extras</th>
+                            <th class="py-2.5 px-3 col-total">Total Itens</th>
+                            <th class="py-2.5 px-3 text-green-600 col-concluidas">Concluídas</th>
+                            <th class="py-2.5 px-3 text-red-600 col-naorealizadas">Não Realizadas</th>
+                            <th class="py-2.5 px-3 text-amber-600 col-extras">Extras (OK / Total)</th>
                             <th class="py-2.5 px-3">Status de Execução</th>
                         </tr>
                     </thead>
@@ -150,6 +188,7 @@
         
         let graficoAnualInstance = null;
         let graficoSemanalInstance = null;
+        let cacheDadosProcessados = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await carregarIndicadoresDaNuvem();
@@ -177,6 +216,14 @@
             return d.getMonth();
         }
 
+        function alternarTodosCanais(marcar) {
+            document.getElementById('checkCanalTotal').checked = marcar;
+            document.getElementById('checkCanalConcluidas').checked = marcar;
+            document.getElementById('checkCanalNaoRealizadas').checked = marcar;
+            document.getElementById('checkCanalExtras').checked = marcar;
+            atualizarVisualizacao();
+        }
+
         function carregarIndicadores() {
             const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value);
             const semanasSalvas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
@@ -184,18 +231,13 @@
             let totalPlaneadasAno = 0;
             let totalConcluidasAno = 0;
             let totalNaoRealizadasAno = 0;
+            let totalExtrasAno = 0;
+            let totalExtrasConcluidasAno = 0;
 
-            let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0 }));
+            let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             
-            let semanasLabels = [];
-            let semanasQtdConcluidas = [];
-            let semanasQtdNaoRealizadas = [];
+            let semanasLista = [];
 
-            let tbody = document.getElementById('tabelaIndicadoresCorpo');
-            tbody.innerHTML = '';
-            let encontrouAlguma = false;
-
-            // Ordena as semanas numericamente antes de exibir
             let chavesOrdenadas = Object.keys(semanasSalvas)
                 .filter(key => key.includes(`_semana_`) && key.includes(`_${anoSelecionado}_`))
                 .sort((a, b) => {
@@ -205,7 +247,6 @@
                 });
 
             chavesOrdenadas.forEach(key => {
-                encontrouAlguma = true;
                 let partes = key.split('_');
                 let numSemana = parseInt(partes[partes.length - 1]);
                 let htmlCard = semanasSalvas[key];
@@ -217,6 +258,11 @@
                 let tarefasExtras = doc.querySelectorAll('.tarefa-extra-box');
                 let concluidas = doc.querySelectorAll('.task-done');
 
+                let extrasConcluidas = 0;
+                tarefasExtras.forEach(ext => {
+                    if (ext.classList.contains('task-done')) extrasConcluidas++;
+                });
+
                 let planeadas = tarefasNormais.length + tarefasExtras.length;
                 let executadas = concluidas.length;
                 let naoRealizadas = Math.max(0, planeadas - executadas);
@@ -225,98 +271,175 @@
                 totalPlaneadasAno += planeadas;
                 totalConcluidasAno += executadas;
                 totalNaoRealizadasAno += naoRealizadas;
+                totalExtrasAno += extrasCount;
+                totalExtrasConcluidasAno += extrasConcluidas;
 
                 let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                 mesesDados[mesIdx].planeadas += planeadas;
                 mesesDados[mesIdx].concluidas += executadas;
                 mesesDados[mesIdx].naoRealizadas += naoRealizadas;
+                mesesDados[mesIdx].extras += extrasCount;
 
-                let percentualExec = planeadas > 0 ? Math.round((executadas / planeadas) * 100) : 0;
-                let percentualNaoRealizado = planeadas > 0 ? Math.round((naoRealizadas / planeadas) * 100) : 0;
-
-                semanasLabels.push(`S${numSemana}`);
-                semanasQtdConcluidas.push(executadas);
-                semanasQtdNaoRealizadas.push(naoRealizadas);
-
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">Semana ${numSemana}</td>
-                    <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">${planeadas}</td>
-                    <td class="py-2.5 px-3 font-bold text-green-600 dark:text-green-400">${executadas}</td>
-                    <td class="py-2.5 px-3 font-bold text-red-600 dark:text-red-400">${naoRealizadas}</td>
-                    <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400">${extrasCount}</td>
-                    <td class="py-2.5 px-3">
-                        <div class="flex items-center gap-2">
-                            <div class="w-24 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
-                                <div class="bg-green-600 h-2" style="width: ${percentualExec}%" title="${percentualExec}% Realizado"></div>
-                                <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Não Realizado"></div>
-                            </div>
-                            <span class="font-bold text-[10px] text-gray-600 dark:text-gray-300">${percentualExec}% OK</span>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                semanasLista.push({
+                    numSemana,
+                    planeadas,
+                    executadas,
+                    naoRealizadas,
+                    extrasCount,
+                    extrasConcluidas
+                });
             });
 
-            if (!encontrouAlguma) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400 italic">Nenhum dado encontrado para o ano ${anoSelecionado}.</td></tr>`;
-            }
-
-            // Atualização dos Cards Superiores
+            // Atualiza os Cards Superiores
             document.getElementById('cardTotalPlaneadas').innerText = totalPlaneadasAno;
             document.getElementById('cardTotalConcluidas').innerText = totalConcluidasAno;
             document.getElementById('cardTotalNaoRealizadas').innerText = totalNaoRealizadasAno;
+            document.getElementById('cardTotalExtras').innerText = totalExtrasAno;
 
             let taxaGeralConcluida = totalPlaneadasAno > 0 ? Math.round((totalConcluidasAno / totalPlaneadasAno) * 100) : 0;
             let taxaGeralNaoRealizada = totalPlaneadasAno > 0 ? Math.round((totalNaoRealizadasAno / totalPlaneadasAno) * 100) : 0;
+            let taxaGeralExtras = totalPlaneadasAno > 0 ? Math.round((totalExtrasAno / totalPlaneadasAno) * 100) : 0;
 
             document.getElementById('cardSubTaxaConcluidas').innerText = `${taxaGeralConcluida}% do total`;
             document.getElementById('cardSubTaxaNaoRealizadas').innerText = `${taxaGeralNaoRealizada}% pendente`;
+            document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume geral (${totalExtrasConcluidasAno} feitas)`;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeralConcluida}%`;
 
-            // Dados dos Meses para o gráfico em linha duplo
-            let mesesTaxasExec = mesesDados.map(m => m.planeadas > 0 ? Math.round((m.concluidas / m.planeadas) * 100) : 0);
-            let mesesTaxasNaoRealizadas = mesesDados.map(m => m.planeadas > 0 ? Math.round((m.naoRealizadas / m.planeadas) * 100) : 0);
+            cacheDadosProcessados = {
+                anoSelecionado,
+                semanasLista,
+                mesesDados
+            };
 
-            renderizarGraficoAnual(mesesTaxasExec, mesesTaxasNaoRealizadas);
-            renderizarGraficoSemanal(semanasLabels, semanasQtdConcluidas, semanasQtdNaoRealizadas);
+            atualizarVisualizacao();
         }
 
-        function renderizarGraficoAnual(dadosExec, dadosNaoRealizadas) {
-            const ctx = document.getElementById('graficoAnualCanvas').getContext('2d');
+        // Função responsável por sincronizar checkboxes com cards, tabelas e gráficos
+        function atualizarVisualizacao() {
+            if (!cacheDadosProcessados) return;
+
+            const mostrarTotal = document.getElementById('checkCanalTotal').checked;
+            const mostrarConcluidas = document.getElementById('checkCanalConcluidas').checked;
+            const mostrarNaoRealizadas = document.getElementById('checkCanalNaoRealizadas').checked;
+            const mostrarExtras = document.getElementById('checkCanalExtras').checked;
+
+            // Opacidade visual nos Cards Superiores conforme seleção
+            document.getElementById('cardBoxTotal').style.opacity = mostrarTotal ? "1" : "0.35";
+            document.getElementById('cardBoxConcluidas').style.opacity = mostrarConcluidas ? "1" : "0.35";
+            document.getElementById('cardBoxNaoRealizadas').style.opacity = mostrarNaoRealizadas ? "1" : "0.35";
+            document.getElementById('cardBoxExtras').style.opacity = mostrarExtras ? "1" : "0.35";
+
+            // Controla visibilidade das colunas da tabela
+            document.querySelectorAll('.col-total').forEach(el => el.style.display = mostrarTotal ? '' : 'none');
+            document.querySelectorAll('.col-concluidas').forEach(el => el.style.display = mostrarConcluidas ? '' : 'none');
+            document.querySelectorAll('.col-naorealizadas').forEach(el => el.style.display = mostrarNaoRealizadas ? '' : 'none');
+            document.querySelectorAll('.col-extras').forEach(el => el.style.display = mostrarExtras ? '' : 'none');
+
+            // Renderiza o corpo da tabela
+            const tbody = document.getElementById('tabelaIndicadoresCorpo');
+            tbody.innerHTML = '';
+
+            if (cacheDadosProcessados.semanasLista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-400 italic">Nenhum dado encontrado para o ano ${cacheDadosProcessados.anoSelecionado}.</td></tr>`;
+            } else {
+                cacheDadosProcessados.semanasLista.forEach(s => {
+                    let percentualExec = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
+                    let percentualNaoRealizado = s.planeadas > 0 ? Math.round((s.naoRealizadas / s.planeadas) * 100) : 0;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">Semana ${s.numSemana}</td>
+                        <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
+                        <td class="py-2.5 px-3 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
+                        <td class="py-2.5 px-3 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
+                        <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400 col-extras" style="${mostrarExtras ? '' : 'display:none;'}">⚡ ${s.extrasConcluidas} / ${s.extrasCount}</td>
+                        <td class="py-2.5 px-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-20 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
+                                    <div class="bg-green-600 h-2" style="width: ${percentualExec}%" title="${percentualExec}% Concluído"></div>
+                                    <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Pendente"></div>
+                                </div>
+                                <span class="font-bold text-[10px] text-gray-600 dark:text-gray-300">${percentualExec}%</span>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Atualiza os Gráficos
+            renderizarGraficosComFiltros(mostrarTotal, mostrarConcluidas, mostrarNaoRealizadas, mostrarExtras);
+        }
+
+        function renderizarGraficosComFiltros(mostrarTotal, mostrarConcluidas, mostrarNaoRealizadas, mostrarExtras) {
+            const meses = cacheDadosProcessados.mesesDados;
+            const semanas = cacheDadosProcessados.semanasLista;
+
+            // 1. DATASETS PARA O GRÁFICO ANUAL (LINHAS)
+            let datasetsAnual = [];
+
+            if (mostrarConcluidas) {
+                datasetsAnual.push({
+                    label: 'Realizadas (%)',
+                    data: meses.map(m => m.planeadas > 0 ? Math.round((m.concluidas / m.planeadas) * 100) : 0),
+                    borderColor: '#16a34a',
+                    backgroundColor: 'rgba(22, 163, 74, 0.08)',
+                    borderWidth: 2.2,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#15803d'
+                });
+            }
+
+            if (mostrarNaoRealizadas) {
+                datasetsAnual.push({
+                    label: 'Não Realizadas (%)',
+                    data: meses.map(m => m.planeadas > 0 ? Math.round((m.naoRealizadas / m.planeadas) * 100) : 0),
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.05)',
+                    borderWidth: 2,
+                    borderDash: [4, 4],
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#b91c1c'
+                });
+            }
+
+            if (mostrarExtras) {
+                datasetsAnual.push({
+                    label: 'Demandas Extras (%)',
+                    data: meses.map(m => m.planeadas > 0 ? Math.round((m.extras / m.planeadas) * 100) : 0),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#d97706'
+                });
+            }
+
+            if (mostrarTotal) {
+                datasetsAnual.push({
+                    label: 'Meta Planeada (100%)',
+                    data: Array(12).fill(100),
+                    borderColor: '#3b82f6',
+                    borderWidth: 1.5,
+                    borderDash: [6, 6],
+                    fill: false,
+                    pointRadius: 0
+                });
+            }
+
+            const ctxAnual = document.getElementById('graficoAnualCanvas').getContext('2d');
             if (graficoAnualInstance) graficoAnualInstance.destroy();
 
-            graficoAnualInstance = new Chart(ctx, {
+            graficoAnualInstance = new Chart(ctxAnual, {
                 type: 'line',
-                data: {
-                    labels: nomesMesesCurtos,
-                    datasets: [
-                        {
-                            label: 'Realizadas (%)',
-                            data: dadosExec,
-                            borderColor: '#16a34a',
-                            backgroundColor: 'rgba(22, 163, 74, 0.08)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.35,
-                            pointRadius: 3,
-                            pointBackgroundColor: '#15803d'
-                        },
-                        {
-                            label: 'Não Realizadas (%)',
-                            data: dadosNaoRealizadas,
-                            borderColor: '#dc2626',
-                            backgroundColor: 'rgba(220, 38, 38, 0.05)',
-                            borderWidth: 2,
-                            borderDash: [4, 4],
-                            fill: true,
-                            tension: 0.35,
-                            pointRadius: 3,
-                            pointBackgroundColor: '#b91c1c'
-                        }
-                    ]
-                },
+                data: { labels: nomesMesesCurtos, datasets: datasetsAnual },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -329,60 +452,74 @@
                                 callback: function(val) { return val + '%'; }
                             }
                         },
-                        x: {
-                            ticks: { font: { size: 10 } }
-                        }
+                        x: { ticks: { font: { size: 10 } } }
                     },
                     plugins: { 
                         legend: { 
-                            display: true,
+                            display: datasetsAnual.length > 0,
                             position: 'top',
                             labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
                         } 
                     }
                 }
             });
-        }
 
-        function renderizarGraficoSemanal(labels, concluidas, naoRealizadas) {
-            const ctx = document.getElementById('graficoSemanalCanvas').getContext('2d');
+            // 2. DATASETS PARA O GRÁFICO SEMANAL (BARRAS)
+            let datasetsSemanal = [];
+            let labelsSemanais = semanas.map(s => `S${s.numSemana}`);
+
+            if (mostrarTotal) {
+                datasetsSemanal.push({
+                    label: 'Total Planeado',
+                    data: semanas.map(s => s.planeadas),
+                    backgroundColor: '#93c5fd',
+                    borderRadius: 4
+                });
+            }
+
+            if (mostrarConcluidas) {
+                datasetsSemanal.push({
+                    label: 'Concluídas',
+                    data: semanas.map(s => s.executadas),
+                    backgroundColor: '#22c55e',
+                    borderRadius: 4
+                });
+            }
+
+            if (mostrarNaoRealizadas) {
+                datasetsSemanal.push({
+                    label: 'Não Realizadas',
+                    data: semanas.map(s => s.naoRealizadas),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                });
+            }
+
+            if (mostrarExtras) {
+                datasetsSemanal.push({
+                    label: 'Extras',
+                    data: semanas.map(s => s.extrasCount),
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 4
+                });
+            }
+
+            const ctxSemanal = document.getElementById('graficoSemanalCanvas').getContext('2d');
             if (graficoSemanalInstance) graficoSemanalInstance.destroy();
 
-            graficoSemanalInstance = new Chart(ctx, {
+            graficoSemanalInstance = new Chart(ctxSemanal, {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Concluídas',
-                            data: concluidas,
-                            backgroundColor: '#22c55e',
-                            borderRadius: 4
-                        },
-                        {
-                            label: 'Não Realizadas',
-                            data: naoRealizadas,
-                            backgroundColor: '#ef4444',
-                            borderRadius: 4
-                        }
-                    ]
-                },
+                data: { labels: labelsSemanais, datasets: datasetsSemanal },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            stacked: false,
-                            ticks: { font: { size: 10 } }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: { font: { size: 10 }, precision: 0 }
-                        }
+                        x: { stacked: false, ticks: { font: { size: 10 } } },
+                        y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 } }
                     },
                     plugins: { 
                         legend: { 
-                            display: true,
+                            display: datasetsSemanal.length > 0,
                             position: 'top',
                             labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
                         } 
