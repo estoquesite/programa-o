@@ -252,16 +252,44 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA NO TOPO -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
+        <!-- SELETOR DE ANO, SEMANA, FERIADOS E EMENDA NO TOPO -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
                 <input type="number" id="inputAno" value="2026" onchange="atualizarDatasSemana()" class="w-20 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
             </div>
             <div class="flex items-center gap-2">
-                <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Nº da Semana:</label>
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Semana:</label>
                 <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
             </div>
+
+            <!-- CAIXINHA 1: FERIADOS NACIONAIS 2026 -->
+            <div class="flex items-center gap-1.5">
+                <label class="text-xs font-bold text-red-700 dark:text-red-400">🎉 Feriado:</label>
+                <select id="selectFeriados" class="text-xs p-1.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-lg font-bold text-red-800 dark:text-red-200">
+                    <option value="">-- Feriados Nacionais --</option>
+                    <option value="01/01 - Confraternização Universal">01/01 - Confraternização Universal</option>
+                    <option value="16/02 - Carnaval">16/02 - Carnaval</option>
+                    <option value="17/02 - Carnaval (Terça)">17/02 - Carnaval (Terça)</option>
+                    <option value="03/04 - Paixão de Cristo">03/04 - Paixão de Cristo</option>
+                    <option value="21/04 - Tiradentes">21/04 - Tiradentes</option>
+                    <option value="01/05 - Dia do Trabalho">01/05 - Dia do Trabalho</option>
+                    <option value="04/06 - Corpus Christi">04/06 - Corpus Christi</option>
+                    <option value="07/09 - Independência do Brasil">07/09 - Independência do Brasil</option>
+                    <option value="12/10 - N. Sra. Aparecida">12/10 - N. Sra. Aparecida</option>
+                    <option value="02/11 - Finados">02/11 - Finados</option>
+                    <option value="15/11 - Proclamação da República">15/11 - Proclamação da República</option>
+                    <option value="20/11 - Consciência Negra">20/11 - Consciência Negra</option>
+                    <option value="25/12 - Natal">25/12 - Natal</option>
+                </select>
+            </div>
+
+            <!-- CAIXINHA 2: EMENDA -->
+            <div class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/40 px-2 py-1 border border-amber-200 dark:border-amber-900 rounded-lg">
+                <input type="checkbox" id="checkEmendaTopo" class="w-4 h-4 text-amber-600 rounded focus:ring-amber-500">
+                <label for="checkEmendaTopo" class="text-xs font-bold text-amber-800 dark:text-amber-200 cursor-pointer">📌 Emenda</label>
+            </div>
+
             <div class="flex gap-2">
                 <button onclick="definirSemanaAtual()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200">
                     🔄 Atual
@@ -1078,7 +1106,6 @@
             const nomesDiasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
 
             if (semanaInteira) {
-                // Adiciona em todos os dias úteis da semana atual (Segunda a Sexta)
                 document.querySelectorAll('.day-card').forEach(card => {
                     inserirItemNoCard(card, tipo, desc);
                 });
