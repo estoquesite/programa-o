@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores de Produtividade (v1.0)</title>
+    <title>Painel de Indicadores de Produtividade (v2.0)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,7 +29,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
         }
     </style>
@@ -40,15 +40,15 @@
         <!-- CABEÇALHO -->
         <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <a href="index.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar ao Menu</a>
-            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores</h2>
-            <button onclick="carregarIndicadores()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar Dados</button>
+            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores & Visão Anual</h2>
+            <button onclick="carregarIndicadoresDaNuvem()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar Dados</button>
         </div>
 
         <!-- FILTRO DE PERÍODO -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Selecionar Ano de Análise</h3>
-                <p class="text-[11px] text-gray-500">Consolida o desempenho semanal e anual com base nas tarefas marcadas.</p>
+                <p class="text-[11px] text-gray-500">Consolida o desempenho anual, mensal e detalhamento semanal.</p>
             </div>
             <div class="flex items-center gap-2">
                 <input type="number" id="inputAnoIndicador" value="2026" onchange="carregarIndicadores()" class="w-20 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
@@ -66,14 +66,25 @@
                 <h3 id="cardTotalConcluidas" class="text-2xl font-black text-green-600 dark:text-green-400">0</h3>
             </div>
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Taxa de Execução</span>
+                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Taxa de Execução Anual</span>
                 <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
+            </div>
+        </div>
+
+        <!-- VISÃO ANUAL / GRÁFICO DE BARRAS POR MÊS -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+            <div>
+                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Desempenho Anual por Mês (Gráfico de Execução)</h3>
+                <p class="text-[11px] text-gray-500">Acompanhamento consolidado do volume executado em relação ao planejado por mês.</p>
+            </div>
+            <div id="graficoMensalContainer" class="space-y-3 pt-2">
+                <!-- Preenchido dinamicamente por mês -->
             </div>
         </div>
 
         <!-- TABELA DE INDICADORES POR SEMANA -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📈 Detalhado por Semana</h3>
+            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento por Semana</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead>
@@ -81,7 +92,7 @@
                             <th class="py-2.5 px-3">Semana</th>
                             <th class="py-2.5 px-3">Planeadas</th>
                             <th class="py-2.5 px-3">Concluídas</th>
-                            <th class="py-2.5 px-3">Extras Executadas</th>
+                            <th class="py-2.5 px-3">Extras</th>
                             <th class="py-2.5 px-3">Desempenho</th>
                         </tr>
                     </thead>
@@ -97,6 +108,7 @@
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const nomesMesesCompletos = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
         window.addEventListener('DOMContentLoaded', async () => {
             await carregarIndicadoresDaNuvem();
@@ -119,27 +131,32 @@
             carregarIndicadores();
         }
 
+        // Função auxiliar para estimar o mês com base no número da semana do ano
+        function obterMesPelaSemana(ano, numSemana) {
+            let d = new Date(ano, 0, 1 + (numSemana - 1) * 7);
+            return d.getMonth(); // 0 a 11
+        }
+
         function carregarIndicadores() {
-            const anoSelecionado = document.getElementById('inputAnoIndicador').value;
+            const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value);
             const semanasSalvas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
             
             let totalPlaneadasAno = 0;
             let totalConcluidasAno = 0;
+            let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0 }));
+
             let tbody = document.getElementById('tabelaIndicadoresCorpo');
             tbody.innerHTML = '';
 
             let encontrouAlguma = false;
 
-            // Varre todas as chaves salvas na nuvem para o ano correspondente
             Object.keys(semanasSalvas).forEach(key => {
-                // Exemplo de chave: prog_grid_2026_semana_40
                 if (key.includes(`_semana_`) && key.includes(`_${anoSelecionado}_`)) {
                     encontrouAlguma = true;
                     let partes = key.split('_');
-                    let numSemana = partes[partes.length - 1];
+                    let numSemana = parseInt(partes[partes.length - 1]);
                     let htmlCard = semanasSalvas[key];
 
-                    // Cria um elemento temporário para ler o HTML guardado na nuvem
                     const parser = new DOMParser();
                     let doc = parser.parseFromString(htmlCard, 'text/html');
 
@@ -153,6 +170,11 @@
 
                     totalPlaneadasAno += planeadas;
                     totalConcluidasAno += executadas;
+
+                    // Agrupar dados por mês estimado da semana
+                    let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
+                    mesesDados[mesIdx].planeadas += planeadas;
+                    mesesDados[mesIdx].concluidas += executadas;
 
                     let percentual = planeadas > 0 ? Math.round((executadas / planeadas) * 100) : 0;
 
@@ -185,6 +207,29 @@
             document.getElementById('cardTotalConcluidas').innerText = totalConcluidasAno;
             let taxaGeral = totalPlaneadasAno > 0 ? Math.round((totalConcluidasAno / totalPlaneadasAno) * 100) : 0;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeral}%`;
+
+            // Renderiza o Gráfico Anual por Mês em barras
+            let graficoContainer = document.getElementById('graficoMensalContainer');
+            graficoContainer.innerHTML = '';
+
+            mesesDados.forEach((m, idx) => {
+                let pMes = m.planeadas;
+                let cMes = m.concluidas;
+                let taxaMes = pMes > 0 ? Math.round((cMes / pMes) * 100) : 0;
+
+                const barraDiv = document.createElement('div');
+                barraDiv.className = 'space-y-1';
+                barraDiv.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-gray-700 dark:text-gray-300">${nomesMesesCompletos[idx]}</span>
+                        <span class="text-gray-400 font-medium">${cMes} de ${pMes} concluídas (${taxaMes}%)</span>
+                    </div>
+                    <div class="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-3 overflow-hidden p-0.5 border border-gray-200 dark:border-gray-700">
+                        <div class="bg-gradient-to-r from-green-600 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${taxaMes > 100 ? 100 : taxaMes}%"></div>
+                    </div>
+                `;
+                graficoContainer.appendChild(barraDiv);
+            });
         }
     </script>
 </body>
