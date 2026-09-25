@@ -887,7 +887,7 @@
                             const semanaTreino = obterNumeroSemanaDaData(t.inicio);
                             const anoTreino = new Date(t.inicio + 'T00:00:00').getFullYear();
 
-                            // Garante que só injeta se a data exata do treino corresponder rigorosamente à semana e ano visualizados
+                            // Rigor absoluto: Só injeta se a data exata do treino corresponder à semana e ano da tela
                             if (semanaTreino === semanaAtualTela && anoTreino === anoAtualTela) {
                                 if (dataStrCard === t.inicio) {
                                     const identificadorUnico = `treino_id_${t.id}`;
@@ -1095,7 +1095,107 @@
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
 
+            // CORREÇÃO CRUCIAL: Limpa o cache estático da semana e reconstrói a estrutura padrão limpa antes de injetar
             localStorage.removeItem(getWeekKey());
+            
+            // Restaura o layout padrão limpo dos 5 dias da semana antes de re-injetar os dados reais
+            document.getElementById('weekGridContainer').innerHTML = `
+                <!-- Segunda -->
+                <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
+                    <div class="day-content">
+                        <div class="day-title" id="titleSegunda">Segunda<br><small>--/---</small></div>
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado</label>
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda</label>
+                        </div>
+                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        </div>
+                    </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    </div>
+                </div>
+                <!-- Terça -->
+                <div class="day-card" data-dia-idx="2" data-dia-nome="Terça">
+                    <div class="day-content">
+                        <div class="day-title" id="titleTerca">Terça<br><small>--/---</small></div>
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado</label>
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda</label>
+                        </div>
+                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        </div>
+                    </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    </div>
+                </div>
+                <!-- Quarta -->
+                <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta">
+                    <div class="day-content">
+                        <div class="day-title" id="titleQuarta">Quarta<br><small>--/---</small></div>
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado</label>
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda</label>
+                        </div>
+                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        </div>
+                    </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    </div>
+                </div>
+                <!-- Quinta -->
+                <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta">
+                    <div class="day-content">
+                        <div class="day-title" id="titleQuinta">Quinta<br><small>--/---</small></div>
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado</label>
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda</label>
+                        </div>
+                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        </div>
+                    </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    </div>
+                </div>
+                <!-- Sexta -->
+                <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta">
+                    <div class="day-content">
+                        <div class="day-title" id="titleSexta">Sexta<br><small>--/---</small></div>
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado</label>
+                            <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 📌 Emenda</label>
+                        </div>
+                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        </div>
+                    </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    </div>
+                </div>
+            `;
 
             const datas = getDateRangeOfWeek(semana, ano);
             const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
@@ -1111,7 +1211,6 @@
             });
 
             injetarDadosNasDatas(datas);
-
             forcarRecursosFixos();
             guardarEstadoDOM();
         }
