@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Treinamentos (v1.1 Nuvem)</title>
+    <title>Módulo de Treinamentos (v1.2 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -92,7 +92,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO SUPABASE (mesma chave para conversarem na nuvem)
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -211,6 +210,7 @@
                         <small class="text-gray-400 block mt-0.5">Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</small>
                     </div>
                     <div class="flex gap-1.5 self-end sm:self-center">
+                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold" title="Duplicar para outra pessoa/data">📋 Duplicar</button>
                         <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
                         <button onclick="apagarTreinamento('${t.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
                     </div>
@@ -230,6 +230,24 @@
                 document.getElementById('treinamentoPessoa').value = t.pessoa;
                 document.getElementById('editId').value = t.id;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function duplicarTreinamento(id) {
+            let treinamentos = obterTreinamentos();
+            let t = treinamentos.find(item => item.id === id);
+            if (t) {
+                // Preenche o formulário com os dados do curso/local, mas limpa o ID de edição (criando um novo) e foca na pessoa/data
+                document.getElementById('treinamentoInicio').value = t.inicio;
+                document.getElementById('treinamentoFim').value = t.fim;
+                document.getElementById('treinamentoNome').value = t.nome;
+                document.getElementById('treinamentoLocal').value = t.local;
+                document.getElementById('treinamentoPessoa').value = ''; // Deixa limpo para colocar o novo nome
+                document.getElementById('editId').value = ''; // Novo registo
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.getElementById('treinamentoPessoa').focus();
+                alert("📋 Dados duplicados! Altere o nome da pessoa ou as datas e clique em 'Guardar Treinamento'.");
             }
         }
 
