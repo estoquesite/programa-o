@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.35 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.37 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -127,6 +127,17 @@
             flex-shrink: 0;
         }
         .task-box:active { cursor: grabbing; }
+        .treinamento-box {
+            font-weight: 600;
+            color: #065f46;
+            background-color: #d1fae5;
+            padding: 5px 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-size: 10px;
+            border-left: 2px solid #059669;
+            flex-shrink: 0;
+        }
         .day-resources {
             display: flex;
             flex-direction: column;
@@ -245,8 +256,9 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="hidden container">
         <div class="header">
-            <h2>Programação Semanal</h2>
-            <div class="flex justify-center items-center gap-2 mt-1">
+            <div class="flex justify-between items-center mb-2 px-2">
+                <a href="index.html" class="print-hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg text-xs font-bold transition">⬅️ Menu</a>
+                <h2>Programação Semanal</h2>
                 <button onclick="sincronizarComNuvemManual()" class="print-hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-xs font-bold transition">🔄 Sincronizar</button>
             </div>
             <div class="week-badge" id="badgeSemana">Semana --</div>
@@ -278,7 +290,6 @@
             <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
                 <div class="day-content">
                     <div class="day-title" id="titleSegunda">Segunda<br><small>--/---</small></div>
-                    <!-- Caixinhas de Feriado e Emenda com Tema de Folha -->
                     <div class="flex items-center justify-between gap-1 mb-2 px-1 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-md text-[11px]">
                         <label class="flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 cursor-pointer">
                             <input type="checkbox" class="check-feriado w-3.5 h-3.5 text-emerald-600 rounded focus:ring-emerald-500" onchange="alternarBloqueioDia(this)"> 🍃 Feriado
@@ -445,7 +456,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.35) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.37) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -488,7 +499,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.35 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.37 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -574,6 +585,9 @@
                             localStorage.setItem(k, dadosGlobaisNuvem.semanas[k]);
                         }
                     }
+                    if (dadosGlobaisNuvem.treinamentos) {
+                        localStorage.setItem("modulo_treinamentos_dados_nuvem", JSON.stringify(dadosGlobaisNuvem.treinamentos));
+                    }
                 } else {
                     await salvarNaNuvem();
                 }
@@ -584,6 +598,7 @@
 
         async function salvarNaNuvem() {
             let historicoLocal = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+            let treinosLocal = JSON.parse(localStorage.getItem("modulo_treinamentos_dados_nuvem")) || [];
             let semanasLocal = {};
             for (let i = 0; i < localStorage.length; i++) {
                 let key = localStorage.key(i);
@@ -594,6 +609,7 @@
 
             dadosGlobaisNuvem = {
                 historico: historicoLocal,
+                treinamentos: treinosLocal,
                 semanas: semanasLocal
             };
 
@@ -609,7 +625,7 @@
         async function sincronizarComNuvemManual() {
             await sincronizarComNuvem();
             atualizarDatasSemana();
-            alert("✅ Sincronizado com sucesso com a nuvem!");
+            alert("✅ Sincronizado com sucesso com a nuvem e treinamentos atualizados!");
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -875,7 +891,6 @@
             }
         }
 
-        // FUNÇÃO PARA BLOQUEAR/DESBLOQUEAR O DIA QUANDO MARCA FERIADO OU EMENDA
         function alternarBloqueioDia(checkbox) {
             const card = checkbox.closest('.day-card');
             const isFeriado = card.querySelector('.check-feriado').checked;
@@ -888,7 +903,6 @@
                 tasksCont.innerHTML = `<div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg text-center font-bold text-emerald-800 dark:text-emerald-200 text-xs my-auto">${motivo}<br><small class="font-normal">Dia bloqueado para tarefas.</small></div>`;
                 resCont.innerHTML = `<div class="resources-title">Recursos</div><div class="text-[10px] text-gray-400 italic text-center py-2">Nenhum recurso alocado.</div>`;
             } else {
-                // Restaura o padrão se desmarcar
                 tasksCont.innerHTML = `
                     <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -902,7 +916,44 @@
             guardarEstadoDOM();
         }
 
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.35)
+        // LEITURA AUTOMÁTICA DOS TREINAMENTOS NAS DATAS CORRETAS
+        function injetarTreinamentosNasDatas(datasDaSemana) {
+            let treinos = JSON.parse(localStorage.getItem("modulo_treinamentos_dados_nuvem")) || [];
+            if (treinos.length === 0) return;
+
+            const nomesDiasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+
+            datasDaSemana.forEach((dataObj, index) => {
+                const diaNome = nomesDiasMap[index];
+                const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
+                if (!card) return;
+
+                const tasksCont = card.querySelector('.tasks-container');
+                if (tasksCont.innerText.includes('bloqueado')) return;
+
+                // Formatar a data atual do card em YYYY-MM-DD para comparar
+                const ano = dataObj.getFullYear();
+                const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+                const dia = String(dataObj.getDate()).padStart(2, '0');
+                const dataStrCard = `${ano}-${mes}-${dia}`;
+
+                // Verificar quais treinamentos abrangem esta data
+                treinos.forEach(t => {
+                    if (dataStrCard >= t.inicio && dataStrCard <= t.fim) {
+                        // Verificar se já não está injetado para não duplicar
+                        const textoBusca = `🎓 ${t.nome}`;
+                        if (!tasksCont.innerHTML.includes(textoBusca)) {
+                            const divTreino = document.createElement('div');
+                            divTreino.className = 'treinamento-box';
+                            divTreino.innerHTML = `🎓 <strong>${t.nome}</strong><br><small>📍 ${t.local} | 👤 ${t.pessoa}</small>`;
+                            tasksCont.appendChild(divTreino);
+                        }
+                    }
+                });
+            });
+        }
+
+        // ANALISADOR INTELIGENTE DE SCRIPT (v3.37)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
@@ -1089,6 +1140,10 @@
                     card.querySelector('.day-title').innerHTML = `${diaNome}<br><small>${String(diaDoMes).padStart(2,'0')}/${mesStr}</small>`;
                 }
             });
+
+            // INJETA AUTOMATICAMENTE OS TREINAMENTOS NAS DATAS CORRETAS
+            injetarTreinamentosNasDatas(datas);
+
             guardarEstadoDOM();
         }
 
@@ -1134,7 +1189,6 @@
             }
         }
 
-        // ADICIONAR ITEM (COM SUPORTE A "SEMANA INTEIRA")
         async function adicionarItemPorData() {
             const dataStr = document.getElementById('inputDataEvento').value;
             const tipo = document.getElementById('inputTipo').value;
@@ -1247,6 +1301,7 @@
                         .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 6px; flex-shrink: 0; }
                         .tasks-container { flex-grow: 1; margin-bottom: 8px; overflow: hidden; }
                         .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
+                        .treinamento-box { font-weight: 600; color: #065f46; background-color: #d1fae5; padding: 5px 6px; border-radius: 4px; margin-bottom: 4px; font-size: 10px; border-left: 2px solid #059669; }
                         .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: auto; height: 125px; flex-shrink: 0; }
                         .resources-title { font-size: 8px; font-weight: 800; color: #2e7d32; text-transform: uppercase; margin-bottom: 3px; }
                         .resource-tag { background: #e8f5e9; color: #1b5e20; padding: 3px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
