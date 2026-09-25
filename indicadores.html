@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v4.1 Correção Recursos)</title>
+    <title>Painel de Indicadores & Gráficos (v4.2 Só Exibe Marcados)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -131,23 +131,7 @@
                 </div>
             </div>
 
-            <!-- LINHA 4: FILTRO DEDICADO DE RECURSOS ESPECÍFICOS -->
-            <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">🚙 Selecionar Recursos a Exibir:</span>
-                        <span id="labelContadorRecursosFiltro" class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase">Todos Selecionados</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="marcarTodosRecursosFiltro(true)" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todos Recursos</button>
-                        <button type="button" onclick="marcarTodosRecursosFiltro(false)" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar Recursos</button>
-                    </div>
-                </div>
-                <div id="containerFiltroRecursos" class="flex flex-wrap gap-2 text-xs font-bold pt-1">
-                </div>
-            </div>
-
-            <!-- LINHA 5: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
+            <!-- LINHA 4: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -199,14 +183,14 @@
             </div>
         </div>
 
-        <!-- BLOCO DEDICADO A INDICADORES DE RECURSOS (COM LEITURA DA CAIXINHA MARCADA) -->
+        <!-- BLOCO DE RECURSOS: SÓ APARECE O QUE FOI MARCADO/CONCLUÍDO -->
         <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                 <div>
                     <h3 class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
-                        <span>🚙</span> Painel de Utilização de Recursos (Baseado em Caixinhas Marcadas)
+                        <span>🚙</span> Painel de Utilização de Recursos (Apenas Caixinhas Marcadas)
                     </h3>
-                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Calcula apenas os recursos cuja caixinha foi efetivamente concluída/utilizada na programação.</p>
+                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Se nada foi marcado na programação, este painel permanece zerado.</p>
                 </div>
                 <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-1 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
             </div>
@@ -214,9 +198,9 @@
             <!-- CARDS DE RECURSOS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Recursos Utilizados (Concluídos)</span>
+                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Recursos Efetivamente Utilizados</span>
                     <h4 id="cardRecursoTotal" class="text-2xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
-                    <p id="cardRecursoTotalSub" class="text-[10px] text-gray-500 font-semibold">0 alocados no total</p>
+                    <p id="cardRecursoTotalSub" class="text-[10px] text-gray-500 font-semibold">Caixinhas marcadas</p>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
@@ -232,25 +216,25 @@
                 </div>
             </div>
 
-            <!-- GRÁFICO RANKING DE RECURSOS + TABELA DE RECURSOS -->
+            <!-- GRÁFICO RANKING DE RECURSOS + TABELA -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                    <h4 class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300 mb-2">📊 Ranking de Utilização (Caixinhas Marcadas)</h4>
-                    <div class="relative h-60 w-full">
+                    <h4 class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300 mb-2">📊 Ranking de Utilização</h4>
+                    <div class="relative h-60 w-full flex items-center justify-center">
                         <canvas id="graficoRecursosCanvas"></canvas>
+                        <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado como utilizado.</p>
                     </div>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2">
-                    <h4 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhe dos Recursos (Feitos vs Planeados)</h4>
+                    <h4 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Recursos Utilizados no Período</h4>
                     <div class="overflow-x-auto max-h-56 overflow-y-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
                                 <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
                                     <th class="py-2 px-3">Recurso / Equipamento</th>
-                                    <th class="py-2 px-3 text-center">Utilizados</th>
-                                    <th class="py-2 px-3 text-center">Planeados</th>
-                                    <th class="py-2 px-3 text-right">Aproveitamento</th>
+                                    <th class="py-2 px-3 text-center">Vezes Marcado</th>
+                                    <th class="py-2 px-3 text-right">% do Uso</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelaRecursosCorpo">
@@ -302,7 +286,7 @@
                             <th class="py-2.5 px-3 text-green-600 col-concluidas">Concluídas</th>
                             <th class="py-2.5 px-3 text-red-600 col-naorealizadas">Não Realizadas</th>
                             <th class="py-2.5 px-3 text-amber-600 col-extras">Extras (OK / Total)</th>
-                            <th class="py-2.5 px-3 text-emerald-700">Recursos Usados</th>
+                            <th class="py-2.5 px-3 text-emerald-700">Recursos Marcados</th>
                             <th class="py-2.5 px-3">Status de Execução</th>
                         </tr>
                     </thead>
@@ -327,7 +311,6 @@
 
         let mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
         let semanasDesmarcadas = new Set();
-        let recursosDesmarcados = new Set();
 
         function limparSimbolosTexto(texto) {
             if (!texto) return "";
@@ -442,7 +425,6 @@
             popularSelectAnos(ano);
             document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
             semanasDesmarcadas.clear();
-            recursosDesmarcados.clear();
             carregarIndicadores();
         }
 
@@ -458,23 +440,6 @@
             } else {
                 if (cacheDadosProcessados && cacheDadosProcessados.todasSemanasDetectadas) {
                     cacheDadosProcessados.todasSemanasDetectadas.forEach(num => semanasDesmarcadas.add(num));
-                }
-            }
-            carregarIndicadores();
-        }
-
-        function alternarRecursoFiltro(nomeRecurso, marcar) {
-            if (marcar) recursosDesmarcados.delete(nomeRecurso);
-            else recursosDesmarcados.add(nomeRecurso);
-            carregarIndicadores();
-        }
-
-        function marcarTodosRecursosFiltro(marcar) {
-            if (marcar) {
-                recursosDesmarcados.clear();
-            } else {
-                if (cacheDadosProcessados && cacheDadosProcessados.todosRecursosNomes) {
-                    cacheDadosProcessados.todosRecursosNomes.forEach(n => recursosDesmarcados.add(n));
                 }
             }
             carregarIndicadores();
@@ -528,12 +493,9 @@
             let totalExtrasAno = 0;
             let totalExtrasConcluidasAno = 0;
 
-            // Estatísticas de Recursos: separa o que foi PLANEADO do que foi EFETIVAMENTE UTILIZADO (marcado)
-            let mapaRecursosUtilizados = {}; // Caixinha marcada
-            let mapaRecursosPlaneados = {};  // Total de alocações
+            // MAPA EXCLUSIVO: Só guarda o que foi MARCADO
+            let mapaRecursosUtilizados = {}; 
             let totalRecursosUtilizadosGeral = 0;
-            let totalRecursosPlaneadosGeral = 0;
-            let todosRecursosNomes = new Set();
 
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
@@ -584,8 +546,7 @@
                 let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
 
                 // ========================================================
-                // CORREÇÃO CRUCIAL DA LEITURA DE RECURSOS:
-                // Agora verifica explicitamente se o recurso foi MARCADO / CONCLUÍDO
+                // REGRA CORRIGIDA: SÓ CONTA SE A CAIXINHA ESTIVER MARCADA!
                 // ========================================================
                 let tagsRecursos = doc.querySelectorAll('.resource-tag');
                 let recursosNestaSemanaFeitos = 0;
@@ -596,21 +557,14 @@
                     let nomeRecurso = limparSimbolosTexto(nomeBruto).toUpperCase();
                     
                     if (nomeRecurso && nomeRecurso.length > 1) {
-                        todosRecursosNomes.add(nomeRecurso);
-
                         let check = tag.querySelector('input[type="checkbox"]');
-                        // Reconhece como concluído se tem a classe task-done OU se o checkbox está checked
                         let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                         
-                        if (!recursosDesmarcados.has(nomeRecurso)) {
-                            mapaRecursosPlaneados[nomeRecurso] = (mapaRecursosPlaneados[nomeRecurso] || 0) + 1;
-                            totalRecursosPlaneadosGeral++;
-
-                            if (estaConcluido && !ehFuturoReal) {
-                                mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
-                                totalRecursosUtilizadosGeral++;
-                                recursosNestaSemanaFeitos++;
-                            }
+                        // SÓ ENTRA SE ESTIVER MARCADO E NÃO FOR SEMANA FUTURA
+                        if (estaConcluido && !ehFuturoReal) {
+                            mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
+                            totalRecursosUtilizadosGeral++;
+                            recursosNestaSemanaFeitos++;
                         }
                     }
                 });
@@ -661,17 +615,14 @@
             document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume (${totalExtrasConcluidasAno} feitas)`;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeralConcluida}%`;
 
-            renderizarFiltroDeRecursos(todosRecursosNomes);
-
-            // Processa o painel de recursos com os dados reais de caixinhas marcadas
-            processarIndicadoresDeRecursos(mapaRecursosUtilizados, mapaRecursosPlaneados, totalRecursosUtilizadosGeral, totalRecursosPlaneadosGeral, semanasLista.length);
+            // Processa o painel de recursos estritamente com os recursos marcados
+            processarIndicadoresDeRecursos(mapaRecursosUtilizados, totalRecursosUtilizadosGeral);
 
             cacheDadosProcessados = {
                 anoSelecionado,
                 semanasLista,
                 mesesDados,
                 todasSemanasDetectadas,
-                todosRecursosNomes,
                 mapaRecursosUtilizados,
                 totalRecursosUtilizadosGeral
             };
@@ -679,71 +630,50 @@
             atualizarVisualizacao();
         }
 
-        function renderizarFiltroDeRecursos(setNomes) {
-            const cont = document.getElementById('containerFiltroRecursos');
-            cont.innerHTML = '';
-            
-            let nomesArray = Array.from(setNomes).sort();
-            if (nomesArray.length === 0) {
-                cont.innerHTML = '<span class="text-xs text-gray-400 italic">Nenhum recurso registado neste período.</span>';
-                document.getElementById('labelContadorRecursosFiltro').innerText = "0 Recursos";
-                return;
-            }
-
-            let ativosCount = 0;
-            nomesArray.forEach(nome => {
-                const isChecked = !recursosDesmarcados.has(nome);
-                if (isChecked) ativosCount++;
-
-                const label = document.createElement('label');
-                label.className = `flex items-center gap-1.5 px-2.5 py-1 rounded-xl border cursor-pointer transition ${isChecked ? 'bg-emerald-50 border-emerald-300 text-emerald-900 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300' : 'bg-gray-100 border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700'}`;
-                label.innerHTML = `
-                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="alternarRecursoFiltro('${nome.replace(/'/g, "\\'")}', this.checked)" class="w-3.5 h-3.5 accent-emerald-600 cursor-pointer">
-                    <span class="text-xs font-bold">${nome}</span>
-                `;
-                cont.appendChild(label);
-            });
-
-            document.getElementById('labelContadorRecursosFiltro').innerText = `${ativosCount} de ${nomesArray.length} Ativo(s)`;
-        }
-
-        function processarIndicadoresDeRecursos(mapaUtilizados, mapaPlaneados, totalUtilizados, totalPlaneados, totalSemanasAtivas) {
+        function processarIndicadoresDeRecursos(mapaUtilizados, totalUtilizados) {
             document.getElementById('cardRecursoTotal').innerText = totalUtilizados;
-            document.getElementById('cardRecursoTotalSub').innerText = `${totalPlaneados} alocações planeadas`;
-            document.getElementById('tagTotalAlocacoes').innerText = `${totalUtilizados} de ${totalPlaneados} Utilizados`;
+            document.getElementById('cardRecursoTotalSub').innerText = totalUtilizados > 0 ? "Utilizações registadas" : "Nenhum recurso marcado";
+            document.getElementById('tagTotalAlocacoes').innerText = `${totalUtilizados} Utilizados`;
 
-            // Ordena os recursos pelo que foi mais utilizado (marcado)
-            let recursosOrdenados = Object.keys(mapaPlaneados).map(nome => ({
+            let recursosOrdenados = Object.keys(mapaUtilizados).map(nome => ({
                 nome: nome,
-                utilizados: mapaUtilizados[nome] || 0,
-                planeados: mapaPlaneados[nome] || 0
+                utilizados: mapaUtilizados[nome]
             })).sort((a, b) => b.utilizados - a.utilizados);
 
-            if (recursosOrdenados.length > 0) {
+            const msgGrafico = document.getElementById('msgSemDadosGrafico');
+            const canvasGrafico = document.getElementById('graficoRecursosCanvas');
+
+            if (recursosOrdenados.length > 0 && totalUtilizados > 0) {
                 let mais = recursosOrdenados[0];
-                let percMais = totalUtilizados > 0 ? Math.round((mais.utilizados / totalUtilizados) * 100) : 0;
+                let percMais = Math.round((mais.utilizados / totalUtilizados) * 100);
                 document.getElementById('cardRecursoMaisNome').innerText = mais.nome;
-                document.getElementById('cardRecursoMaisQtd').innerText = `${mais.utilizados} vezes (${percMais}% das utilizações)`;
+                document.getElementById('cardRecursoMaisQtd').innerText = `${mais.utilizados} vezes (${percMais}%)`;
 
                 let menos = recursosOrdenados[recursosOrdenados.length - 1];
-                let percMenos = totalUtilizados > 0 ? Math.round((menos.utilizados / totalUtilizados) * 100) : 0;
+                let percMenos = Math.round((menos.utilizados / totalUtilizados) * 100);
                 document.getElementById('cardRecursoMenosNome').innerText = menos.nome;
-                document.getElementById('cardRecursoMenosQtd').innerText = `${menos.utilizados} vezes (${percMenos}% das utilizações)`;
+                document.getElementById('cardRecursoMenosQtd').innerText = `${menos.utilizados} vezes (${percMenos}%)`;
+
+                msgGrafico.classList.add('hidden');
+                canvasGrafico.classList.remove('hidden');
             } else {
                 document.getElementById('cardRecursoMaisNome').innerText = "Nenhum";
                 document.getElementById('cardRecursoMaisQtd').innerText = "0 utilizações";
                 document.getElementById('cardRecursoMenosNome').innerText = "Nenhum";
                 document.getElementById('cardRecursoMenosQtd').innerText = "0 utilizações";
+
+                msgGrafico.classList.remove('hidden');
+                canvasGrafico.classList.add('hidden');
             }
 
             const tbodyRecursos = document.getElementById('tabelaRecursosCorpo');
             tbodyRecursos.innerHTML = '';
 
-            if (recursosOrdenados.length === 0) {
-                tbodyRecursos.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 italic">Nenhum recurso alocado nas semanas e filtros selecionados.</td></tr>`;
+            if (recursosOrdenados.length === 0 || totalUtilizados === 0) {
+                tbodyRecursos.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-400 italic">Nenhum recurso marcado como utilizado nas semanas selecionadas.</td></tr>`;
             } else {
                 recursosOrdenados.forEach((r, idx) => {
-                    let taxaAproveitamento = r.planeados > 0 ? Math.round((r.utilizados / r.planeados) * 100) : 0;
+                    let perc = Math.round((r.utilizados / totalUtilizados) * 100);
                     
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-emerald-50/40 dark:hover:bg-gray-700/20';
@@ -753,9 +683,8 @@
                             <span>${r.nome}</span>
                         </td>
                         <td class="py-2 px-3 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
-                        <td class="py-2 px-3 text-center font-semibold text-gray-600 dark:text-gray-300">${r.planeados}</td>
                         <td class="py-2 px-3 text-right">
-                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${taxaAproveitamento >= 70 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${taxaAproveitamento}%</span>
+                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">${perc}%</span>
                         </td>
                     `;
                     tbodyRecursos.appendChild(tr);
@@ -769,9 +698,10 @@
             const ctx = document.getElementById('graficoRecursosCanvas').getContext('2d');
             if (graficoRecursosInstance) graficoRecursosInstance.destroy();
 
+            if (recursos.length === 0) return;
+
             let labels = recursos.map(r => r.nome);
             let valoresUtilizados = recursos.map(r => r.utilizados);
-            let valoresPlaneados = recursos.map(r => r.planeados);
 
             graficoRecursosInstance = new Chart(ctx, {
                 type: 'bar',
@@ -779,15 +709,9 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Utilizados (Marcados)',
+                            label: 'Vezes Utilizado (Marcado)',
                             data: valoresUtilizados,
                             backgroundColor: '#059669',
-                            borderRadius: 4
-                        },
-                        {
-                            label: 'Total Planeados',
-                            data: valoresPlaneados,
-                            backgroundColor: '#cbd5e1',
                             borderRadius: 4
                         }
                     ]
@@ -801,11 +725,7 @@
                         y: { ticks: { font: { size: 10, weight: 'bold' } } }
                     },
                     plugins: { 
-                        legend: { 
-                            display: true,
-                            position: 'top',
-                            labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } }
-                        } 
+                        legend: { display: false } 
                     }
                 }
             });
