@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.48 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.49 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -207,6 +207,7 @@
             gap: 10px;
             margin-top: 15px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
         .btn-action {
             background-color: #1976d2;
@@ -224,6 +225,12 @@
             transition: background 0.2s;
         }
         .btn-action:hover { background-color: #115293; }
+        .btn-save-nuvem {
+            background-color: #2e7d32;
+        }
+        .btn-save-nuvem:hover {
+            background-color: #1b5e20;
+        }
         .dragging { opacity: 0.4; }
     </style>
 </head>
@@ -385,6 +392,7 @@
         </div>
 
         <div class="actions-bar print-hidden">
+            <button class="btn-action btn-save-nuvem" onclick="salvarProgramacaoManualNuvem()">💾 Salvar Programação na Nuvem</button>
             <button class="btn-action" onclick="imprimirProgramacao()">🖨️ Imprimir Programação (PDF Limpo)</button>
         </div>
 
@@ -432,7 +440,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.48) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.49) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -474,7 +482,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.48 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.49 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -554,29 +562,22 @@
                     if (dadosGlobaisNuvem.historico) {
                         localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
                     }
-                    if (dadosGlobaisNuvem.treinamentos) {
-                        localStorage.setItem("modulo_treinamentos_dados_nuvem", JSON.stringify(dadosGlobaisNuvem.treinamentos));
-                    }
-                    if (dadosGlobaisNuvem.feriados) {
-                        localStorage.setItem("modulo_feriados_dados_nuvem", JSON.stringify(dadosGlobaisNuvem.feriados));
-                    }
                 } else {
-                    await salvarNaNuvem();
+                    dadosGlobaisNuvem = {};
                 }
             } catch(e) {
-                console.error("Erro ao sincronizar com nuvem:", e);
+                console.error("Erro ao buscar da nuvem:", e);
             }
         }
 
         async function salvarNaNuvem() {
             let historicoLocal = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            let treinosLocal = JSON.parse(localStorage.getItem("modulo_treinamentos_dados_nuvem")) || [];
-            let feriadosLocal = JSON.parse(localStorage.getItem("modulo_feriados_dados_nuvem")) || [];
-            
-            // Pega as semanas salvas diretamente na nuvem atual se existirem
             let semanasNuvem = dadosGlobaisNuvem.semanas || {};
             let currentWeekKey = getWeekKey();
             semanasNuvem[currentWeekKey] = document.getElementById('weekGridContainer').innerHTML;
+
+            let treinosLocal = JSON.parse(localStorage.getItem("modulo_treinamentos_dados_nuvem")) || [];
+            let feriadosLocal = JSON.parse(localStorage.getItem("modulo_feriados_dados_nuvem")) || [];
 
             dadosGlobaisNuvem = {
                 historico: historicoLocal,
@@ -586,11 +587,23 @@
             };
 
             try {
-                await supabaseClient
+                let { error } = await supabaseClient
                     .from('app_dados_programacao')
                     .upsert({ id: '1', conteudo: dadosGlobaisNuvem });
+                if (error) throw error;
+                return true;
             } catch (err) {
                 console.error("Erro ao gravar na nuvem:", err);
+                return false;
+            }
+        }
+
+        async function salvarProgramacaoManualNuvem() {
+            let sucesso = await salvarNaNuvem();
+            if (sucesso) {
+                alert("✅ Programação salva com sucesso na nuvem!");
+            } else {
+                alert("❌ Erro ao salvar na nuvem. Verifique a conexão.");
             }
         }
 
@@ -879,7 +892,7 @@
                             const semanaTreino = obterNumeroSemanaDaData(t.inicio);
                             const anoTreino = new Date(t.inicio + 'T00:00:00').getFullYear();
 
-                            // Rigor absoluto: Só injeta se a data exata do treinamento corresponder estritamente à semana e ano da tela
+                            // Verifica estritamente se o treinamento pertence a esta semana e ano exatos
                             if (semanaTreino === semanaAtualTela && anoTreino === anoAtualTela) {
                                 if (dataStrCard === t.inicio) {
                                     const identificadorUnico = `treino_id_${t.id}`;
@@ -1087,7 +1100,7 @@
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
 
-            // Restaura o layout padrão limpo dos 5 dias da semana antes de re-injetar os dados vindos direto da nuvem
+            // Restaura o grid limpo
             document.getElementById('weekGridContainer').innerHTML = `
                 <!-- Segunda -->
                 <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
@@ -1186,7 +1199,7 @@
                 </div>
             `;
 
-            // Se existir HTML salvo na nuvem para esta semana específica, carrega ele limpinho
+            // Se existir dados salvos na nuvem para esta semana, carrega
             let semanaKey = getWeekKey();
             if (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey]) {
                 document.getElementById('weekGridContainer').innerHTML = dadosGlobaisNuvem.semanas[semanaKey];
@@ -1288,7 +1301,7 @@
             document.getElementById('inputDesc').value = '';
             document.getElementById('selectFrequentes').value = '';
             document.getElementById('checkSemanaInteira').checked = false;
-            await guardarEstadoDOM();
+            await salvarNaNuvem();
         }
 
         function inserirItemNoCard(card, tipo, desc) {
@@ -1311,13 +1324,13 @@
             let novoTexto = prompt("Editar descrição:", itemSpan.innerText);
             if (novoTexto !== null && novoTexto.trim() !== "") {
                 itemSpan.innerText = aplicarCorrecao(novoTexto);
-                await guardarEstadoDOM();
+                await salvarNaNuvem();
             }
         }
 
         async function removerElemento(botao) {
             (botao.closest('.task-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box')).remove();
-            await guardarEstadoDOM();
+            await salvarNaNuvem();
         }
 
         async function guardarEstadoDOM() {
