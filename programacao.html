@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.66 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.67 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -86,6 +86,7 @@
             flex-direction: column;
             flex-grow: 1;
             overflow: hidden;
+            height: calc(100% - 110px);
         }
         .tasks-container {
             flex-grow: 1;
@@ -147,11 +148,13 @@
             flex-direction: column;
             gap: 3px;
             border-top: 2px dashed #c8e6c9;
-            padding-top: 8px;
-            margin-top: auto; 
-            height: 125px;
+            padding-top: 6px;
+            height: 110px !important;
+            min-height: 110px !important;
+            max-height: 110px !important;
             flex-shrink: 0;
             background: #ffffff;
+            overflow-y: auto;
         }
         .resources-title {
             font-size: 8px;
@@ -159,7 +162,8 @@
             color: #2e7d32;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
+            flex-shrink: 0;
         }
         .resource-tag {
             background: var(--secondary-color);
@@ -172,6 +176,7 @@
             justify-content: space-between;
             align-items: center;
             cursor: grab;
+            flex-shrink: 0;
         }
         .resource-tag:active { cursor: grabbing; }
         .item-controls {
@@ -282,7 +287,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.66) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.67) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -376,7 +381,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.66 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.67 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -1108,7 +1113,7 @@
 
         function imprimirProgramacao() {
             const w = window.open('', '_blank', 'width=900,height=700');
-            w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',Tahoma,sans-serif;padding:20px;background:#fff;color:#333;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:15px;align-items:stretch;}.day-card{background:#fff;border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:10px;display:flex;flex-direction:column;height:480px!important;}.day-title{font-size:14px;font-weight:bold;color:#1b5e20;text-align:center;background:#e8f5e9!important;border:1px solid #a3e4d7!important;border-radius:4px;padding:4px;margin-bottom:6px;flex-shrink:0;}.tasks-container{flex-grow:1;margin-bottom:8px;overflow:hidden;}.task-box,.treinamento-box{font-weight:600;color:#1b5e20!important;background:#f1f8e9!important;padding:4px 6px;border-radius:4px;margin-bottom:4px;font-size:10px;border-left:2px solid #2e7d32!important;}.day-resources{display:flex;flex-direction:column;gap:3px;border-top:2px dashed #c8e6c9;padding-top:8px;margin-top:auto;height:125px;flex-shrink:0;background:#fff;}.resources-title{font-size:8px;font-weight:800;color:#2e7d32;text-transform:uppercase;margin-bottom:3px;}.resource-tag{background:#e8f5e9!important;color:#1b5e20!important;padding:3px 5px;border-radius:3px;font-size:10px;font-weight:600;}.flex.items-center.justify-between.gap-1.mb-2,.drag-handle,.item-controls,button{display:none!important;}h2{color:#1b5e20;text-align:center;text-transform:uppercase;}.week-badge{float:right;background:#1b5e20;color:#fff;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style></head><body><h2>Programação Semanal</h2><div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div><script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>`);
+            w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',Tahoma,sans-serif;padding:20px;background:#fff;color:#333;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:15px;align-items:stretch;}.day-card{background:#fff;border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:10px;display:flex;flex-direction:column;height:480px!important;}.day-title{font-size:14px;font-weight:bold;color:#1b5e20;text-align:center;background:#e8f5e9!important;border:1px solid #a3e4d7!important;border-radius:4px;padding:4px;margin-bottom:6px;flex-shrink:0;}.tasks-container{flex-grow:1;margin-bottom:8px;overflow:hidden;}.task-box,.treinamento-box{font-weight:600;color:#1b5e20!important;background:#f1f8e9!important;padding:4px 6px;border-radius:4px;margin-bottom:4px;font-size:10px;border-left:2px solid #2e7d32!important;}.day-resources{display:flex;flex-direction:column;gap:3px;border-top:2px dashed #c8e6c9;padding-top:8px;height:110px!important;min-height:110px!important;flex-shrink:0;background:#fff;overflow:hidden;}.resources-title{font-size:8px;font-weight:800;color:#2e7d32;text-transform:uppercase;margin-bottom:3px;}.resource-tag{background:#e8f5e9!important;color:#1b5e20!important;padding:3px 5px;border-radius:3px;font-size:10px;font-weight:600;}.flex.items-center.justify-between.gap-1.mb-2,.drag-handle,.item-controls,button{display:none!important;}h2{color:#1b5e20;text-align:center;text-transform:uppercase;}.week-badge{float:right;background:#1b5e20;color:#fff;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style></head><body><h2>Programação Semanal</h2><div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div><script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>`);
             w.document.close();
         }
     </script>
