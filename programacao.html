@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.45 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.46 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -432,7 +432,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.45) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.46) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -474,7 +474,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.45 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.46 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -660,7 +660,7 @@
 
             localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
             await salvarNaNuvem();
-            alert(`✅ Programação da ${badgeTexto} de ${ano} guardada com sucesso e sincronizada!`);
+            alert(`✅ Programação da ${badgeTexto} de${ano} guardada com sucesso e sincronizada!`);
             renderizarListaHistorico();
         }
 
@@ -741,7 +741,7 @@
 
         function gerenciarFrequentes() {
             let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-            let listaStr = salvos.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
+            let listaStr = salvos.map((item, idx) => `${idx + 1}.${item}`).join('\n');
             let escolha = prompt(`Itens Frequentes:\n\n${listaStr}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
             if (escolha !== null && !isNaN(escolha)) {
                 let index = parseInt(escolha) - 1;
@@ -783,7 +783,7 @@
 
         function gerenciarPalavrasChave() {
             let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            let listaStr = chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
+            let listaStr = chaves.map((item, idx) => `${idx + 1}.${item}`).join('\n');
             let escolha = prompt(`Palavras-Chave:\n\n${listaStr}\n\nNúmero do item para APAGAR:`);
             if (escolha !== null && !isNaN(escolha)) {
                 let index = parseInt(escolha) - 1;
@@ -802,24 +802,24 @@
             const tasksCont = card.querySelector('.tasks-container');
             const resCont = card.querySelector('.day-resources');
 
-            if (isFeriado || isEmenda) {
-                const motivo = isFeriado ? "🍃 FERIADO" : "📌 EMENDA";
-                
-                // Caixa de tarefas ocupando o espaço com visual elegante de feriado/emenda
+            if (isFeriado) {
+                // Feriado: preenche a tela inteira (tarefas + recursos) com o verde padrão elegante
                 tasksCont.innerHTML = `
-                    <div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px;" class="p-4 text-center my-auto shadow-sm">
-                        <span style="color: #1b5e20; font-weight: 900; font-size: 13px;">${motivo}</span>
+                    <div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm">
+                        <span style="color: #1b5e20; font-weight: 900; font-size: 14px;">🍃 FERIADO</span>
                         <div style="color: #2e7d32; font-size: 11px; font-weight: 600; margin-top: 4px;">Dia bloqueado para tarefas.</div>
                     </div>
                 `;
-                
-                // Área de recursos exibindo "Nenhum recurso alocado" estilizado exatamente igual às caixas normais
-                resCont.innerHTML = `
-                    <div class="resources-title">Recursos</div>
-                    <div style="background-color: #e8f5e9; color: #1b5e20; border-left: 2px solid #2e7d32; font-size: 10px; font-weight: 600; padding: 5px 8px; border-radius: 4px; text-align: center;">
-                        Nenhum recurso alocado
+                resCont.innerHTML = ``; // Remove a seção de recursos inteira para ocupar o dia todo
+            } else if (isEmenda) {
+                // Emenda: preenche a tela inteira com um tom harmonioso e o ícone de pin/tachinha 📌
+                tasksCont.innerHTML = `
+                    <div style="background-color: #e0f2f1; border: 1px solid #b2dfdb; border-left: 4px solid #00897b; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm">
+                        <span style="color: #004d40; font-weight: 900; font-size: 14px;">📌 EMENDA</span>
+                        <div style="color: #00695c; font-size: 11px; font-weight: 600; margin-top: 4px;">Dia bloqueado para tarefas.</div>
                     </div>
                 `;
+                resCont.innerHTML = ``; // Remove a seção de recursos inteira para ocupar o dia todo
             } else {
                 tasksCont.innerHTML = `
                     <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
