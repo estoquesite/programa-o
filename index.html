@@ -377,8 +377,8 @@
             </div>
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
-                <!-- CAMPO COM TRANSFORMAÇÃO AUTOMÁTICA EM MAIÚSCULO -->
-                <input type="text" id="inputDesc" placeholder="Ex: Manutenção de rotina..." oninput="this.value = this.value.toUpperCase()" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
+                <!-- CAMPO COM CORREÇÃO AUTOMÁTICA DE ACENTOS E TERMOS -->
+                <input type="text" id="inputDesc" placeholder="Ex: almoxarifado..." oninput="tratarTextoAutomatico(this)" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
             </div>
             <div class="flex gap-2 pt-1">
                 <button onclick="adicionarItemPorData()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Adicionar (OK)</button>
@@ -386,10 +386,10 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT E NOTAS DE SALA -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (ORIGINAL RESTAURADO) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script + Sala)</h3>
+                <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
                 <div class="flex gap-1.5">
                     <button onclick="adicionarNovaPalavraChave()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">➕ Palavra</button>
                     <button onclick="gerenciarPalavrasChave()" class="bg-gray-600 hover:bg-gray-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">⚙️ Gerir</button>
@@ -397,16 +397,11 @@
             </div>
             
             <div>
-                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">1. Cole o Script / Transcrição do Teams:</label>
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Cole o Script / Transcrição da Reunião:</label>
                 <textarea id="inputScriptTexto" rows="3" placeholder="Cole aqui o texto da transcrição..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
             </div>
 
-            <div>
-                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">2. Apontamentos da Sala (O que os outros falaram e não saiu no Teams):</label>
-                <textarea id="inputNotasSala" rows="3" placeholder="Ex: Fulano disse que o caminhão chega terça às 14h; Ciclano pediu empilhadeira..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
-            </div>
-
-            <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">🔎 Analisar Tudo e Gerar Sugestões</button>
+            <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">🔎 Analisar Script e Buscar Citações</button>
             <div id="resultadoSugestoes" class="space-y-1.5 pt-2"></div>
         </div>
     </div>
@@ -454,9 +449,17 @@
 
         let itensFrequentesPadrao = [
             "🕒 HORA CERTA", "📦 MOVIMENTAÇÃO G4", "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
-            "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO", "CARRO"
+            "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO", "CARRO", "ALMOXARIFADO"
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
+
+        // CORREÇÃO AUTOMÁTICA DE TERMOS E ACENTOS
+        function tratarTextoAutomatico(input) {
+            let texto = input.value;
+            texto = texto.replace(/almoçegifado|almocedifado|almoxarifad|almoxarifado/gi, "ALMOXARIFADO");
+            texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+            input.value = texto;
+        }
 
         function getWeekKey() {
             const ano = document.getElementById('inputAno').value;
@@ -547,11 +550,6 @@
             document.getElementById('inputDataEvento').valueAsDate = new Date();
 
             const inputDescEl = document.getElementById('inputDesc');
-            
-            inputDescEl.addEventListener('input', function() {
-                this.value = this.value.toUpperCase();
-            });
-
             inputDescEl.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') { adicionarItemPorData(); }
             });
@@ -729,7 +727,7 @@
         async function adicionarNovoFrequente() {
             const novo = prompt("Digite o nome da nova tarefa ou recurso frequente:");
             if (novo && novo.trim() !== "") {
-                const itemMaiusculo = novo.trim().toUpperCase();
+                const itemMaiusculo = novo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
                 let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
                 if (!salvos.includes(itemMaiusculo)) {
                     salvos.push(itemMaiusculo);
@@ -753,7 +751,7 @@
                     if (acao === "1") {
                         let novoNome = prompt("Novo nome:", itemSelecionado);
                         if (novoNome && novoNome.trim() !== "") {
-                            salvos[index] = novoNome.trim().toUpperCase();
+                            salvos[index] = novoNome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
                             localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
                             carregarFrequentes();
                             alert("Atualizado!");
@@ -773,7 +771,7 @@
         function adicionarNovaPalavraChave() {
             const nova = prompt("Palavra-chave para o analisador:");
             if (nova && nova.trim() !== "") {
-                const termo = nova.trim().toUpperCase();
+                const termo = nova.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
                 let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
                 if (!chaves.includes(termo)) {
                     chaves.push(termo);
@@ -797,75 +795,67 @@
             }
         }
 
-        // NOVO ANALISADOR ROBUSTO: Lê blocos maiores de conversação (para capturar qualquer minuto: 02:25, 15h, 16h, etc.)
+        // ANALISADOR INTELIGENTE DE SCRIPT (BUSCA EXATA DA FRASE/FALA)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
-            const textoNotas = document.getElementById('inputNotasSala').value;
-            const textoCombinado = textoScript + "\n" + textoNotas;
-            
             const containerSugestoes = document.getElementById('resultadoSugestoes');
             containerSugestoes.innerHTML = '';
 
-            if (!textoCombinado.trim()) {
-                containerSugestoes.innerHTML = `<p class="text-[10px] text-red-500">Insira algum texto na transcrição ou nas notas da sala.</p>`;
+            if (!textoScript.trim()) {
+                containerSugestoes.innerHTML = `<p class="text-[10px] text-red-500">Insira algum texto na transcrição.</p>`;
                 return;
             }
 
             const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
             
-            // Agrupa as linhas em blocos inteligentes (juntando blocos de 5 linhas para nunca perder o contexto de horários e minutos)
-            const linhas = textoCombinado.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            // Divide o texto em frases ou linhas para localizar exatamente a citação
+            const linhas = textoScript.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2);
             let encontradas = 0;
-            let textosProcessados = new Set();
+            let jaAdicionadas = new Set();
 
-            for (let i = 0; i < linhas.length; i++) {
-                // Monta um bloco robusto com a linha atual e as próximas 4 linhas para abranger o minuto completo e a fala
-                let blocoContexto = "";
-                let limite = Math.min(i + 5, linhas.length);
-                for (let j = i; j < limite; j++) {
-                    blocoContexto += (blocoContexto ? " " : "") + linhas[j];
-                }
-
-                const blocoUp = blocoContexto.toUpperCase();
-
-                // Verifica se alguma palavra-chave está neste bloco
-                const contemPalavra = palavrasChave.some(p => {
+            linhas.forEach(linha => {
+                const linhaUp = linha.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+                
+                const contem = palavrasChave.some(p => {
                     const regex = new RegExp("\\b" + p + "\\b", "i");
-                    return regex.test(blocoUp) || blocoUp.includes(p);
+                    return regex.test(linhaUp) || linhaUp.includes(p);
                 });
 
-                if (contemPalavra && !textosProcessados.has(blocoContexto)) {
-                    textosProcessados.add(blocoContexto);
+                if (contem && !jaAdicionadas.has(linhaUp)) {
+                    jaAdicionadas.add(linhaUp);
                     encontradas++;
 
                     const div = document.createElement('div');
-                    div.className = 'flex flex-col gap-1.5 bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border border-blue-200 dark:border-blue-900';
+                    div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border border-blue-200 dark:border-blue-900 text-xs';
                     div.innerHTML = `
-                        <span class="text-[11px] font-medium text-blue-900 dark:text-blue-200">💬 "${blocoContexto}"</span>
-                        <div class="flex justify-end gap-1">
-                            <button onclick="usarSugestao(this)" data-texto="${blocoContexto.replace(/"/g, '&quot;')}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar no Planejamento ➜</button>
-                            <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕ Descartar</button>
+                        <span class="font-medium text-blue-900 dark:text-blue-200">💬 "${linha}"</span>
+                        <div class="flex gap-1">
+                            <button onclick="usarSugestao(this)" data-texto="${linha.replace(/"/g, '&quot;')}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar ➜</button>
+                            <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕</button>
                         </div>
                     `;
                     containerSugestoes.appendChild(div);
                 }
-            }
+            });
 
             if (encontradas === 0) {
-                containerSugestoes.innerHTML = `<p class="text-[10px] text-gray-500">Nenhuma palavra-chave reconhecida no texto combinado. Verifique se cadastrou o termo em "Gerir Palavras".</p>`;
+                containerSugestoes.innerHTML = `<p class="text-[10px] text-gray-500">Nenhuma palavra-chave reconhecida no texto. Verifique se o nome ou termo está cadastrado em "Gerir Palavras".</p>`;
             }
         }
 
         function usarSugestao(botao) {
-            const texto = botao.getAttribute('data-texto');
-            document.getElementById('inputDesc').value = texto.toUpperCase();
-            if (/caminhão|empilhadeira|carro|recurso/i.test(texto)) {
+            let texto = botao.getAttribute('data-texto');
+            texto = texto.replace(/almoçegifado|almocedifado|almoxarifad|almoxarifado/gi, "ALMOXARIFADO");
+            texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+            
+            document.getElementById('inputDesc').value = texto;
+            if (/caminhao|empilhadeira|carro|recurso/i.test(texto)) {
                 document.getElementById('inputTipo').value = 'resource';
             } else { document.getElementById('inputTipo').value = 'task'; }
             document.getElementById('inputDesc').focus();
         }
 
-        function removerSugestao(botao) { botao.closest('div.flex-col').remove(); }
+        function removerSugestao(botao) { botao.closest('div.flex').remove(); }
 
         function iniciarArrasto(e) {
             elementoArrastado = e.currentTarget;
@@ -981,10 +971,11 @@
         }
 
         function preencherPredefinido() {
-            const val = document.getElementById('selectFrequentes').value;
+            let val = document.getElementById('selectFrequentes').value;
             if (val) {
-                document.getElementById('inputDesc').value = val.toUpperCase();
-                if (/recurso|empilhadeira|caminhão|carro/i.test(val)) {
+                val = val.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+                document.getElementById('inputDesc').value = val;
+                if (/recurso|empilhadeira|caminhao|carro/i.test(val)) {
                     document.getElementById('inputTipo').value = 'resource';
                 } else { document.getElementById('inputTipo').value = 'task'; }
             }
@@ -993,9 +984,12 @@
         async function adicionarItemPorData() {
             const dataStr = document.getElementById('inputDataEvento').value;
             const tipo = document.getElementById('inputTipo').value;
-            const desc = document.getElementById('inputDesc').value.trim().toUpperCase();
+            let desc = document.getElementById('inputDesc').value.trim();
 
             if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
+
+            desc = desc.replace(/almoçegifado|almocedifado|almoxarifad|almoxarifado/gi, "ALMOXARIFADO");
+            desc = desc.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 
             const dataObj = new Date(dataStr + 'T00:00:00');
             const diaSemanaNum = dataObj.getDay();
@@ -1025,9 +1019,11 @@
         async function editarItem(botao) {
             const itemBox = botao.closest('.task-box') || botao.closest('.resource-tag');
             const itemSpan = itemBox.querySelector('.item-text');
-            const novoTexto = prompt("Editar descrição:", itemSpan.innerText);
+            let novoTexto = prompt("Editar descrição:", itemSpan.innerText);
             if (novoTexto !== null && novoTexto.trim() !== "") {
-                itemSpan.innerText = novoTexto.trim().toUpperCase();
+                novoTexto = novoTexto.replace(/almoçegifado|almocedifado|almoxarifad|almoxarifado/gi, "ALMOXARIFADO");
+                novoTexto = novoTexto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+                itemSpan.innerText = novoTexto;
                 await guardarEstadoDOM();
             }
         }
@@ -1060,7 +1056,9 @@
 
             recognition.onstart = () => { btnVoz.classList.add('animate-pulse', 'bg-amber-500'); };
             recognition.onresult = (event) => {
-                document.getElementById('inputDesc').value = event.results[0][0].transcript.toUpperCase();
+                let textoVoz = event.results[0][0].transcript;
+                textoVoz = textoVoz.replace(/almoçegifado|almocedifado|almoxarifad|almoxarifado/gi, "ALMOXARIFADO");
+                document.getElementById('inputDesc').value = textoVoz.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
                 adicionarItemPorData();
             };
             recognition.onerror = recognition.onend = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
