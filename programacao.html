@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.90 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.88 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -261,12 +261,9 @@
         <!-- BARRA DE AÇÕES DA SEMANA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
-            <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel</button>
-            <input type="file" id="inputImportarCSV" accept=".csv" style="display:none" onchange="importarPlanilhaCSV(event)">
-            <button onclick="document.getElementById('inputImportarCSV').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📤 Importar Planilha</button>
+            <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
-            <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar Semana</button>
-            <button onclick="resetTotalNuvem()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">⚠️ Reset Nuvem</button>
+            <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
         </div>
 
         <!-- ADICIONAR NOVO ITEM -->
@@ -405,7 +402,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.90 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.88 Nuvem</span>
         </div>
     </div>
 
@@ -496,71 +493,14 @@
             document.getElementById('modalIndicador').classList.add('hidden');
         }
 
-        function importarPlanilhaCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const text = e.target.result;
-                const linhas = text.split('\n');
-                
-                let importados = 0;
-                for (let i = 1; i < linhas.length; i++) {
-                    let linha = linhas[i].trim();
-                    if (!linha) continue;
-                    
-                    let cols = linha.includes(';') ? linha.split(';') : linha.split(',');
-                    if (cols.length >= 5) {
-                        let atividade = aplicarCorrecao(cols[3] || '');
-                        let diaSemana = (cols[7] || '').toLowerCase().trim();
-                        let recursos = aplicarCorrecao(cols[13] || '');
-
-                        if (atividade) {
-                            let mapaDias = { 'segunda-feira': 'Segunda', 'terça-feira': 'Terça', 'quarta-feira': 'Quarta', 'quinta-feira': 'Quinta', 'sexta-feira': 'Sexta' };
-                            let nomeDiaCard = mapaDias[diaSemana];
-
-                            if (nomeDiaCard) {
-                                let card = document.querySelector(`.day-card[data-dia-nome="${nomeDiaCard}"]`);
-                                if (card) {
-                                    let tasksCont = card.querySelector('.tasks-container');
-                                    let resCont = card.querySelector('.day-resources');
-                                    let handle = `<span class="drag-handle">⠿</span>`;
-                                    let checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
-                                    let controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-
-                                    let divTask = document.createElement('div');
-                                    divTask.className = 'task-box';
-                                    divTask.setAttribute('draggable', 'true');
-                                    divTask.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                                    divTask.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${atividade}</span></span>${controls}`;
-                                    tasksCont.appendChild(divTask);
-
-                                    if (recursos && recursos.length > 2) {
-                                        let divRes = document.createElement('div');
-                                        divRes.className = 'resource-tag';
-                                        divRes.setAttribute('draggable', 'true');
-                                        divRes.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                                        divRes.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${recursos}</span></span>${controls}`;
-                                        resCont.appendChild(divRes);
-                                    }
-                                    importados++;
-                                }
-                            }
-                        }
-                    }
-                }
-                await salvarNaNuvem();
-                alert(`✅ ${importados} itens importados com sucesso da planilha!`);
-                event.target.value = '';
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
-
+        // Exportação EXATAMENTE igual ao padrão da planilha da Vale enviada na foto
         function exportarParaExcelTabelaVale() {
             let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
+            
+            // Cabeçalho idêntico à imagem oficial da Vale
             let csvContent = "\uFEFFITEM;OS;Área Responsável;Atividade;Local de execução;Sala/Equipamento;Data de execução;Dia da Semana;Tem Bloqueio elétrico?;Tem Bloqueio mecânico?;Tem PTS?;Tem solicitação ao almoxarifado;Necessidade de Recurso (Equip. moveis)?\n";
+
             let diasMap = { "Segunda": "segunda-feira", "Terça": "terça-feira", "Quarta": "quarta-feira", "Quinta": "quinta-feira", "Sexta": "sexta-feira" };
 
             document.querySelectorAll('.day-card').forEach(card => {
@@ -568,10 +508,13 @@
                 let diaSemanaStr = diasMap[diaNomePt] || diaNomePt.toLowerCase();
                 let dataExec = card.querySelector('.day-title small') ? card.querySelector('.day-title small').innerText : '';
 
+                // Varre Tarefas
                 card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
                     let descEl = box.querySelector('.item-text') || box.querySelector('strong');
                     let atividade = descEl ? descEl.innerText.trim() : '';
+                    let statusConcluido = box.querySelector('input[type="checkbox"]').checked ? 'SIM' : 'NÃO';
                     
+                    // Pega recursos daquele dia para alinhar na mesma linha se necessário
                     let recursosDia = [];
                     card.querySelectorAll('.resource-tag').forEach(tag => {
                         let rEl = tag.querySelector('.item-text');
@@ -579,6 +522,7 @@
                     });
                     let necessidadeRecurso = recursosDia.join(', ');
 
+                    // ITEM; OS; Área Responsável; Atividade; Local; Sala; Data; Dia da Semana; Bloq Eletrico; Bloq Mec; PTS; Almoxarifado; Recursos
                     csvContent += `1;;ALMOXARIFADO;"${atividade}";;;"${dataExec}";"${diaSemanaStr}";NÃO;NÃO;NÃO;NÃO;"${necessidadeRecurso}"\n`;
                 });
             });
@@ -807,7 +751,7 @@
                         divTreino.innerHTML = `
                             <span class="${identificadorUnico} flex items-center gap-1.5">
                                 <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
-                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} | 👤 ${t.pessoa}</small>
+                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
                             </span>
                             <span class="item-controls">
                                 <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
@@ -895,7 +839,7 @@
                     await salvarNaNuvem();
                     atualizarIndicadorProgresso();
                     fecharModalFeriados();
-                    alert(`✅ ${f.desc} aplicado na Semana ${semanaNo}!`);
+                    alert(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
                 }
             } else { alert("⚠️ A data deste evento cai em fim de semana."); }
         }
@@ -1050,7 +994,7 @@
 
         function gerenciarPalavrasChave() {
             let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            let escolha = prompt(`Palavras-Chave:\n${chaves.map((item, idx) => `${idx + 1}.${item}`).join('\n')}\n\nNúmero para APAGAR:`);
+            let escolha = prompt(`Palavras-Chave:\n${chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}\n\nNúmero para APAGAR:`);
             if (escolha !== null && !isNaN(escolha)) {
                 let index = parseInt(escolha) - 1;
                 if (index >= 0 && index < chaves.length) {
@@ -1059,6 +1003,300 @@
                     alert("Apagada!");
                 }
             }
+        }
+
+        function alternarBloqueioDia(checkbox) {
+            const card = checkbox.closest('.day-card');
+            const isFeriado = card.querySelector('.check-feriado').checked;
+            const isEmenda = card.querySelector('.check-emenda').checked;
+            const tasksCont = card.querySelector('.tasks-container');
+            const resCont = card.querySelector('.day-resources');
+
+            if (isFeriado) {
+                tasksCont.innerHTML = `<div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #1b5e20; font-weight: 900; font-size: 12px;">🍃 FERIADO</span><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+                resCont.innerHTML = ``;
+            } else if (isEmenda) {
+                tasksCont.innerHTML = `<div style="background-color: #e0f2f1; border: 1px solid #b2dfdb; border-left: 4px solid #00897b; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #004d40; font-weight: 900; font-size: 12px;">📌 EMENDA</span><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+                resCont.innerHTML = ``;
+            } else {
+                restaurarDiaNormal(checkbox);
+            }
+            atualizarIndicadorProgresso();
+            guardarEstadoDOM();
+        }
+
+        function injetarRotinasFixas(datasDaSemana) {
+            const nomesDiasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            datasDaSemana.forEach((dataObj, index) => {
+                const diaNome = nomesDiasMap[index];
+                const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
+                if (!card) return;
+                const tasksCont = card.querySelector('.tasks-container');
+                if (!tasksCont || tasksCont.innerText.includes("bloqueado") || tasksCont.innerText.includes("FERIADO") || tasksCont.innerText.includes("EMENDA")) return;
+
+                if (diaNome === "Quarta" && !tasksCont.innerText.includes("APC")) {
+                    const divAPC = document.createElement('div');
+                    divAPC.className = 'task-box';
+                    divAPC.setAttribute('draggable', 'true');
+                    divAPC.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    divAPC.innerHTML = `
+                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
+                        <span class="item-controls">
+                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                        </span>
+                    `;
+                    tasksCont.appendChild(divAPC);
+                }
+
+                const ano = dataObj.getFullYear(), mes = dataObj.getMonth(), dia = dataObj.getDate();
+                const ultimoDiaDoMes = new Date(ano, mes + 1, 0).getDate();
+                if (dia >= ultimoDiaDoMes - 6 && !tasksCont.innerText.includes("5S")) {
+                    const div5S = document.createElement('div');
+                    div5S.className = 'task-box';
+                    div5S.setAttribute('draggable', 'true');
+                    div5S.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div5S.innerHTML = `
+                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
+                        <span class="item-controls">
+                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                        </span>
+                    `;
+                    tasksCont.appendChild(div5S);
+                }
+            });
+        }
+
+        function analisarScript() {
+            const textoScript = document.getElementById('inputScriptTexto').value;
+            const containerSugestoes = document.getElementById('resultadoSugestoes');
+            containerSugestoes.innerHTML = '';
+            if (!textoScript.trim()) return;
+            const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
+            const linhas = textoScript.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2);
+            let jaAdicionadas = new Set();
+            linhas.forEach(linha => {
+                let linhaUp = aplicarCorrecao(linha);
+                if (palavrasChave.some(p => linhaUp.includes(p)) && !jaAdicionadas.has(linhaUp)) {
+                    jaAdicionadas.add(linhaUp);
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border text-xs';
+                    div.innerHTML = `<span>💬 "${linhaUp}"</span><button onclick="usarSugestao(this)" data-texto="${linhaUp.replace(/"/g, '&quot;')}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
+                    containerSugestoes.appendChild(div);
+                }
+            });
+        }
+
+        function usarSugestao(botao) {
+            document.getElementById('inputDesc').value = aplicarCorrecao(botao.getAttribute('data-texto'));
+        }
+
+        function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
+        function permitirDrop(e) { e.preventDefault(); }
+        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
+
+        function reativarEventosDragDrop() {
+            document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
+                item.setAttribute('draggable', 'true');
+                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            });
+            document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
+                cont.setAttribute('ondragover', 'permitirDrop(event)');
+                cont.setAttribute('ondrop', 'soltarItem(event)');
+            });
+        }
+
+        function definirSemanaAtualComRegraSexta() {
+            const hoje = new Date(); 
+            document.getElementById('inputAno').value = hoje.getFullYear();
+            let dataCalculo = new Date(hoje);
+            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) {
+                dataCalculo.setDate(hoje.getDate() + 3);
+            }
+            const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            document.getElementById('inputNumSemana').value = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            atualizarDatasSemana();
+        }
+
+        function sincronizarSemanaPelaData(dataStr) {
+            if (!dataStr) return;
+            const dataObj = new Date(dataStr + 'T00:00:00');
+            document.getElementById('inputAno').value = dataObj.getFullYear();
+            const d = new Date(Date.UTC(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate()));
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            document.getElementById('inputNumSemana').value = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            atualizarDatasSemana();
+        }
+
+        function getDateRangeOfWeek(weekNo, y) {
+            let d = new Date(y, 0, 1), dayNum = d.getDay();
+            let requiredDay = (weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum);
+            d.setDate(1 + requiredDay);
+            let dias = [];
+            for (let i = 0; i < 5; i++) {
+                let temp = new Date(d); temp.setDate(d.getDate() + i);
+                dias.push(temp);
+            }
+            return dias;
+        }
+
+        async function atualizarDatasSemana() {
+            const ano = parseInt(document.getElementById('inputAno').value) || 2026;
+            const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
+            document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
+
+            const baseCardHTML = `
+                <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
+                    <div class="day-title">Segunda<br><small>--/---</small></div>
+                    <div class="day-content">
+                        <div class="flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[10px] flex-shrink-0">
+                            <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-feriado w-3 h-3" onchange="alternarBloqueioDia(this)"> Feriado</label>
+                            <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3 h-3" onchange="alternarBloqueioDia(this)"> Emenda</label>
+                        </div>
+                        <div class="tasks-container" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        </div>
+                    </div>
+                    <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                        <div class="resources-title">Recursos</div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    </div>
+                </div>
+            `;
+
+            const diasNomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            let gridHTML = "";
+            diasNomes.forEach((dia, idx) => {
+                gridHTML += baseCardHTML.replace('data-dia-idx="1"', `data-dia-idx="${idx+1}"`).replace('data-dia-nome="Segunda"', `data-dia-nome="${dia}"`).replace('Segunda<br>', `${dia}<br>`);
+            });
+
+            document.getElementById('weekGridContainer').innerHTML = gridHTML;
+
+            let semanaKey = getWeekKey();
+            if (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey]) {
+                let htmlNuvemCorrigido = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[semanaKey]);
+                document.getElementById('weekGridContainer').innerHTML = htmlNuvemCorrigido;
+            }
+
+            const datas = getDateRangeOfWeek(semana, ano);
+            datas.forEach((dataObj, index) => {
+                const card = document.querySelector(`.day-card[data-dia-nome="${diasNomes[index]}"]`);
+                if (card) {
+                    card.querySelector('.day-title').innerHTML = `${diasNomes[index]}<br><small>${String(dataObj.getDate()).padStart(2,'0')}/${nomesMeses[dataObj.getMonth()]}</small>`;
+                }
+            });
+
+            injetarRotinasFixas(datas);
+            forcarRecursosFixos();
+            reativarEventosDragDrop();
+            atualizarIndicadorProgresso();
+        }
+
+        function forcarRecursosFixos() {
+            document.querySelectorAll('.day-card').forEach(card => {
+                const recursosCont = card.querySelector('.day-resources');
+                if (!recursosCont || card.querySelector('.tasks-container').innerText.includes("bloqueado")) return;
+                const textos = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
+                if (!textos.includes('CARRO')) adicionarTagRecurso(recursosCont, 'CARRO');
+                if (!textos.includes('EMPILHADEIRA G4')) adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
+            });
+        }
+
+        function adicionarTagRecurso(container, nome) {
+            const div = document.createElement('div');
+            div.className = 'resource-tag';
+            div.setAttribute('draggable', 'true');
+            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            div.innerHTML = `<span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">${nome}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+            container.appendChild(div);
+        }
+
+        async function adicionarItemPorData() {
+            const dataStr = document.getElementById('inputDataEvento').value;
+            const tipo = document.getElementById('inputTipo').value;
+            let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
+
+            if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
+
+            const dObj = new Date(dataStr + 'T00:00:00');
+            const diaNum = dObj.getDay();
+            if (diaNum === 0 || diaNum === 6) { alert("Selecione um dia útil (Segunda a Sexta)."); return; }
+
+            const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+            const card = document.querySelector(`.day-card[data-dia-nome="${nomes[diaNum]}"]`);
+
+            if (card) {
+                const handle = `<span class="drag-handle">⠿</span>`;
+                const checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
+                const controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+                const div = document.createElement('div');
+
+                if (tipo === 'extra') {
+                    div.className = 'tarefa-extra-box';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-orange-600 cursor-pointer" onchange="alternarConclusaoTarefa(this)">⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.tasks-container').appendChild(div);
+                } else if (tipo === 'task') {
+                    div.className = 'task-box';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.tasks-container').appendChild(div);
+                } else {
+                    div.className = 'resource-tag';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.day-resources').appendChild(div);
+                }
+
+                document.getElementById('inputDesc').value = "";
+                await salvarNaNuvem();
+                atualizarIndicadorProgresso();
+                alert("✅ Adicionado com sucesso!");
+            }
+        }
+
+        async function editarItem(botao) {
+            const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
+            if (!box) return;
+            const span = box.querySelector('.item-text') || box.querySelector('strong');
+            let novo = prompt("Editar descrição:", span ? span.innerText : "");
+            if (novo !== null && novo.trim() !== "") {
+                if (span) span.innerText = aplicarCorrecao(novo);
+                await salvarNaNuvem();
+            }
+        }
+
+        async function removerElemento(botao) {
+            const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
+            if (box) { 
+                box.remove(); 
+                await salvarNaNuvem(); 
+                atualizarIndicadorProgresso();
+            }
+        }
+
+        async function guardarEstadoDOM() { await salvarNaNuvem(); }
+
+        async function limparTudo() {
+            if (confirm("Deseja apagar esta semana?")) {
+                if (dadosGlobaisNuvem.semanas) delete dadosGlobaisNuvem.semanas[getWeekKey()];
+                await salvarNaNuvem();
+                atualizarDatasSemana();
+            }
+        }
+
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
         }
 
         function imprimirProgramacao() {
