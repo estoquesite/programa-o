@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.85 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.86 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -317,6 +317,23 @@
                 <button onclick="adicionarItemPorData()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Adicionar (OK)</button>
             </div>
         </div>
+
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (RECOLOCADO AQUI) -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
+                <div class="flex gap-1.5">
+                    <button onclick="adicionarNovaPalavraChave()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">➕ Palavra</button>
+                    <button onclick="gerenciarPalavrasChave()" class="bg-gray-600 hover:bg-gray-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">⚙️ Gerir</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Cole o Script / Transcrição da Reunião:</label>
+                <textarea id="inputScriptTexto" rows="3" placeholder="Cole aqui o texto da transcrição..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white"></textarea>
+            </div>
+            <button onclick="analisarScript()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition">🔎 Analisar Script e Buscar Citações</button>
+            <div id="resultadoSugestoes" class="space-y-1.5 pt-2"></div>
+        </div>
     </div>
 
     <!-- MODAL DE INDICADOR DETALHADO -->
@@ -399,7 +416,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.85 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.86 Nuvem</span>
         </div>
     </div>
 
