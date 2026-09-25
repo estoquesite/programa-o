@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Feriados e Emendas (v1.0 Nuvem)</title>
+    <title>Módulo de Feriados e Emendas (v1.1 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -44,6 +44,17 @@
             <button onclick="sincronizarFeriados()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Sincronizar</button>
         </div>
 
+        <!-- SELETOR DE ANO PARA GERAR FERIADOS AUTOMÁTICOS -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+            <div>
+                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Ano de Referência para Feriados Nacionais</h3>
+                <p class="text-[11px] text-gray-500">Gera automaticamente os feriados fixos e móveis para o ano selecionado.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="number" id="inputAnoFeriados" value="2026" onchange="gerarFeriadosNacionaisAno(this.value)" class="w-20 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
+            </div>
+        </div>
+
         <!-- FORMULÁRIO DE CADASTRO DE FERIADO/EMENDA LOCAL -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
             <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Registar Feriado Local ou Emenda por Data</h3>
@@ -77,7 +88,7 @@
 
         <!-- LISTA DE FERIADOS E EMENDAS -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Feriados Nacionais (2026) e Registos Customizados</h3>
+            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Feriados Nacionais Automáticos e Registos Customizados</h3>
             <div id="listaFeriadosContainer" class="space-y-2 max-h-96 overflow-y-auto pr-1">
                 <!-- Preenchido dinamicamente -->
             </div>
@@ -91,22 +102,63 @@
         
         const CHAVE_LOCAL_FERIADOS = "modulo_feriados_dados_nuvem";
 
-        // Feriados Nacionais Oficiais de 2026 pré-carregados
-        const feriadosNacionais2026 = [
-            { id: 'f_1', data: '2026-01-01', tipo: 'feriado', desc: 'CONFRATERNIZAÇÃO UNIVERSAL' },
-            { id: 'f_2', data: '2026-02-16', tipo: 'feriado', desc: 'CARNAVAL' },
-            { id: 'f_3', data: '2026-02-17', tipo: 'feriado', desc: 'CARNAVAL (TERÇA)' },
-            { id: 'f_4', data: '2026-04-03', tipo: 'feriado', desc: 'PAIXÃO DE CRISTO' },
-            { id: 'f_5', data: '2026-04-21', tipo: 'feriado', desc: 'TIRADENTES' },
-            { id: 'f_6', data: '2026-05-01', tipo: 'feriado', desc: 'DIA DO TRABALHO' },
-            { id: 'f_7', data: '2026-06-04', tipo: 'feriado', desc: 'CORPUS CHRISTI' },
-            { id: 'f_8', data: '2026-09-07', tipo: 'feriado', desc: 'INDEPENDÊNCIA DO BRASIL' },
-            { id: 'f_9', data: '2026-10-12', tipo: 'feriado', desc: 'N. SRA. APARECIDA' },
-            { id: 'f_10', data: '2026-11-02', tipo: 'feriado', desc: 'FINADOS' },
-            { id: 'f_11', data: '2026-11-15', tipo: 'feriado', desc: 'PROCLAMAÇÃO DA REPÚBLICA' },
-            { id: 'f_12', data: '2026-11-20', tipo: 'feriado', desc: 'CONSCIÊNCIA NEGRA' },
-            { id: 'f_13', data: '2026-12-25', tipo: 'feriado', desc: 'NATAL' }
-        ];
+        // Função para calcular a Páscoa e feriados móveis para qualquer ano
+        function calcularPascoa(ano) {
+            let a = ano % 19,
+                b = Math.floor(ano / 100),
+                c = ano % 100,
+                d = Math.floor(b / 4),
+                e = b % 4,
+                f = Math.floor((b + 8) / 25),
+                g = Math.floor((b - f + 1) / 3),
+                h = (19 * a + b - d - g + 15) % 30,
+                i = Math.floor(c / 4),
+                k = c % 4,
+                L = (32 + 2 * e + 2 * i - h - k) % 7,
+                m = Math.floor((a + 11 * h + 22 * L) / 451),
+                mes = Math.floor((h + L - 7 * m + 114) / 31),
+                dia = ((h + L - 7 * m + 114) % 31) + 1;
+            return new Date(ano, mes - 1, dia);
+        }
+
+        function formatarDataISO(date) {
+            let y = date.getFullYear();
+            let m = String(date.getMonth() + 1).padStart(2, '0');
+            let d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function obterFeriadosFixosEMoveis(ano) {
+            let pascoa = calcularPascoa(ano);
+            
+            // Carnaval (47 dias antes da Páscoa)
+            let carnaval = new Date(pascoa);
+            carnaval.setDate(pascoa.getDate() - 47);
+
+            // Paixão de Cristo (2 dias antes da Páscoa)
+            let paixao = new Date(pascoa);
+            paixao.setDate(pascoa.getDate() - 2);
+
+            // Corpus Christi (60 dias após a Páscoa)
+            let corpus = new Date(pascoa);
+            corpus.setDate(pascoa.getDate() + 60);
+
+            return [
+                { id: `fn_${ano}_1`, data: `${ano}-01-01`, tipo: 'feriado', desc: 'CONFRATERNIZAÇÃO UNIVERSAL' },
+                { id: `fn_${ano}_2`, data: formatarDataISO(carnaval), tipo: 'feriado', desc: 'CARNAVAL' },
+                { id: `fn_${ano}_3`, data: formatarDataISO(new Date(carnaval.getTime() + 86400000)), tipo: 'feriado', desc: 'CARNAVAL (TERÇA)' },
+                { id: `fn_${ano}_4`, data: formatarDataISO(paixao), tipo: 'feriado', desc: 'PAIXÃO DE CRISTO' },
+                { id: `fn_${ano}_5`, data: `${ano}-04-21`, tipo: 'feriado', desc: 'TIRADENTES' },
+                { id: `fn_${ano}_6`, data: `${ano}-05-01`, tipo: 'feriado', desc: 'DIA DO TRABALHO' },
+                { id: `fn_${ano}_7`, data: formatarDataISO(corpus), tipo: 'feriado', desc: 'CORPUS CHRISTI' },
+                { id: `fn_${ano}_8`, data: `${ano}-09-07`, tipo: 'feriado', desc: 'INDEPENDÊNCIA DO BRASIL' },
+                { id: `fn_${ano}_9`, data: `${ano}-10-12`, tipo: 'feriado', desc: 'N. SRA. APARECIDA' },
+                { id: `fn_${ano}_10`, data: `${ano}-11-02`, tipo: 'feriado', desc: 'FINADOS' },
+                { id: `fn_${ano}_11`, data: `${ano}-11-15`, tipo: 'feriado', desc: 'PROCLAMAÇÃO DA REPÚBLICA' },
+                { id: `fn_${ano}_12`, data: `${ano}-11-20`, tipo: 'feriado', desc: 'CONSCIÊNCIA NEGRA' },
+                { id: `fn_${ano}_13`, data: `${ano}-12-25`, tipo: 'feriado', desc: 'NATAL' }
+            ];
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('feriadoData').valueAsDate = new Date();
@@ -115,32 +167,50 @@
 
         async function sincronizarFeriados() {
             try {
-                let { data, error } = await supabaseClient
+                let { data } = await supabaseClient
                     .from('app_dados_programacao')
                     .select('conteudo')
                     .eq('id', '1')
                     .single();
 
-                if (data && data.conteudo) {
-                    let salvas = data.conteudo.feriados || [];
-                    // Garantir que os nacionais 2026 estejam sempre presentes se não existirem
-                    let idsExistentes = salvas.map(s => s.id);
-                    feriadosNacionais2026.forEach(fn => {
-                        if (!idsExistentes.includes(fn.id)) {
-                            salvas.push(fn);
-                        }
-                    });
-                    localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(salvas));
-                } else {
-                    localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(feriadosNacionais2026));
-                }
+                let salvas = (data && data.conteudo && data.conteudo.feriados) ? data.conteudo.feriados : [];
+                
+                // Garantir feriados do ano atual e próximo se não existirem
+                let anoAtual = new Date().getFullYear();
+                verificarEGarantirAno(salvas, anoAtual);
+                verificarEGarantirAno(salvas, anoAtual + 1);
+
+                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(salvas));
             } catch (e) {
                 console.error("Erro ao sincronizar feriados:", e);
-                if (!localStorage.getItem(CHAVE_LOCAL_FERIADOS)) {
-                    localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(feriadosNacionais2026));
-                }
+                let salvas = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || obterFeriadosFixosEMoveis(new Date().getFullYear());
+                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(salvas));
             }
             renderizarListaFeriados();
+        }
+
+        function verificarEGarantirAno(lista, ano) {
+            let idsAno = lista.map(l => l.id);
+            let gerados = obterFeriadosFixosEMoveis(ano);
+            gerados.forEach(g => {
+                if (!idsAno.includes(g.id)) {
+                    lista.push(g);
+                }
+            });
+        }
+
+        async function gerarFeriadosNacionaisAno(anoStr) {
+            let ano = parseInt(anoStr);
+            if (isNaN(ano) || ano < 2000 || ano > 2100) return;
+
+            let feriados = obterFeriados();
+            verificarEGarantirAno(feriados, ano);
+            
+            feriados.sort((a, b) => new Date(a.data) - new Date(b.data));
+            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(feriados));
+            await salvarNaNuvemGeral(feriados);
+            renderizarListaFeriados();
+            alert(`✅ Feriados nacionais gerados e sincronizados para o ano ${ano}!`);
         }
 
         async function salvarNaNuvemGeral(novosFeriados) {
@@ -160,7 +230,7 @@
         function obterFeriados() {
             let dados = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS));
             if (!dados) {
-                dados = feriadosNacionais2026;
+                dados = obterFeriadosFixosEMoveis(new Date().getFullYear());
                 localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dados));
             }
             return dados;
@@ -179,7 +249,7 @@
 
             let feriados = obterFeriados();
             const itemObj = {
-                id: editId !== "" ? editId : 'feriado_' + Date.now(),
+                id: editId !== "" ? editId : 'feriado_custom_' + Date.now(),
                 data, tipo, desc
             };
 
@@ -193,7 +263,6 @@
                 feriados.push(itemObj);
             }
 
-            // Ordenar por data
             feriados.sort((a, b) => new Date(a.data) - new Date(b.data));
 
             localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(feriados));
@@ -221,7 +290,7 @@
             }
 
             feriados.forEach((f) => {
-                const isNacional = f.id.startsWith('f_');
+                const isNacional = f.id.startsWith('fn_');
                 const icone = f.tipo === 'feriado' ? '🍃' : '📌';
                 const corBadge = f.tipo === 'feriado' ? 'text-emerald-800 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300';
                 
@@ -230,7 +299,7 @@
                 div.innerHTML = `
                     <div>
                         <span class="font-bold ${corBadge} block text-sm">${icone} ${f.desc}</span>
-                        <small class="text-gray-500 font-semibold">Data: ${f.data.split('-').reverse().join('/')} ${isNacional ? '• (Nacional 2026)' : '• (Customizado)'}</small>
+                        <small class="text-gray-500 font-semibold">Data: ${f.data.split('-').reverse().join('/')} ${isNacional ? '• (Nacional Automático)' : '• (Customizado)'}</small>
                     </div>
                     <div class="flex gap-1.5">
                         <button onclick="editarFeriado('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
