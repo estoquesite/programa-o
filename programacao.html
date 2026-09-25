@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.39 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.40 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -226,35 +226,8 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
-    <!-- TELA DE LOGIN / CAPA COM PIN 1510 E BIOMETRIA -->
-    <div id="tela-login" class="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center space-y-4 border border-gray-100 dark:border-gray-700">
-            <div class="w-16 h-16 bg-green-50 dark:bg-green-950/50 rounded-2xl mx-auto flex items-center justify-center text-3xl">📋</div>
-            <div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Acesso Restrito</h2>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Programação Semanal (Nuvem)</p>
-            </div>
-            
-            <form onsubmit="verificarLogin(event)" class="space-y-3 text-left">
-                <div>
-                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Senha (PIN)</label>
-                    <input type="password" id="input-senha" required placeholder="••••" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-green-500 dark:text-white">
-                </div>
-                <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm">
-                    Entrar com Senha PIN
-                </button>
-            </form>
-
-            <button type="button" onclick="entrarComBiometria()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm flex items-center justify-center gap-2">
-                <span>🔐</span> Entrar com Biometria
-            </button>
-
-            <p id="erro-senha" class="text-xs text-red-500 hidden font-medium">Senha incorreta! A senha correta é 1510.</p>
-        </div>
-    </div>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div id="conteudo-site" class="hidden container">
+    <!-- CONTEÚDO PRINCIPAL (SEM TELA DE LOGIN) -->
+    <div id="conteudo-site" class="container">
         <div class="header">
             <div class="flex justify-between items-center mb-2 px-2">
                 <a href="index.html" class="print-hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-lg text-xs font-bold transition">⬅️ Menu</a>
@@ -456,7 +429,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.39) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.40) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -493,13 +466,12 @@
         </div>
     </div>
 
-    <!-- BARRA INFERIOR FIXA -->
+    <!-- BARRA INFERIOR FIXA (SEM O BOTÃO DE SAIR/BLOQUEAR) -->
     <div class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.39 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.40 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -510,7 +482,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const SENHA_MESTRA = "1510";
         const CHAVE_HISTORICO = "programacao_historico_semanas_definitivo";
         const nomesMeses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
         let elementoArrastado = null;
@@ -644,9 +615,6 @@
             const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
             document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
 
-            if (sessionStorage.getItem('autenticado_programacao') === 'true') {
-                liberarAcessoInicial();
-            }
             if (localStorage.getItem('dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
             }
@@ -663,79 +631,6 @@
             } else {
                 alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
             }
-        }
-
-        function verificarLogin(e) {
-            e.preventDefault();
-            const senhaDigitada = document.getElementById('input-senha').value;
-            const erroEl = document.getElementById('erro-senha');
-
-            if (senhaDigitada === SENHA_MESTRA) {
-                sessionStorage.setItem('autenticado_programacao', 'true');
-                liberarAcessoInicial();
-            } else {
-                erroEl.classList.remove('hidden');
-                document.getElementById('input-senha').value = '';
-                document.getElementById('input-senha').focus();
-            }
-        }
-
-        async function entrarComBiometria() {
-            if (!window.PublicKeyCredential) {
-                alert("O seu navegador não suporta autenticação biométrica.");
-                return;
-            }
-            try {
-                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                if (!available) { alert("Nenhum leitor biométrico encontrado."); return; }
-
-                const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-                const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
-
-                const createCredentialOptions = {
-                    challenge: challenge, rp: { name: "Programação Semanal", id: window.location.hostname },
-                    user: { id: userId, name: "prog@local", displayName: "Mariana" },
-                    pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
-                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
-                    timeout: 60000
-                };
-
-                let cred; const credentialIdStr = localStorage.getItem('biometria_cred_id_prog');
-                if (credentialIdStr) {
-                    try {
-                        const rawId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
-                        cred = await navigator.credentials.get({ challenge, allowCredentials: [{ id: rawId, type: "public-key" }], userVerification: "required", timeout: 60000 });
-                    } catch (err) {
-                        cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
-                        localStorage.setItem('biometria_cred_id_prog', btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId))));
-                    }
-                } else {
-                    cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
-                    localStorage.setItem('biometria_cred_id_prog', btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId))));
-                }
-
-                if (cred) {
-                    sessionStorage.setItem('autenticado_programacao', 'true');
-                    liberarAcessoInicial();
-                }
-            } catch (error) {
-                alert("Biometria cancelada. Podes usar a senha PIN (1510).");
-            }
-        }
-
-        async function liberarAcessoInicial() {
-            await sincronizarComNuvem();
-            document.getElementById('tela-login').classList.add('hidden');
-            document.getElementById('conteudo-site').classList.remove('hidden');
-            atualizarDatasSemana();
-        }
-
-        function bloquearNovamente() {
-            sessionStorage.removeItem('autenticado_programacao');
-            document.getElementById('conteudo-site').classList.add('hidden');
-            document.getElementById('tela-login').classList.remove('hidden');
-            document.getElementById('input-senha').value = '';
-            document.getElementById('erro-senha').classList.add('hidden');
         }
 
         function abrirModalHistorico() {
@@ -921,7 +816,7 @@
             guardarEstadoDOM();
         }
 
-        // LEITURA AUTOMÁTICA DE FERIADOS, EMENDAS E TREINAMENTOS COM A FOLHINHA E O GRAMPINHO
+        // LEITURA AUTOMÁTICA DE FERIADOS, EMENDAS E TREINAMENTOS
         function injetarDadosNasDatas(datasDaSemana) {
             const nomesDiasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
 
@@ -971,7 +866,7 @@
             });
         }
 
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.39)
+        // ANALISADOR INTELIGENTE DE SCRIPT (v3.40)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
@@ -1159,7 +1054,7 @@
                 }
             });
 
-            // INJETA AUTOMATICAMENTE OS FERIADOS (COM FOLHINHA), EMENDAS (COM GRAMPO) E TREINAMENTOS
+            // INJETA AUTOMATICAMENTE OS FERIADOS, EMENDAS E TREINAMENTOS
             injetarDadosNasDatas(datas);
 
             guardarEstadoDOM();
