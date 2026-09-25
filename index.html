@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.42 Nuvem Definitiva)</title>
+    <title>Programação Semanal Interativa (v3.43 Nuvem Definitiva)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -466,7 +466,7 @@
             <button onclick="salvarTreinamentoAnual()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg text-xs transition">💾 Salvar Treinamento no Calendário Anual</button>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.42) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.43) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -523,7 +523,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.42 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.43 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -612,6 +612,21 @@
             await sincronizarComNuvem();
             atualizarDatasSemana();
             alert("✅ Sincronizado com sucesso!");
+        }
+
+        // REGRA INTELIGENTE DE SEXTA/FDS PARA ABRIR JÁ NA PRÓXIMA SEMANA
+        function definirSemanaAtualComRegraSexta() {
+            const hoje = new Date(); 
+            document.getElementById('inputAno').value = hoje.getFullYear();
+
+            let dataCalculo = new Date(hoje);
+            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) {
+                dataCalculo.setDate(hoje.getDate() + 3);
+            }
+
+            const weekNo = getWeekNumber(dataCalculo);
+            document.getElementById('inputNumSemana').value = weekNo;
+            atualizarDatasSemana();
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -721,12 +736,9 @@
             }
         }
 
-        // VERIFICAÇÃO RIGOROSA: Injeta o treinamento APENAS se a data do dia na semana corresponder ao período do curso cadastrado
-        function verificarTreinamentosAnuais() {
+        // VERIFICAÇÃO RIGOROSA: Injeta Treinamentos e Avaliação 5S no Fim do Mês
+        function verificarEventosAutomaticos(datasDaSemana) {
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
-            let anoAtual = document.getElementById('inputAno').value;
-            let semanaAtual = document.getElementById('inputNumSemana').value;
-            let datasDaSemana = getDateRangeOfWeek(semanaAtual, anoAtual);
 
             datasDaSemana.forEach(dt => {
                 let isoDt = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
@@ -734,20 +746,27 @@
                 if (dNum !== 0 && dNum !== 6) {
                     const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
                     const card = document.querySelector(`.day-card[data-dia-nome="${nomes[dNum]}"]`);
-                    
+                    if (!card) return;
+                    let containerTasks = card.querySelector('.tasks-container');
+
+                    // 1. INJETAR TREINAMENTOS
                     for (let k in treinamentos) {
                         let item = treinamentos[k];
-                        // Só injeta se a data exata do dia cair dentro do intervalo de início e fim do curso
                         if (isoDt >= item.dataInicio && isoDt <= item.dataFim) {
                             let textoFormatado = `🎓 ${item.curso} (${item.participantes})`;
-                            if (card) {
-                                let containerTasks = card.querySelector('.tasks-container');
-                                let jaExiste = [...containerTasks.querySelectorAll('.item-text')].some(el => el.innerText.trim() === textoFormatado);
-                                if (!jaExiste) {
-                                    inserirItemNoCard(card, 'task', textoFormatado);
-                                }
-                            }
+                            let jaExiste = [...containerTasks.querySelectorAll('.item-text')].some(el => el.innerText.trim() === textoFormatado);
+                            if (!jaExiste) inserirItemNoCard(card, 'task', textoFormatado);
                         }
+                    }
+
+                    // 2. INJETAR AVALIAÇÃO 5S (ÚLTIMO DIA ÚTIL DO MÊS)
+                    let proximoDia = new Date(dt);
+                    proximoDia.setDate(proximoDia.getDate() + 1);
+                    // Se o dia seguinte já pertence ao próximo mês, então este dia atual é o último dia útil do mês corrente!
+                    if (proximoDia.getMonth() !== dt.getMonth() || (dt.getDay() === 5 && proximoDia.getDay() === 6 && new Date(dt.getTime() + 3*86400000).getMonth() !== dt.getMonth())) {
+                        let texto5S = "📋 AVALIAÇÃO DOS POSTOS 5S";
+                        let jaExiste5S = [...containerTasks.querySelectorAll('.item-text')].some(el => el.innerText.trim() === texto5S);
+                        if (!jaExiste5S) inserirItemNoCard(card, 'task', texto5S);
                     }
                 }
             });
@@ -778,32 +797,40 @@
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 1;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
+            const key = getWeekKey(ano, semana);
+            const salvo = localStorage.getItem(key);
             
-            // Recria a estrutura limpa dos cards antes de aplicar os salvos e treinamentos
-            const nomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
-            const datas = getDateRangeOfWeek(semana, ano);
+            if (salvo) { 
+                document.getElementById('weekGridContainer').innerHTML = salvo; 
+                reativarEventosDragDrop(); 
+            }
 
-            // Garante que os títulos e datas fiquem corretos
+            forcarRecursosFixos();
+
+            const datas = getDateRangeOfWeek(semana, ano);
+            const nomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            
             datas.forEach((dt, idx) => {
                 const card = document.querySelector(`.day-card[data-dia-nome="${nomes[idx]}"]`);
                 if (card) {
                     const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
                     card.querySelector('.day-title').innerHTML = `${nomes[idx]}<br><small>${String(dt.getDate()).padStart(2,'0')}/${nomesMeses[dt.getMonth()]}</small>`;
                     
+                    // Verifica Feriado Nacional Automático
                     if (feriadosNacionais.includes(iso)) {
                         card.style.backgroundColor = "#e8f5e9";
                         card.style.borderColor = "#2e7d32";
                         card.querySelector('.tasks-container').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center p-2"><span class="text-xl">🌿</span><span class="font-bold text-green-800 text-[10px] uppercase">Feriado Nacional</span></div>`;
                         card.querySelector('.day-resources').style.display = 'none';
                     } else {
-                        card.style.backgroundColor = ""; card.style.borderColor = "";
+                        card.style.backgroundColor = ""; 
+                        card.style.borderColor = "";
                         card.querySelector('.day-resources').style.display = 'flex';
                     }
                 }
             });
 
-            forcarRecursosFixos();
-            verificarTreinamentosAnuais();
+            verificarEventosAutomaticos(datas);
             guardarEstadoDOM();
         }
 
@@ -866,9 +893,13 @@
             const card = checkbox.closest('.day-card');
             const title = card.querySelector('.day-title');
             if (checkbox.checked) {
-                if (tipo === 'feriado') { title.style.backgroundColor = '#e8f5e9'; }
-                else if (tipo === 'emenda') { title.style.backgroundColor = '#fff9c4'; }
-            } else { title.style.backgroundColor = ''; }
+                if (tipo === 'feriado') { title.style.backgroundColor = '#e8f5e9'; title.style.border = '2px solid #2e7d32'; }
+                else if (tipo === 'emenda') { title.style.backgroundColor = '#fff9c4'; title.style.border = '2px solid #fbc02d'; }
+            } else { 
+                title.style.backgroundColor = ''; 
+                title.style.border = '';
+            }
+            guardarEstadoDOM();
         }
 
         function imprimirProgramacao() {
