@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.39 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.40 Nuvem Completa)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -435,7 +435,7 @@
             </div>
         </div>
 
-        <!-- MÓDULO: CADASTRO DE TREINAMENTOS ANUAIS (INVERTIDO E COM PERÍODO DE INÍCIO/FIM) -->
+        <!-- MÓDULO: CADASTRO DE TREINAMENTOS ANUAIS (INVERTIDO + PERÍODO DE DIAS + EDITAR) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">🎓 Cadastro de Treinamentos Anuais (Vários Dias)</h3>
@@ -466,7 +466,7 @@
             <button onclick="salvarTreinamentoAnual()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg text-xs transition">💾 Salvar Treinamento no Calendário Anual</button>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.39) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.40) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -523,7 +523,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.39 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.40 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -568,10 +568,16 @@
             return resultado;
         }
 
-        function getWeekKey() {
-            const ano = document.getElementById('inputAno').value;
-            const semana = document.getElementById('inputNumSemana').value;
+        function getWeekKey(ano, semana) {
             return `prog_grid_${ano}_semana_${semana}`;
+        }
+
+        function getWeekNumber(dObj) {
+            let d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+            let dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         }
 
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
@@ -662,11 +668,14 @@
             
             localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
             await salvarNaNuvem();
-            injetarPeriodoTreinamentoNaSemana(dataInicioStr, dataFimStr, `🎓 ${curso} (${participantes})`);
+            
+            // Distribui o treinamento para as respectivas semanas na base
+            distribuirTreinamentoNasSemanas(dataInicioStr, dataFimStr, `🎓 ${curso} (${participantes})`);
 
             document.getElementById('inputNomeCurso').value = '';
             document.getElementById('inputParticipantes').value = '';
-            alert("✅ Treinamento guardado com sucesso para o período!");
+            alert("✅ Treinamento guardado com sucesso e alocado nas respectivas semanas!");
+            atualizarDatasSemana();
         }
 
         function renderizarListaTreinamentos() {
@@ -699,7 +708,6 @@
                 item.participantes = aplicarCorrecao(novosParticipantes || "");
                 localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
                 await salvarNaNuvem();
-                renderizarListaTreinamentos();
                 atualizarDatasSemana();
                 alert("✅ Treinamento atualizado com sucesso!");
             }
@@ -716,40 +724,91 @@
             }
         }
 
-        function injetarPeriodoTreinamentoNaSemana(inicioStr, fimStr, texto) {
+        // CORREÇÃO CRUCIAL: Distribui o treinamento diretamente na semana correspondente à data informada
+        function distribuirTreinamentoNasSemanas(inicioStr, fimStr, textoFormatado) {
             let curr = new Date(inicioStr + 'T00:00:00');
             let end = new Date(fimStr + 'T00:00:00');
             if (curr > end) return;
 
+            let cacheSemanasAfetadas = {};
+
             while (curr <= end) {
                 let dNum = curr.getDay();
-                if (dNum !== 0 && dNum !== 6) { // Apenas dias úteis
-                    let iso = `${curr.getFullYear()}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`;
-                    const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-                    const card = document.querySelector(`.day-card[data-dia-nome="${nomes[dNum]}"]`);
-                    if (card) {
-                        inserirItemNoCard(card, 'task', texto);
+                if (dNum !== 0 && dNum !== 6) { // Dias úteis
+                    let ano = curr.getFullYear();
+                    let semanaNum = getWeekNumber(curr);
+                    let wKey = getWeekKey(ano, semanaNum);
+
+                    if (!cacheSemanasAfetadas[wKey]) {
+                        cacheSemanasAfetadas[wKey] = [];
                     }
+                    cacheSemanasAfetadas[wKey].push({
+                        dataIso: `${ano}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`,
+                        texto: textoFormatado
+                    });
                 }
                 curr.setDate(curr.getDate() + 1);
             }
-            guardarEstadoDOM();
+
+            // Aplica em cada semana respectiva salva no localStorage ou DOM
+            for (let wKey in cacheSemanasAfetadas) {
+                let htmlSalvo = localStorage.getItem(wKey);
+                
+                // Se a semana atual for a que está na tela, injeta direto no DOM
+                if (wKey === getWeekKey(document.getElementById('inputAno').value, document.getElementById('inputNumSemana').value)) {
+                    cacheSemanasAfetadas[wKey].forEach(item => {
+                        const dObj = new Date(item.dataIso + 'T00:00:00');
+                        const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+                        const card = document.querySelector(`.day-card[data-dia-nome="${nomes[dObj.getDay()]}"]`);
+                        if (card) {
+                            let containerTasks = card.querySelector('.tasks-container');
+                            let jaExiste = [...containerTasks.querySelectorAll('.item-text')].some(el => el.innerText.trim() === item.texto);
+                            if (!jaExiste) inserirItemNoCard(card, 'task', item.texto);
+                        }
+                    });
+                    guardarEstadoDOM();
+                } else {
+                    // Se for outra semana, cria um elemento temporário ou atualiza o storage daquela semana
+                    // Vamos simplificar garantindo que ao abrir a semana, o 'verificarTreinamentosAnuais' cuide disso
+                }
+            }
         }
 
         function verificarTreinamentosAnuais() {
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
-            for (let k in treinamentos) {
-                let item = treinamentos[k];
-                injetarPeriodoTreinamentoNaSemana(item.dataInicio, item.dataFim, `🎓 ${item.curso} (${item.participantes})`);
-            }
+            let anoAtual = document.getElementById('inputAno').value;
+            let semanaAtual = document.getElementById('inputNumSemana').value;
+            let datasDaSemana = getDateRangeOfWeek(semanaAtual, anoAtual);
+
+            datasDaSemana.forEach(dt => {
+                let isoDt = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+                let dNum = dt.getDay();
+                if (dNum !== 0 && dNum !== 6) {
+                    const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+                    const card = document.querySelector(`.day-card[data-dia-nome="${nomes[dNum]}"]`);
+                    
+                    for (let k in treinamentos) {
+                        let item = treinamentos[k];
+                        if (isoDt >= item.dataInicio && isoDt <= item.dataFim) {
+                            let textoFormatado = `🎓 ${item.curso} (${item.participantes})`;
+                            if (card) {
+                                let containerTasks = card.querySelector('.tasks-container');
+                                let jaExiste = [...containerTasks.querySelectorAll('.item-text')].some(el => el.innerText.trim() === textoFormatado);
+                                if (!jaExiste) {
+                                    inserirItemNoCard(card, 'task', textoFormatado);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function definirSemanaAtualComRegraSexta() {
             const hoje = new Date(); document.getElementById('inputAno').value = hoje.getFullYear();
             let calc = new Date(hoje);
             if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) calc.setDate(hoje.getDate() + 3);
-            const d = new Date(Date.UTC(calc.getFullYear(), calc.getMonth(), calc.getDate()));
-            const weekNo = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
+            const weekNo = getWeekNumber(calc);
             document.getElementById('inputNumSemana').value = weekNo;
             atualizarDatasSemana();
         }
@@ -758,8 +817,7 @@
             if (!dataStr) return;
             const dObj = new Date(dataStr + 'T00:00:00');
             document.getElementById('inputAno').value = dObj.getFullYear();
-            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
-            const weekNo = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
+            const weekNo = getWeekNumber(dObj);
             document.getElementById('inputNumSemana').value = weekNo;
             atualizarDatasSemana();
         }
@@ -776,7 +834,7 @@
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
             const semana = parseInt(document.getElementById('inputNumSemana').value) || 1;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
-            const key = getWeekKey();
+            const key = getWeekKey(ano, semana);
             const salvo = localStorage.getItem(key);
             if (salvo) { document.getElementById('weekGridContainer').innerHTML = salvo; reativarEventosDragDrop(); }
             forcarRecursosFixos();
@@ -855,8 +913,8 @@
         }
 
         async function removerElemento(btn) { btn.closest('.task-box, .resource-tag').remove(); await guardarEstadoDOM(); }
-        async function guardarEstadoDOM() { localStorage.setItem(getWeekKey(), document.getElementById('weekGridContainer').innerHTML); await salvarNaNuvem(); }
-        async function limparTudo() { if (confirm("Redefinir?")) { localStorage.removeItem(getWeekKey()); await salvarNaNuvem(); location.reload(); } }
+        async function guardarEstadoDOM() { localStorage.setItem(getWeekKey(document.getElementById('inputAno').value, document.getElementById('inputNumSemana').value), document.getElementById('weekGridContainer').innerHTML); await salvarNaNuvem(); }
+        async function limparTudo() { if (confirm("Redefinir?")) { localStorage.removeItem(getWeekKey(document.getElementById('inputAno').value, document.getElementById('inputNumSemana').value)); await salvarNaNuvem(); location.reload(); } }
 
         function alternarStatusDia(checkbox, tipo) {
             const card = checkbox.closest('.day-card');
