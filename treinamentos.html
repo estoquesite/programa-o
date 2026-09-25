@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Treinamentos (v1.2 Nuvem)</title>
+    <title>Módulo de Treinamentos (v1.3 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -80,6 +80,13 @@
                 <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">✓ Guardar Treinamento (OK)</button>
                 <button onclick="limparFormulario()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-bold">Limpar</button>
             </div>
+        </div>
+
+        <!-- BOTÃO DE IMPRESSÃO -->
+        <div class="flex justify-center">
+            <button onclick="imprimirTreinamentos()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
+                🖨️ Imprimir Relatório de Treinamentos (PDF Limpo)
+            </button>
         </div>
 
         <!-- LISTA DE TREINAMENTOS CADASTRADOS -->
@@ -237,13 +244,12 @@
             let treinamentos = obterTreinamentos();
             let t = treinamentos.find(item => item.id === id);
             if (t) {
-                // Preenche o formulário com os dados do curso/local, mas limpa o ID de edição (criando um novo) e foca na pessoa/data
                 document.getElementById('treinamentoInicio').value = t.inicio;
                 document.getElementById('treinamentoFim').value = t.fim;
                 document.getElementById('treinamentoNome').value = t.nome;
                 document.getElementById('treinamentoLocal').value = t.local;
-                document.getElementById('treinamentoPessoa').value = ''; // Deixa limpo para colocar o novo nome
-                document.getElementById('editId').value = ''; // Novo registo
+                document.getElementById('treinamentoPessoa').value = '';
+                document.getElementById('editId').value = '';
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 document.getElementById('treinamentoPessoa').focus();
@@ -259,6 +265,62 @@
                 await salvarNaNuvemGeral(treinamentos);
                 renderizarListaTreinamentos();
             }
+        }
+
+        function imprimirTreinamentos() {
+            let treinamentos = obterTreinamentos();
+            const janelaImpressao = window.open('', '_blank', 'width=900,height=700');
+            
+            let htmlItens = '';
+            if (treinamentos.length === 0) {
+                htmlItens = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #666;">Nenhum treinamento registado.</td></tr>';
+            } else {
+                treinamentos.forEach(t => {
+                    htmlItens += `
+                        <tr>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: bold;">${t.nome}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">${t.pessoa}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">${t.local}</td>
+                            <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            janelaImpressao.document.write(`
+                <!DOCTYPE html>
+                <html lang="pt-PT">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Relatório de Treinamentos</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 30px; background: #fff; color: #333; }
+                        h2 { color: #1b5e20; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+                        th { background-color: #1b5e20; color: white; padding: 10px; text-align: left; }
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Relatório de Treinamentos</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Treinamento</th>
+                                <th>Participante</th>
+                                <th>Local</th>
+                                <th style="text-align: center;">Período</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${htmlItens}
+                        </tbody>
+                    </table>
+                    <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }<\/script>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
         }
     </script>
 </body>
