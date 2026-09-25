@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Feriados e Emendas (v1.1 Nuvem)</title>
+    <title>Módulo de Feriados e Emendas (v1.2 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -102,7 +102,6 @@
         
         const CHAVE_LOCAL_FERIADOS = "modulo_feriados_dados_nuvem";
 
-        // Função para calcular a Páscoa e feriados móveis para qualquer ano
         function calcularPascoa(ano) {
             let a = ano % 19,
                 b = Math.floor(ano / 100),
@@ -130,16 +129,10 @@
 
         function obterFeriadosFixosEMoveis(ano) {
             let pascoa = calcularPascoa(ano);
-            
-            // Carnaval (47 dias antes da Páscoa)
             let carnaval = new Date(pascoa);
             carnaval.setDate(pascoa.getDate() - 47);
-
-            // Paixão de Cristo (2 dias antes da Páscoa)
             let paixao = new Date(pascoa);
             paixao.setDate(pascoa.getDate() - 2);
-
-            // Corpus Christi (60 dias após a Páscoa)
             let corpus = new Date(pascoa);
             corpus.setDate(pascoa.getDate() + 60);
 
@@ -174,8 +167,6 @@
                     .single();
 
                 let salvas = (data && data.conteudo && data.conteudo.feriados) ? data.conteudo.feriados : [];
-                
-                // Garantir feriados do ano atual e próximo se não existirem
                 let anoAtual = new Date().getFullYear();
                 verificarEGarantirAno(salvas, anoAtual);
                 verificarEGarantirAno(salvas, anoAtual + 1);
@@ -273,6 +264,81 @@
             alert("✅ Registo guardado e sincronizado com sucesso!");
         }
 
+        // Função para enviar o feriado/emenda explicitamente para a programação semanal ao clicar em OK
+        async function enviarFeriadoParaProgramacao(id) {
+            let feriados = obterFeriados();
+            let f = feriados.find(item => item.id === id);
+            if (!f) return;
+
+            try {
+                let { data } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
+                let conteudo = data ? (data.conteudo || {}) : {};
+                if (!conteudo.semanas) conteudo.semanas = {};
+
+                // Calcula o ano e a semana da data do feriado
+                const dObj = new Date(f.data + 'T00:00:00');
+                const ano = dObj.getFullYear();
+                
+                const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+                const dayNum = d.getUTCDay() || 7; 
+                d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+                const semanaKey = `prog_grid_${ano}_semana_${semanaNo}`;
+
+                // Cria esqueleto padrão se a semana não existir na nuvem
+                if (!conteudo.semanas[semanaKey]) {
+                    conteudo.semanas[semanaKey] = `
+                        <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda"><div class="day-content"><div class="day-title">Segunda</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="2" data-dia-nome="Terça"><div class="day-content"><div class="day-title">Terça</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta"><div class="day-content"><div class="day-title">Quarta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta"><div class="day-content"><div class="day-title">Quinta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta"><div class="day-content"><div class="day-title">Sexta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                    `;
+                }
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = conteudo.semanas[semanaKey];
+
+                const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+                const diaSemanaNum = dObj.getDay();
+
+                if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
+                    const nomeDia = diasMap[diaSemanaNum];
+                    const cardDia = tempDiv.querySelector(`.day-card[data-dia-nome="${nomeDia}"]`);
+                    
+                    if (cardDia) {
+                        const tasksCont = cardDia.querySelector('.tasks-container');
+                        const tituloFeriado = f.tipo === 'feriado' ? '🍃 FERIADO' : '📌 EMENDA';
+
+                        tasksCont.innerHTML = `
+                            <div style="background-color: ${f.tipo === 'feriado' ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${f.tipo === 'feriado' ? '#2e7d32' : '#00897b'}; border-radius: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;" class="p-4 text-center shadow-sm">
+                                <span style="color: ${f.tipo === 'feriado' ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 13px;">${tituloFeriado}</span>
+                                <div style="color: ${f.tipo === 'feriado' ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${f.desc}</div>
+                                <button onclick="removerElemento(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold">Remover Bloqueio</button>
+                            </div>
+                        `;
+                        cardDia.querySelector('.day-resources').innerHTML = '';
+
+                        conteudo.semanas[semanaKey] = tempDiv.innerHTML;
+
+                        await supabaseClient
+                            .from('app_dados_programacao')
+                            .upsert({ id: '1', conteudo: conteudo });
+
+                        alert(`✅ ${f.desc} enviado com sucesso para a Semana ${semanaNo} (${ano})!`);
+                    }
+                } else {
+                    alert("⚠️ A data deste evento cai num fim de semana (Sábado/Domingo).");
+                }
+
+            } catch (err) {
+                console.error("Erro ao enviar feriado para programação:", err);
+                alert("❌ Erro ao enviar para a programação.");
+            }
+        }
+
         function limparFormulario() {
             document.getElementById('feriadoData').valueAsDate = new Date();
             document.getElementById('feriadoDesc').value = '';
@@ -302,6 +368,7 @@
                         <small class="text-gray-500 font-semibold">Data: ${f.data.split('-').reverse().join('/')} ${isNacional ? '• (Nacional Automático)' : '• (Customizado)'}</small>
                     </div>
                     <div class="flex gap-1.5">
+                        <button onclick="enviarFeriadoParaProgramacao('${f.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2.5 py-1 rounded-lg font-bold shadow-sm" title="Enviar para a Programação Semanal">✅ OK (Enviar)</button>
                         <button onclick="editarFeriado('${f.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
                         <button onclick="apagarFeriado('${f.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
                     </div>
