@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Treinamentos (v1.0)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #1b5e20;
+            --secondary-color: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #d0d0d0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
+
+    <div class="container space-y-6">
+        <!-- CABEÇALHO -->
+        <div class="text-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-black uppercase text-green-800 dark:text-green-400">🎓 Gestão de Treinamentos</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Registo e alocação automática por período</p>
+        </div>
+
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+            <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Novo Registo de Treinamento</h3>
+            
+            <input type="hidden" id="editIndex" value="">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de Início</label>
+                    <input type="date" id="treinamentoInicio" class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de Fim</label>
+                    <input type="date" id="treinamentoFim" class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome do Treinamento</label>
+                    <input type="text" id="treinamentoNome" placeholder="Ex: SEGURANÇA EM MÁQUINAS..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Local</label>
+                    <input type="text" id="treinamentoLocal" placeholder="Ex: SALA DE AUDIÊNCIAS..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome da Pessoa</label>
+                    <input type="text" id="treinamentoPessoa" placeholder="Ex: MARIANA..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">✓ Guardar e Distribuir Treinamento</button>
+                <button onclick="limparFormulario()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-bold">Limpar</button>
+            </div>
+        </div>
+
+        <!-- LISTA DE TREINAMENTOS CADASTRADOS -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Treinamentos Registados</h3>
+            <div id="listaTreinamentos" class="space-y-2">
+                <!-- Preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CHAVE_TREINAMENTOS = "modulo_treinamentos_dados_v1";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('treinamentoInicio').valueAsDate = new Date();
+            document.getElementById('treinamentoFim').valueAsDate = new Date();
+            renderizarListaTreinamentos();
+        });
+
+        function obterTreinamentos() {
+            return JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || [];
+        }
+
+        function salvarTreinamento() {
+            const inicio = document.getElementById('treinamentoInicio').value;
+            const fim = document.getElementById('treinamentoFim').value;
+            const nome = document.getElementById('treinamentoNome').value.trim().toUpperCase();
+            const local = document.getElementById('treinamentoLocal').value.trim().toUpperCase();
+            const pessoa = document.getElementById('treinamentoPessoa').value.trim().toUpperCase();
+            const editIdx = document.getElementById('editIndex').value;
+
+            if (!inicio || !fim || !nome || !local || !pessoa) {
+                alert("Por favor, preencha todos os campos do treinamento.");
+                return;
+            }
+
+            if (new Date(inicio) > new Date(fim)) {
+                alert("A data de início não pode ser posterior à data de fim.");
+                return;
+            }
+
+            let treinamentos = obterTreinamentos();
+            const novoItem = { inicio, fim, nome, local, pessoa };
+
+            if (editIdx !== "") {
+                treinamentos[parseInt(editIdx)] = novoItem;
+                document.getElementById('editIndex').value = "";
+            } else {
+                treinamentos.push(novoItem);
+            }
+
+            localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
+            limparFormulario();
+            renderizarListaTreinamentos();
+            alert("✅ Treinamento guardado com sucesso!");
+        }
+
+        function limparFormulario() {
+            document.getElementById('treinamentoInicio').valueAsDate = new Date();
+            document.getElementById('treinamentoFim').valueAsDate = new Date();
+            document.getElementById('treinamentoNome').value = '';
+            document.getElementById('treinamentoLocal').value = '';
+            document.getElementById('treinamentoPessoa').value = '';
+            document.getElementById('editIndex').value = '';
+        }
+
+        function renderizarListaTreinamentos() {
+            const container = document.getElementById('listaTreinamentos');
+            container.innerHTML = '';
+            let treinamentos = obterTreinamentos();
+
+            if (treinamentos.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhum treinamento registado.</p>';
+                return;
+            }
+
+            treinamentos.forEach((t, idx) => {
+                const div = document.createElement('div');
+                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs gap-2';
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-green-800 dark:text-green-300 block text-sm">🎓 ${t.nome}</span>
+                        <span class="text-gray-600 dark:text-gray-300 font-semibold">📍 Local: ${t.local} | 👤 Participante: ${t.pessoa}</span>
+                        <small class="text-gray-400 block mt-0.5">Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</small>
+                    </div>
+                    <div class="flex gap-1.5 self-end sm:self-center">
+                        <button onclick="editarTreinamento(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
+                        <button onclick="apagarTreinamento(${idx})" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function editarTreinamento(idx) {
+            let treinamentos = obterTreinamentos();
+            let t = treinamentos[idx];
+            document.getElementById('treinamentoInicio').value = t.inicio;
+            document.getElementById('treinamentoFim').value = t.fim;
+            document.getElementById('treinamentoNome').value = t.nome;
+            document.getElementById('treinamentoLocal').value = t.local;
+            document.getElementById('treinamentoPessoa').value = t.pessoa;
+            document.getElementById('editIndex').value = idx;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function apagarTreinamento(idx) {
+            if (confirm("Tem certeza que deseja apagar este registo de treinamento?")) {
+                let treinamentos = obterTreinamentos();
+                treinamentos.splice(idx, 1);
+                localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
+                renderizarListaTreinamentos();
+            }
+        }
+    </script>
+</body>
+</html>
