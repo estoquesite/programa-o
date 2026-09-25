@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.35 Nuvem Completa)</title>
+    <title>Programação Semanal Interativa (v3.39 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -78,8 +78,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            height: 480px !important;
-            max-height: 480px !important;
+            height: 500px !important;
+            max-height: 500px !important;
         }
         .day-content {
             display: flex;
@@ -110,6 +110,18 @@
             font-weight: 700;
             color: #0e3b12;
             font-size: 10px;
+        }
+        .day-options-header {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 8px;
+            background: #f1f8e9;
+            padding: 3px;
+            border-radius: 4px;
         }
         .task-box {
             font-weight: 600;
@@ -278,6 +290,10 @@
             <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
                 <div class="day-content">
                     <div class="day-title" id="titleSegunda">Segunda<br><small>--/---</small></div>
+                    <div class="print-hidden day-options-header">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'feriado')" class="check-feriado"> Feriado</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'emenda')" class="check-emenda"> Emenda</label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -294,6 +310,10 @@
             <div class="day-card" data-dia-idx="2" data-dia-nome="Terça">
                 <div class="day-content">
                     <div class="day-title" id="titleTerca">Terça<br><small>--/---</small></div>
+                    <div class="print-hidden day-options-header">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'feriado')" class="check-feriado"> Feriado</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'emenda')" class="check-emenda"> Emenda</label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -310,6 +330,10 @@
             <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta">
                 <div class="day-content">
                     <div class="day-title" id="titleQuarta">Quarta<br><small>--/---</small></div>
+                    <div class="print-hidden day-options-header">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'feriado')" class="check-feriado"> Feriado</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'emenda')" class="check-emenda"> Emenda</label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -327,6 +351,10 @@
             <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta">
                 <div class="day-content">
                     <div class="day-title" id="titleQuinta">Quinta<br><small>--/---</small></div>
+                    <div class="print-hidden day-options-header">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'feriado')" class="check-feriado"> Feriado</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'emenda')" class="check-emenda"> Emenda</label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -343,6 +371,10 @@
             <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta">
                 <div class="day-content">
                     <div class="day-title" id="titleSexta">Sexta<br><small>--/---</small></div>
+                    <div class="print-hidden day-options-header">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'feriado')" class="check-feriado"> Feriado</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" onchange="alternarStatusDia(this, 'emenda')" class="check-emenda"> Emenda</label>
+                    </div>
                     <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -388,7 +420,6 @@
                 </div>
             </div>
 
-            <!-- OPÇÃO "SEMANA INTEIRA" -->
             <div class="flex items-center gap-2 bg-green-50 dark:bg-green-950/40 p-2.5 rounded-lg border border-green-200 dark:border-green-900">
                 <input type="checkbox" id="checkSemanaInteira" class="w-4 h-4 text-green-600 rounded focus:ring-green-500">
                 <label for="checkSemanaInteira" class="text-xs font-bold text-green-900 dark:text-green-200 cursor-pointer">📅 Aplicar para a Semana Inteira (Segunda a Sexta)</label>
@@ -404,32 +435,38 @@
             </div>
         </div>
 
-        <!-- MÓDULO: CADASTRO DE TREINAMENTOS ANUAIS -->
+        <!-- MÓDULO: CADASTRO DE TREINAMENTOS ANUAIS (INVERTIDO E COM PERÍODO DE INÍCIO/FIM) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">🎓 Cadastro de Treinamentos Anuais</h3>
+                <h3 class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">🎓 Cadastro de Treinamentos Anuais (Vários Dias)</h3>
                 <button onclick="abrirModalTreinamentos()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">📋 Ver Lista</button>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Treinamento</label>
-                    <input type="date" id="inputDataTreinamento" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome do Curso / Treinamento</label>
-                    <input type="text" id="inputNomeCurso" placeholder="Ex: SEGURANÇA NO TRABALHO" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
-                </div>
+            <div>
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome do Curso / Treinamento</label>
+                <input type="text" id="inputNomeCurso" placeholder="Ex: SEGURANÇA NO TRABALHO" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
             </div>
+
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Participantes / Observação</label>
                 <input type="text" id="inputParticipantes" placeholder="Ex: MARIANA, ALBERTO..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
             </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de Início</label>
+                    <input type="date" id="inputDataInicio" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de Fim</label>
+                    <input type="date" id="inputDataFim" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+            </div>
+
             <button onclick="salvarTreinamentoAnual()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg text-xs transition">💾 Salvar Treinamento no Calendário Anual</button>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.35) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.39) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -486,13 +523,12 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.35 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.39 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
 
     <script>
-        // CONFIGURAÇÃO SUPABASE
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -512,43 +548,18 @@
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // FERIADOS NACIONAIS FIXOS DO BRASIL
-        const feriadosNacionais = [
-            "2026-01-01", // Confraternização Universal
-            "2026-04-21", // Tiradentes
-            "2026-05-01", // Dia do Trabalho
-            "2026-09-07", // Independência do Brasil
-            "2026-10-12", // Nossa Sra. Aparecida
-            "2026-11-02", // Finados
-            "2026-11-15", // Proclamação da República
-            "2026-12-25"  // Natal
-        ];
+        const feriadosNacionais = ["2026-01-01", "2026-04-21", "2026-05-01", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-12-25"];
 
-        // CORRETOR INTELIGENTE UNIVERSAL DE ACENTOS EM PORTUGUÊS
         function aplicarCorrecao(texto) {
             let resultado = texto.trim().toUpperCase();
             const acentosComuns = {
-                "ALMOÇEGIFADO": "ALMOXARIFADO",
-                "ALMOCEDIFADO": "ALMOXARIFADO",
-                "ALMOXARIFAD": "ALMOXARIFADO",
-                "INVENTARIO": "INVENTÁRIO",
-                "MAGNETICO": "MAGNÉTICOS",
-                "MAGNETICOS": "MAGNÉTICOS",
-                "MANUTENCAO": "MANUTENÇÃO",
-                "EQUIPE": "EQUIPE",
-                "CAMINHAO": "CAMINHÃO",
-                "ARRUMACAO": "ARRUMAÇÃO",
-                "MANHA": "MANHÃ",
-                "TARDE": "TARDE",
-                "INSTALACAO": "INSTALAÇÃO",
-                "VALVULA": "VÁLVULA",
-                "MEDICAO": "MEDIÇÃO",
-                "CONCLUSAO": "CONCLUSÃO",
-                "MAQUINA": "MÁQUINA",
-                "PECA": "PEÇA",
-                "FUNCIONAMENTO": "FUNCIONAMENTO"
+                "ALMOÇEGIFADO": "ALMOXARIFADO", "ALMOCEDIFADO": "ALMOXARIFADO", "ALMOXARIFAD": "ALMOXARIFADO",
+                "INVENTARIO": "INVENTÁRIO", "MAGNETICO": "MAGNÉTICOS", "MAGNETICOS": "MAGNÉTICOS",
+                "MANUTENCAO": "MANUTENÇÃO", "EQUIPE": "EQUIPE", "CAMINHAO": "CAMINHÃO",
+                "ARRUMACAO": "ARRUMAÇÃO", "MANHA": "MANHÃ", "TARDE": "TARDE",
+                "INSTALACAO": "INSTALAÇÃO", "VALVULA": "VÁLVULA", "MEDICAO": "MEDIÇÃO",
+                "CONCLUSAO": "CONCLUSÃO", "MAQUINA": "MÁQUINA", "PECA": "PEÇA", "FUNCIONAMENTO": "FUNCIONAMENTO"
             };
-
             for (let errada in acentosComuns) {
                 if (resultado.includes(errada)) {
                     resultado = resultado.replace(new RegExp(errada, 'g'), acentosComuns[errada]);
@@ -563,38 +574,20 @@
             return `prog_grid_${ano}_semana_${semana}`;
         }
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
 
         async function sincronizarComNuvem() {
             try {
-                let { data, error } = await supabaseClient
-                    .from('app_dados_programacao')
-                    .select('conteudo')
-                    .eq('id', '1')
-                    .single();
-
+                let { data, error } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
                 if (data && data.conteudo) {
                     dadosGlobaisNuvem = data.conteudo;
-                    if (dadosGlobaisNuvem.historico) {
-                        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
-                    }
-                    if (dadosGlobaisNuvem.treinamentos) {
-                        localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
-                    }
+                    if (dadosGlobaisNuvem.historico) localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
+                    if (dadosGlobaisNuvem.treinamentos) localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
                     if (dadosGlobaisNuvem.semanas) {
-                        for (let k in dadosGlobaisNuvem.semanas) {
-                            localStorage.setItem(k, dadosGlobaisNuvem.semanas[k]);
-                        }
+                        for (let k in dadosGlobaisNuvem.semanas) localStorage.setItem(k, dadosGlobaisNuvem.semanas[k]);
                     }
-                } else {
-                    await salvarNaNuvem();
-                }
-            } catch(e) {
-                console.error("Erro ao sincronizar com nuvem:", e);
-            }
+                } else { await salvarNaNuvem(); }
+            } catch(e) { console.error("Erro ao sincronizar:", e); }
         }
 
         async function salvarNaNuvem() {
@@ -603,120 +596,34 @@
             let semanasLocal = {};
             for (let i = 0; i < localStorage.length; i++) {
                 let key = localStorage.key(i);
-                if (key.startsWith('prog_grid_')) {
-                    semanasLocal[key] = localStorage.getItem(key);
-                }
+                if (key.startsWith('prog_grid_')) semanasLocal[key] = localStorage.getItem(key);
             }
-
-            dadosGlobaisNuvem = {
-                historico: historicoLocal,
-                treinamentos: treinamentosLocal,
-                semanas: semanasLocal
-            };
-
-            try {
-                await supabaseClient
-                    .from('app_dados_programacao')
-                    .upsert({ id: '1', conteudo: dadosGlobaisNuvem });
-            } catch (err) {
-                console.error("Erro ao gravar na nuvem:", err);
-            }
+            dadosGlobaisNuvem = { historico: historicoLocal, treinamentos: treinamentosLocal, semanas: semanasLocal };
+            try { await supabaseClient.from('app_dados_programacao').upsert({ id: '1', conteudo: dadosGlobaisNuvem }); } catch (err) { console.error("Erro ao gravar:", err); }
         }
 
         async function sincronizarComNuvemManual() {
             await sincronizarComNuvem();
             atualizarDatasSemana();
-            alert("✅ Sincronizado com sucesso com a nuvem!");
+            alert("✅ Sincronizado com sucesso!");
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
             await sincronizarComNuvem();
-
-            const manifestObj = {
-                "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
-                "display": "standalone", "background_color": "#f9f9f9", "theme_color": "#1b5e20",
-                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", "sizes": "512x512", "type": "image/png"}]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
-            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
-
-            if (sessionStorage.getItem('autenticado_programacao') === 'true') {
-                liberarAcessoInicial();
-            }
-            if (localStorage.getItem('dark_mode') === 'true') {
-                document.documentElement.classList.add('dark');
-            }
             carregarFrequentes();
-            
             definirSemanaAtualComRegraSexta();
             document.getElementById('inputDataEvento').valueAsDate = new Date();
-            document.getElementById('inputDataTreinamento').valueAsDate = new Date();
+            document.getElementById('inputDataInicio').valueAsDate = new Date();
+            document.getElementById('inputDataFim').valueAsDate = new Date();
         });
-
-        function instalarApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-            } else {
-                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
-            }
-        }
 
         function verificarLogin(e) {
             e.preventDefault();
-            const senhaDigitada = document.getElementById('input-senha').value;
-            const erroEl = document.getElementById('erro-senha');
-
-            if (senhaDigitada === SENHA_MESTRA) {
+            if (document.getElementById('input-senha').value === SENHA_MESTRA) {
                 sessionStorage.setItem('autenticado_programacao', 'true');
                 liberarAcessoInicial();
             } else {
-                erroEl.classList.remove('hidden');
-                document.getElementById('input-senha').value = '';
-                document.getElementById('input-senha').focus();
-            }
-        }
-
-        async function entrarComBiometria() {
-            if (!window.PublicKeyCredential) {
-                alert("O seu navegador não suporta autenticação biométrica.");
-                return;
-            }
-            try {
-                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                if (!available) { alert("Nenhum leitor biométrico encontrado."); return; }
-
-                const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-                const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
-
-                const createCredentialOptions = {
-                    challenge: challenge, rp: { name: "Programação Semanal", id: window.location.hostname },
-                    user: { id: userId, name: "prog@local", displayName: "Mariana" },
-                    pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
-                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
-                    timeout: 60000
-                };
-
-                let cred; const credentialIdStr = localStorage.getItem('biometria_cred_id_prog');
-                if (credentialIdStr) {
-                    try {
-                        const rawId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
-                        cred = await navigator.credentials.get({ challenge, allowCredentials: [{ id: rawId, type: "public-key" }], userVerification: "required", timeout: 60000 });
-                    } catch (err) {
-                        cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
-                        localStorage.setItem('biometria_cred_id_prog', btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId))));
-                    }
-                } else {
-                    cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
-                    localStorage.setItem('biometria_cred_id_prog', btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId))));
-                }
-
-                if (cred) {
-                    sessionStorage.setItem('autenticado_programacao', 'true');
-                    liberarAcessoInicial();
-                }
-            } catch (error) {
-                alert("Biometria cancelada. Podes usar a senha PIN (1510).");
+                document.getElementById('erro-senha').classList.remove('hidden');
             }
         }
 
@@ -731,76 +638,71 @@
             sessionStorage.removeItem('autenticado_programacao');
             document.getElementById('conteudo-site').classList.add('hidden');
             document.getElementById('tela-login').classList.remove('hidden');
-            document.getElementById('input-senha').value = '';
-            document.getElementById('erro-senha').classList.add('hidden');
         }
 
-        function abrirModalHistorico() {
-            renderizarListaHistorico();
-            document.getElementById('modalHistorico').classList.remove('hidden');
-        }
-        function fecharModalHistorico() {
-            document.getElementById('modalHistorico').classList.add('hidden');
-        }
-
-        function abrirModalTreinamentos() {
-            renderizarListaTreinamentos();
-            document.getElementById('modalTreinamentos').classList.remove('hidden');
-        }
-        function fecharModalTreinamentos() {
-            document.getElementById('modalTreinamentos').classList.add('hidden');
-        }
+        function abrirModalHistorico() { renderizarListaHistorico(); document.getElementById('modalHistorico').classList.remove('hidden'); }
+        function fecharModalHistorico() { document.getElementById('modalHistorico').classList.add('hidden'); }
+        function abrirModalTreinamentos() { renderizarListaTreinamentos(); document.getElementById('modalTreinamentos').classList.remove('hidden'); }
+        function fecharModalTreinamentos() { document.getElementById('modalTreinamentos').classList.add('hidden'); }
 
         async function salvarTreinamentoAnual() {
-            const dataStr = document.getElementById('inputDataTreinamento').value;
+            const dataInicioStr = document.getElementById('inputDataInicio').value;
+            const dataFimStr = document.getElementById('inputDataFim').value;
             let curso = aplicarCorrecao(document.getElementById('inputNomeCurso').value);
             let participantes = aplicarCorrecao(document.getElementById('inputParticipantes').value);
 
-            if (!dataStr || !curso) {
-                alert("Preencha a data e o nome do curso.");
+            if (!dataInicioStr || !dataFimStr || !curso) {
+                alert("Preencha a data de início, data de fim e o nome do curso.");
                 return;
             }
 
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
-            const idTreinamento = `treinamento_${dataStr}_${Date.now()}`;
+            const id = `treinamento_${dataInicioStr}_${Date.now()}`;
+            treinamentos[id] = { id, dataInicio: dataInicioStr, dataFim: dataFimStr, curso, participantes };
             
-            treinamentos[idTreinamento] = {
-                id: idTreinamento,
-                data: dataStr,
-                curso: curso,
-                participantes: participantes
-            };
-
             localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
             await salvarNaNuvem();
-            injetarTreinamentoNaSemana(dataStr, `🎓 ${curso} (${participantes})`);
+            injetarPeriodoTreinamentoNaSemana(dataInicioStr, dataFimStr, `🎓 ${curso} (${participantes})`);
 
             document.getElementById('inputNomeCurso').value = '';
             document.getElementById('inputParticipantes').value = '';
-            alert("✅ Treinamento guardado com sucesso no calendário anual e aplicado na programação!");
+            alert("✅ Treinamento guardado com sucesso para o período!");
         }
 
         function renderizarListaTreinamentos() {
             const container = document.getElementById('listaTreinamentosCadastrados');
             container.innerHTML = '';
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
-            let chaves = Object.keys(treinamentos);
-
-            if (chaves.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhum treinamento cadastrado.</p>';
-                return;
+            if (Object.keys(treinamentos).length === 0) { container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhum treinamento cadastrado.</p>'; return; }
+            for (let k in treinamentos) {
+                let item = treinamentos[k];
+                let periodo = item.dataInicio === item.dataFim ? item.dataInicio : `${item.dataInicio} até ${item.dataFim}`;
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border text-xs">
+                        <div><b>${periodo}: ${item.curso}</b><br><small>Participantes: ${item.participantes}</small></div>
+                        <div class="flex gap-1">
+                            <button onclick="editarTreinamento('${item.id}')" class="bg-blue-600 text-white px-2 py-1 rounded font-bold">Editar</button>
+                            <button onclick="apagarTreinamento('${item.id}')" class="bg-red-100 text-red-700 px-2 py-1 rounded font-bold">Apagar</button>
+                        </div>
+                    </div>`;
             }
+        }
 
-            chaves.forEach(key => {
-                let item = treinamentos[key];
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
-                div.innerHTML = `
-                    <div><span class="font-bold text-purple-800 dark:text-purple-300 block">${item.data}: ${item.curso}</span><small class="text-gray-400">Participantes: ${item.participantes || 'Nenhum'}</small></div>
-                    <button onclick="apagarTreinamento('${item.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
-                `;
-                container.appendChild(div);
-            });
+        async function editarTreinamento(id) {
+            let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
+            let item = treinamentos[id];
+            if (!item) return;
+            let novoCurso = prompt("Editar Nome do Curso:", item.curso);
+            let novosParticipantes = prompt("Editar Participantes:", item.participantes);
+            if (novoCurso !== null) {
+                item.curso = aplicarCorrecao(novoCurso);
+                item.participantes = aplicarCorrecao(novosParticipantes || "");
+                localStorage.setItem(CHAVE_TREINAMENTOS, JSON.stringify(treinamentos));
+                await salvarNaNuvem();
+                renderizarListaTreinamentos();
+                atualizarDatasSemana();
+                alert("✅ Treinamento atualizado com sucesso!");
+            }
         }
 
         async function apagarTreinamento(id) {
@@ -814,387 +716,88 @@
             }
         }
 
-        function injetarTreinamentoNaSemana(dataStr, textoFormatado) {
-            const dataObj = new Date(dataStr + 'T00:00:00');
-            const diaSemanaNum = dataObj.getDay();
-            if (diaSemanaNum === 0 || diaSemanaNum === 6) return;
+        function injetarPeriodoTreinamentoNaSemana(inicioStr, fimStr, texto) {
+            let curr = new Date(inicioStr + 'T00:00:00');
+            let end = new Date(fimStr + 'T00:00:00');
+            if (curr > end) return;
 
-            const nomesDiasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const card = document.querySelector(`.day-card[data-dia-nome="${nomesDiasMap[diaSemanaNum]}"]`);
-            if (card) {
-                inserirItemNoCard(card, 'task', textoFormatado);
-                guardarEstadoDOM();
+            while (curr <= end) {
+                let dNum = curr.getDay();
+                if (dNum !== 0 && dNum !== 6) { // Apenas dias úteis
+                    let iso = `${curr.getFullYear()}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`;
+                    const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+                    const card = document.querySelector(`.day-card[data-dia-nome="${nomes[dNum]}"]`);
+                    if (card) {
+                        inserirItemNoCard(card, 'task', texto);
+                    }
+                }
+                curr.setDate(curr.getDate() + 1);
             }
+            guardarEstadoDOM();
         }
 
         function verificarTreinamentosAnuais() {
             let treinamentos = JSON.parse(localStorage.getItem(CHAVE_TREINAMENTOS)) || {};
             for (let k in treinamentos) {
                 let item = treinamentos[k];
-                injetarTreinamentoNaSemana(item.data, `🎓 ${item.curso} (${item.participantes})`);
+                injetarPeriodoTreinamentoNaSemana(item.dataInicio, item.dataFim, `🎓 ${item.curso} (${item.participantes})`);
             }
-        }
-
-        async function salvarSemanaAtualNoHistorico() {
-            const numSemana = document.getElementById('inputNumSemana').value;
-            const ano = document.getElementById('inputAno').value;
-            const idHistorico = `Semana_${numSemana}_${ano}`;
-            const htmlConteudo = document.getElementById('weekGridContainer').innerHTML;
-            const badgeTexto = document.getElementById('badgeSemana').innerText;
-
-            let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            historico[idHistorico] = {
-                id: idHistorico, titulo: `${badgeTexto} (${ano})`,
-                dataSalvo: new Date().toLocaleDateString('pt-PT'), html: htmlConteudo
-            };
-
-            localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
-            await salvarNaNuvem();
-            alert(`✅ Programação da ${badgeTexto} de ${ano} guardada com sucesso e sincronizada!`);
-            renderizarListaHistorico();
-        }
-
-        function renderizarListaHistorico() {
-            const container = document.getElementById('listaHistoricoSemanas');
-            container.innerHTML = '';
-            let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            let chaves = Object.keys(historico);
-
-            if (chaves.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada no histórico.</p>';
-                return;
-            }
-
-            chaves.forEach(key => {
-                let item = historico[key];
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
-                div.innerHTML = `
-                    <div><span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span><small class="text-gray-400">Guardado em: ${item.dataSalvo}</small></div>
-                    <div class="flex gap-1.5">
-                        <button onclick="carregarSemanaHistorico('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Carregar</button>
-                        <button onclick="apagarSemanaHistorico('${item.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        async function carregarSemanaHistorico(id) {
-            if (confirm("Deseja carregar esta semana?")) {
-                let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-                if (historico[id]) {
-                    document.getElementById('weekGridContainer').innerHTML = historico[id].html;
-                    await guardarEstadoDOM();
-                    reativarEventosDragDrop();
-                    fecharModalHistorico();
-                    alert("Semana carregada com sucesso!");
-                }
-            }
-        }
-
-        async function apagarSemanaHistorico(id) {
-            if (confirm("Tem certeza que deseja apagar?")) {
-                let historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-                delete historico[id];
-                localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
-                await salvarNaNuvem();
-                renderizarListaHistorico();
-            }
-        }
-
-        function carregarFrequentes() {
-            let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-            const select = document.getElementById('selectFrequentes');
-            select.innerHTML = '<option value="">-- Escolher item frequente --</option>';
-            salvos.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item; opt.innerText = item;
-                select.appendChild(opt);
-            });
-        }
-
-        async function adicionarNovoFrequente() {
-            const novo = prompt("Digite o nome da nova tarefa ou recurso frequente:");
-            if (novo && novo.trim() !== "") {
-                const itemMaiusculo = novo.trim().toUpperCase();
-                let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-                if (!salvos.includes(itemMaiusculo)) {
-                    salvos.push(itemMaiusculo);
-                    localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                    carregarFrequentes();
-                    document.getElementById('selectFrequentes').value = itemMaiusculo;
-                    preencherPredefinido();
-                }
-            }
-        }
-
-        function gerenciarFrequentes() {
-            let salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-            let listaStr = salvos.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
-            let escolha = prompt(`Itens Frequentes:\n\n${listaStr}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
-            if (escolha !== null && !isNaN(escolha)) {
-                let index = parseInt(escolha) - 1;
-                if (index >= 0 && index < salvos.length) {
-                    let itemSelecionado = salvos[index];
-                    let acao = prompt(`Item: "${itemSelecionado}"\n\n1 - Editar nome\n2 - Apagar item`, "1");
-                    if (acao === "1") {
-                        let novoNome = prompt("Novo nome:", itemSelecionado);
-                        if (novoNome && novoNome.trim() !== "") {
-                            salvos[index] = novoNome.trim().toUpperCase();
-                            localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                            carregarFrequentes();
-                            alert("Atualizado!");
-                        }
-                    } else if (acao === "2") {
-                        if (confirm(`Apagar "${itemSelecionado}"?`)) {
-                            salvos.splice(index, 1);
-                            localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                            carregarFrequentes();
-                            alert("Apagado!");
-                        }
-                    }
-                }
-            }
-        }
-
-        function adicionarNovaPalavraChave() {
-            const nova = prompt("Palavra-chave para o analisador:");
-            if (nova && nova.trim() !== "") {
-                const termo = nova.trim().toUpperCase();
-                let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-                if (!chaves.includes(termo)) {
-                    chaves.push(termo);
-                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    alert(`Adicionada: "${termo}"!`);
-                }
-            }
-        }
-
-        function gerenciarPalavrasChave() {
-            let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            let listaStr = chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
-            let escolha = prompt(`Palavras-Chave:\n\n${listaStr}\n\nNúmero do item para APAGAR:`);
-            if (escolha !== null && !isNaN(escolha)) {
-                let index = parseInt(escolha) - 1;
-                if (index >= 0 && index < chaves.length) {
-                    chaves.splice(index, 1);
-                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    alert("Apagada!");
-                }
-            }
-        }
-
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.35)
-        function analisarScript() {
-            const textoScript = document.getElementById('inputScriptTexto').value;
-            const containerSugestoes = document.getElementById('resultadoSugestoes');
-            containerSugestoes.innerHTML = '';
-
-            if (!textoScript.trim()) {
-                containerSugestoes.innerHTML = `<p class="text-[10px] text-red-500">Insira algum texto na transcrição.</p>`;
-                return;
-            }
-
-            const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            const linhas = textoScript.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2);
-            let encontradas = 0;
-            let jaAdicionadas = new Set();
-
-            linhas.forEach(linha => {
-                let linhaUp = aplicarCorrecao(linha);
-                
-                const contem = palavrasChave.some(p => {
-                    const regex = new RegExp("\\b" + p + "\\b", "i");
-                    return regex.test(linhaUp) || linhaUp.includes(p);
-                });
-
-                if (contem && !jaAdicionadas.has(linhaUp)) {
-                    jaAdicionadas.add(linhaUp);
-                    encontradas++;
-
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border border-blue-200 dark:border-blue-900 text-xs';
-                    div.innerHTML = `
-                        <span class="font-medium text-blue-900 dark:text-blue-200">💬 "${linhaUp}"</span>
-                        <div class="flex gap-1">
-                            <button onclick="usarSugestao(this)" data-texto="${linhaUp.replace(/"/g, '&quot;')}" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-[10px] font-bold">Usar ➜</button>
-                            <button onclick="removerSugestao(this)" class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">✕</button>
-                        </div>
-                    `;
-                    containerSugestoes.appendChild(div);
-                }
-            });
-
-            if (encontradas === 0) {
-                containerSugestoes.innerHTML = `<p class="text-[10px] text-gray-500">Nenhuma palavra-chave reconhecida no texto. Verifique se o nome ou termo está cadastrado em "Gerir Palavras".</p>`;
-            }
-        }
-
-        function usarSugestao(botao) {
-            let texto = aplicarCorrecao(botao.getAttribute('data-texto'));
-            document.getElementById('inputDesc').value = texto;
-            if (/caminhão|empilhadeira|carro|recurso/i.test(texto)) {
-                document.getElementById('inputTipo').value = 'resource';
-            } else { document.getElementById('inputTipo').value = 'task'; }
-            document.getElementById('inputDesc').focus();
-        }
-
-        function removerSugestao(botao) { botao.closest('div.flex').remove(); }
-
-        function iniciarArrasto(e) {
-            elementoArrastado = e.currentTarget;
-            e.currentTarget.classList.add('dragging');
-        }
-
-        function permitirDrop(e) {
-            e.preventDefault();
-            const containerAlvo = e.currentTarget;
-            const depoisDeElemento = obterElementoAposCursor(containerAlvo, e.clientY);
-            if (elementoArrastado) {
-                if (depoisDeElemento == null) { containerAlvo.appendChild(elementoArrastado); }
-                else { containerAlvo.insertBefore(elementoArrastado, depoisDeElemento); }
-            }
-        }
-
-        async function soltarItem(e) {
-            e.preventDefault();
-            if (elementoArrastado) {
-                elementoArrastado.classList.remove('dragging');
-                elementoArrastado = null;
-                await guardarEstadoDOM();
-            }
-        }
-
-        function obterElementoAposCursor(container, y) {
-            const elementosDrags = [...container.querySelectorAll('.task-box:not(.dragging), .resource-tag:not(.dragging)')];
-            return elementosDrags.reduce((maisProximo, filho) => {
-                const caixa = filho.getBoundingClientRect();
-                const deslocamento = y - caixa.top - caixa.height / 2;
-                if (deslocamento < 0 && deslocamento > maisProximo.deslocamento) {
-                    return { deslocamento: deslocamento, elemento: filho };
-                } else { return maisProximo; }
-            }, { deslocamento: Number.NEGATIVE_INFINITY }).elemento;
-        }
-
-        function reativarEventosDragDrop() {
-            document.querySelectorAll('.task-box, .resource-tag').forEach(item => {
-                item.setAttribute('draggable', 'true');
-                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            });
-            document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
-                cont.setAttribute('ondragover', 'permitirDrop(event)');
-                cont.setAttribute('ondrop', 'soltarItem(event)');
-            });
-        }
-
-        function definirSemanaAtual() {
-            const hoje = new Date(); const ano = hoje.getFullYear();
-            document.getElementById('inputAno').value = ano;
-            const d = new Date(Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            document.getElementById('inputNumSemana').value = weekNo;
-            atualizarDatasSemana();
         }
 
         function definirSemanaAtualComRegraSexta() {
-            const hoje = new Date(); 
-            const ano = hoje.getFullYear();
-            document.getElementById('inputAno').value = ano;
-
-            let dataCalculo = new Date(hoje);
-            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) {
-                dataCalculo.setDate(hoje.getDate() + 3);
-            }
-
-            const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-
+            const hoje = new Date(); document.getElementById('inputAno').value = hoje.getFullYear();
+            let calc = new Date(hoje);
+            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) calc.setDate(hoje.getDate() + 3);
+            const d = new Date(Date.UTC(calc.getFullYear(), calc.getMonth(), calc.getDate()));
+            const weekNo = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
             document.getElementById('inputNumSemana').value = weekNo;
             atualizarDatasSemana();
         }
 
         function sincronizarSemanaPelaData(dataStr) {
             if (!dataStr) return;
-            const dataObj = new Date(dataStr + 'T00:00:00');
-            const ano = dataObj.getFullYear();
-            document.getElementById('inputAno').value = ano;
-
-            const d = new Date(Date.UTC(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-
+            const dObj = new Date(dataStr + 'T00:00:00');
+            document.getElementById('inputAno').value = dObj.getFullYear();
+            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+            const weekNo = Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
             document.getElementById('inputNumSemana').value = weekNo;
             atualizarDatasSemana();
         }
 
         function getDateRangeOfWeek(weekNo, y) {
-            let d = new Date(y, 0, 1); let dayNum = d.getDay();
-            let requiredDay = (weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum);
-            d.setDate(1 + requiredDay);
+            let d = new Date(y, 0, 1), dayNum = d.getDay();
+            d.setDate(1 + ((weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum)));
             let dias = [];
-            for (let i = 0; i < 5; i++) {
-                let temp = new Date(d); temp.setDate(d.getDate() + i);
-                dias.push(temp);
-            }
+            for (let i = 0; i < 5; i++) { let t = new Date(d); t.setDate(d.getDate() + i); dias.push(t); }
             return dias;
         }
 
         function atualizarDatasSemana() {
             const ano = parseInt(document.getElementById('inputAno').value) || 2026;
-            const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
+            const semana = parseInt(document.getElementById('inputNumSemana').value) || 1;
             document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
-
             const key = getWeekKey();
-            const salvoSemana = localStorage.getItem(key);
-
-            if (salvoSemana) {
-                document.getElementById('weekGridContainer').innerHTML = salvoSemana;
-                reativarEventosDragDrop();
-            } 
-            
+            const salvo = localStorage.getItem(key);
+            if (salvo) { document.getElementById('weekGridContainer').innerHTML = salvo; reativarEventosDragDrop(); }
             forcarRecursosFixos();
             verificarTreinamentosAnuais();
 
             const datas = getDateRangeOfWeek(semana, ano);
-            const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
-
-            datas.forEach((dataObj, index) => {
-                const diaNome = nomesDias[index];
-                const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
+            const nomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            datas.forEach((dt, idx) => {
+                const card = document.querySelector(`.day-card[data-dia-nome="${nomes[idx]}"]`);
                 if (card) {
-                    const diaDoMes = dataObj.getDate();
-                    const mesStr = nomesMeses[dataObj.getMonth()];
-                    
-                    // VERIFICA SE O DIA É FERIADO NACIONAL
-                    const anoStr = dataObj.getFullYear();
-                    const mesStrPad = String(dataObj.getMonth() + 1).padStart(2, '0');
-                    const diaStrPad = String(diaDoMes).padStart(2, '0');
-                    const dataIso = `${anoStr}-${mesStrPad}-${diaStrPad}`;
-
-                    if (feriadosNacionais.includes(dataIso)) {
-                        card.style.backgroundColor = "#ffebee";
-                        card.style.borderColor = "#c62828";
-                        card.querySelector('.day-title').innerHTML = `${diaNome}<br><small>${diaStrPad}/${mesStr}</small>`;
-                        card.querySelector('.tasks-container').innerHTML = `
-                            <div class="flex flex-col items-center justify-center h-full text-center p-4">
-                                <span class="text-2xl mb-1">🛑</span>
-                                <span class="font-bold text-red-700 text-xs uppercase">Feriado Nacional</span>
-                                <small class="text-red-600 text-[9px] mt-1">Nenhum agendamento permitido</small>
-                            </div>
-                        `;
+                    const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+                    if (feriadosNacionais.includes(iso)) {
+                        card.style.backgroundColor = "#e8f5e9";
+                        card.style.borderColor = "#2e7d32";
+                        card.querySelector('.tasks-container').innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center p-2"><span class="text-xl">🌿</span><span class="font-bold text-green-800 text-[10px] uppercase">Feriado Nacional</span></div>`;
                         card.querySelector('.day-resources').style.display = 'none';
                     } else {
-                        card.style.backgroundColor = "";
-                        card.style.borderColor = "";
+                        card.style.backgroundColor = ""; card.style.borderColor = "";
                         card.querySelector('.day-resources').style.display = 'flex';
-                        card.querySelector('.day-title').innerHTML = `${diaNome}<br><small>${diaStrPad}/${mesStr}</small>`;
                     }
+                    card.querySelector('.day-title').innerHTML = `${nomes[idx]}<br><small>${String(dt.getDate()).padStart(2,'0')}/${nomesMeses[dt.getMonth()]}</small>`;
                 }
             });
             guardarEstadoDOM();
@@ -1202,175 +805,72 @@
 
         function forcarRecursosFixos() {
             document.querySelectorAll('.day-card').forEach(card => {
-                const recursosCont = card.querySelector('.day-resources');
-                if (!recursosCont) return;
-                
-                const textosExistentes = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
-                
-                if (!textosExistentes.includes('CARRO')) {
-                    adicionarTagRecurso(recursosCont, 'CARRO');
-                }
-                if (!textosExistentes.includes('EMPILHADEIRA G4')) {
-                    adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
-                }
+                const cont = card.querySelector('.day-resources');
+                if (!cont) return;
+                const txt = [...cont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
+                if (!txt.includes('CARRO')) adicionarTagRecurso(cont, 'CARRO');
+                if (!txt.includes('EMPILHADEIRA G4')) adicionarTagRecurso(cont, 'EMPILHADEIRA G4');
             });
         }
 
         function adicionarTagRecurso(container, nome) {
-            const handleHtml = `<span class="drag-handle">⠿</span>`;
-            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
             const div = document.createElement('div');
-            div.className = 'resource-tag';
-            div.setAttribute('draggable', 'true');
-            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            div.innerHTML = `<span>${handleHtml} <span class="item-text">${nome}</span></span>${controlsHtml}`;
+            div.className = 'resource-tag'; div.setAttribute('draggable', 'true'); div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            div.innerHTML = `<span><span class="drag-handle">⠿</span> <span class="item-text">${nome}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span>`;
             container.appendChild(div);
-        }
-
-        function alternarDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
-        }
-
-        function preencherPredefinido() {
-            let val = document.getElementById('selectFrequentes').value;
-            if (val) {
-                document.getElementById('inputDesc').value = val;
-                if (/recurso|empilhadeira|caminhão|carro/i.test(val)) {
-                    document.getElementById('inputTipo').value = 'resource';
-                } else { document.getElementById('inputTipo').value = 'task'; }
-            }
         }
 
         async function adicionarItemPorData() {
             const dataStr = document.getElementById('inputDataEvento').value;
             const tipo = document.getElementById('inputTipo').value;
             let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
-            const semanaInteira = document.getElementById('checkSemanaInteira').checked;
-
+            const semInteira = document.getElementById('checkSemanaInteira').checked;
             if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
-
-            const nomesDiasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-
-            if (semanaInteira) {
-                document.querySelectorAll('.day-card').forEach(card => {
-                    inserirItemNoCard(card, tipo, desc);
-                });
+            const mapa = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+            if (semInteira) {
+                document.querySelectorAll('.day-card').forEach(c => inserirItemNoCard(c, tipo, desc));
             } else {
-                const dataObj = new Date(dataStr + 'T00:00:00');
-                const diaSemanaNum = dataObj.getDay();
-                if (diaSemanaNum === 0 || diaSemanaNum === 6) { alert("Selecione um dia útil (Segunda a Sexta)."); return; }
-
-                const card = document.querySelector(`.day-card[data-dia-nome="${nomesDiasMap[diaSemanaNum]}"]`);
-                if (!card) { alert("Dia não visível."); return; }
-
-                inserirItemNoCard(card, tipo, desc);
+                const dNum = new Date(dataStr + 'T00:00:00').getDay();
+                if (dNum === 0 || dNum === 6) { alert("Apenas dias úteis."); return; }
+                const card = document.querySelector(`.day-card[data-dia-nome="${mapa[dNum]}"]`);
+                if (card) inserirItemNoCard(card, tipo, desc);
             }
-
             document.getElementById('inputDesc').value = '';
-            document.getElementById('selectFrequentes').value = '';
             document.getElementById('checkSemanaInteira').checked = false;
             await guardarEstadoDOM();
         }
 
         function inserirItemNoCard(card, tipo, desc) {
-            const handleHtml = `<span class="drag-handle">⠿</span>`;
-            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-
             const div = document.createElement('div');
-            div.className = tipo === 'task' ? 'task-box' : 'resource-tag';
-            div.setAttribute('draggable', 'true');
-            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span></span>${controlsHtml}`;
-
-            if (tipo === 'task') { card.querySelector('.tasks-container').appendChild(div); }
-            else { card.querySelector('.day-resources').appendChild(div); }
+            div.className = tipo === 'task' ? 'task-box' : 'resource-tag'; div.setAttribute('draggable', 'true'); div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            div.innerHTML = `<span><span class="drag-handle">⠿</span> <span class="item-text">${desc}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item">✕</button></span>`;
+            if (tipo === 'task') card.querySelector('.tasks-container').appendChild(div);
+            else card.querySelector('.day-resources').appendChild(div);
         }
 
-        async function editarItem(botao) {
-            const itemBox = botao.closest('.task-box') || botao.closest('.resource-tag');
-            const itemSpan = itemBox.querySelector('.item-text');
-            let novoTexto = prompt("Editar descrição:", itemSpan.innerText);
-            if (novoTexto !== null && novoTexto.trim() !== "") {
-                itemSpan.innerText = aplicarCorrecao(novoTexto);
-                await guardarEstadoDOM();
-            }
+        async function editarItem(btn) {
+            let span = btn.closest('.task-box, .resource-tag').querySelector('.item-text');
+            let novo = prompt("Editar:", span.innerText);
+            if (novo) { span.innerText = aplicarCorrecao(novo); await guardarEstadoDOM(); }
         }
 
-        async function removerElemento(botao) {
-            (botao.closest('.task-box') || botao.closest('.resource-tag')).remove();
-            await guardarEstadoDOM();
-        }
+        async function removerElemento(btn) { btn.closest('.task-box, .resource-tag').remove(); await guardarEstadoDOM(); }
+        async function guardarEstadoDOM() { localStorage.setItem(getWeekKey(), document.getElementById('weekGridContainer').innerHTML); await salvarNaNuvem(); }
+        async function limparTudo() { if (confirm("Redefinir?")) { localStorage.removeItem(getWeekKey()); await salvarNaNuvem(); location.reload(); } }
 
-        async function guardarEstadoDOM() {
-            const key = getWeekKey();
-            const html = document.getElementById('weekGridContainer').innerHTML;
-            localStorage.setItem(key, html);
-            await salvarNaNuvem();
-        }
-
-        async function limparTudo() {
-            if (confirm("Deseja redefinir a programação desta semana?")) {
-                localStorage.removeItem(getWeekKey());
-                await salvarNaNuvem();
-                location.reload();
-            }
-        }
-
-        function ouvirVoz() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { alert("Reconhecimento de voz não suportado."); return; }
-            const recognition = new SpeechRecognition(); recognition.lang = 'pt-PT';
-            const btnVoz = document.getElementById('btn-voz');
-
-            recognition.onstart = () => { btnVoz.classList.add('animate-pulse', 'bg-amber-500'); };
-            recognition.onresult = (event) => {
-                let textoVoz = aplicarCorrecao(event.results[0][0].transcript);
-                document.getElementById('inputDesc').value = textoVoz;
-                adicionarItemPorData();
-            };
-            recognition.onerror = recognition.onend = () => { btnVoz.classList.remove('animate-pulse', 'bg-amber-500'); };
-            recognition.start();
+        function alternarStatusDia(checkbox, tipo) {
+            const card = checkbox.closest('.day-card');
+            const title = card.querySelector('.day-title');
+            if (checkbox.checked) {
+                if (tipo === 'feriado') { title.style.backgroundColor = '#e8f5e9'; }
+                else if (tipo === 'emenda') { title.style.backgroundColor = '#fff9c4'; }
+            } else { title.style.backgroundColor = ''; }
         }
 
         function imprimirProgramacao() {
-            const janelaImpressao = window.open('', '_blank', 'width=900,height=700');
-            janelaImpressao.document.write(`
-                <!DOCTYPE html>
-                <html lang="pt-PT">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Impressão - Programação Semanal</title>
-                    <style>
-                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background: #fff; color: #333; }
-                        .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; align-items: stretch; }
-                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; height: 480px !important; }
-                        .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 8px; flex-shrink: 0; }
-                        .tasks-container { flex-grow: 1; margin-bottom: 8px; overflow: hidden; }
-                        .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
-                        .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: auto; height: 125px; flex-shrink: 0; }
-                        .resources-title { font-size: 8px; font-weight: 800; color: #2e7d32; text-transform: uppercase; margin-bottom: 3px; }
-                        .resource-tag { background: #e8f5e9; color: #1b5e20; padding: 3px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-                        .drag-handle, .item-controls { display: none !important; }
-                        .header { text-align: center; margin-bottom: 15px; position: relative; }
-                        h2 { color: #1b5e20; font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; }
-                        .week-badge { position: absolute; top: 0; right: 5px; background-color: #1b5e20; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h2>Programação Semanal</h2>
-                        <div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div>
-                    </div>
-                    <div class="week-grid">
-                        ${document.getElementById('conteudo-site').querySelector('.week-grid').innerHTML}
-                    </div>
-                    <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }<\/script>
-                </body>
-                </html>
-            `);
-            janelaImpressao.document.close();
+            const w = window.open('', '_blank', 'width=900,height=700');
+            w.document.write(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:sans-serif;padding:20px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.day-card{border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:8px;height:480px!important;display:flex;flex-direction:column;}.day-title{background:#e8f5e9;padding:4px;text-align:center;font-weight:bold;font-size:12px;}.tasks-container{flex-grow:1;}.task-box{background:#f1f8e9;padding:4px;font-size:9px;margin-bottom:3px;border-left:2px solid #2e7d32;}.day-resources{border-top:2px dashed #c8e6c9;padding-top:6px;height:125px;margin-top:auto;}.resource-tag{background:#e8f5e9;padding:3px;font-size:9px;margin-bottom:2px;}.print-hidden,.day-options-header,.drag-handle,.item-controls{display:none!important;}</style></head><body><h2 style="text-align:center;color:#1b5e20;">Programação Semanal</h2><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div><script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
+            w.document.close();
         }
     </script>
 </body>
