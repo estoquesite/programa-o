@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.81 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.82 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -277,9 +277,9 @@
         <!-- BARRA DE AÇÕES DA SEMANA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
-            <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar Semana</button>
-            <button onclick="resetTotalNuvem()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">⚠️ Reset Nuvem</button>
+            <button onclick="exportarParaExcel()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel</button>
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
+            <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
         </div>
 
         <!-- ADICIONAR NOVO ITEM -->
@@ -328,9 +328,7 @@
                 <h3 class="text-sm font-bold uppercase text-green-800 dark:text-green-300">📊 Relatório do Indicador</h3>
                 <button onclick="fecharModalIndicador()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
-            <div id="conteudoRelatorioIndicador" class="space-y-3 text-xs text-gray-700 dark:text-gray-300">
-                <!-- Preenchido via JS -->
-            </div>
+            <div id="conteudoRelatorioIndicador" class="space-y-3 text-xs text-gray-700 dark:text-gray-300"></div>
             <div class="flex justify-end pt-2">
                 <button onclick="fecharModalIndicador()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button>
             </div>
@@ -403,7 +401,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.81 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.82 Nuvem</span>
         </div>
     </div>
 
@@ -494,6 +492,43 @@
 
         function fecharModalIndicador() {
             document.getElementById('modalIndicador').classList.add('hidden');
+        }
+
+        // Função para exportar os dados da semana para Excel (CSV compatível)
+        function exportarParaExcel() {
+            let ano = document.getElementById('inputAno').value;
+            let semana = document.getElementById('inputNumSemana').value;
+            let csvContent = "\uFEFFDia;Tipo;Descrição;Status\n";
+
+            document.querySelectorAll('.day-card').forEach(card => {
+                let diaNome = card.querySelector('.day-title').innerText.split('\n')[0].trim();
+                
+                // Tarefas normais e extras
+                card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
+                    let descEl = box.querySelector('.item-text') || box.querySelector('strong');
+                    let desc = descEl ? descEl.innerText.replace(/;/g, ',') : '';
+                    let status = box.querySelector('input[type="checkbox"]').checked ? 'Concluído' : 'Pendente';
+                    let tipo = box.classList.contains('tarefa-extra-box') ? 'Extra' : (box.classList.contains('treinamento-box') ? 'Treinamento' : 'Tarefa');
+                    csvContent += `${diaNome};${tipo};${desc};${status}\n`;
+                });
+
+                // Recursos
+                card.querySelectorAll('.resource-tag').forEach(tag => {
+                    let descEl = tag.querySelector('.item-text');
+                    let desc = descEl ? descEl.innerText.replace(/;/g, ',') : '';
+                    let status = tag.querySelector('input[type="checkbox"]').checked ? 'Concluído' : 'Pendente';
+                    csvContent += `${diaNome};Recurso;${desc};${status}\n`;
+                });
+            });
+
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `Programacao_Semana_${semana}_${ano}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function garantirCaixinhasEmHtmlSalvo(htmlString) {
