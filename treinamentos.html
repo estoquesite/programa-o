@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Treinamentos (v1.3 Nuvem)</title>
+    <title>Módulo de Treinamentos (v1.4 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -197,6 +197,86 @@
             document.getElementById('editId').value = '';
         }
 
+        // Função para enviar o treinamento explicitamente para a programação semanal ao clicar em OK
+        async function enviarParaProgramacao(id) {
+            let treinamentos = obterTreinamentos();
+            let t = treinamentos.find(item => item.id === id);
+            if (!t) return;
+
+            try {
+                let { data } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
+                let conteudo = data ? (data.conteudo || {}) : {};
+                if (!conteudo.semanas) conteudo.semanas = {};
+
+                // Calcula o ano e a semana da data de início do treinamento
+                const dObj = new Date(t.inicio + 'T00:00:00');
+                const ano = dObj.getFullYear();
+                
+                const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+                const dayNum = d.getUTCDay() || 7; 
+                d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+                const semanaKey = `prog_grid_${ano}_semana_${semanaNo}`;
+
+                // Se a semana ainda não tem HTML guardado na nuvem, criamos o esqueleto padrão dos 5 dias
+                if (!conteudo.semanas[semanaKey]) {
+                    // Cria uma estrutura padrão limpa para injetar o treinamento
+                    conteudo.semanas[semanaKey] = `
+                        <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda"><div class="day-content"><div class="day-title">Segunda</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="2" data-dia-nome="Terça"><div class="day-content"><div class="day-title">Terça</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta"><div class="day-content"><div class="day-title">Quarta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta"><div class="day-content"><div class="day-title">Quinta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                        <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta"><div class="day-content"><div class="day-title">Sexta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                    `;
+                }
+
+                // Cria um elemento temporário para manipular o HTML da semana na nuvem
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = conteudo.semanas[semanaKey];
+
+                const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
+                const diaSemanaNum = dObj.getDay();
+
+                if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
+                    const nomeDia = diasMap[diaSemanaNum];
+                    const cardDia = tempDiv.querySelector(`.day-card[data-dia-nome="${nomeDia}"]`);
+                    
+                    if (cardDia) {
+                        const tasksCont = cardDia.querySelector('.tasks-container');
+                        const identificadorUnico = `treino_id_${t.id}`;
+
+                        // Evita duplicados na mesma semana
+                        if (!tasksCont.innerHTML.includes(identificadorUnico)) {
+                            const divTreino = document.createElement('div');
+                            divTreino.className = 'treinamento-box';
+                            divTreino.innerHTML = `
+                                <span class="${identificadorUnico}">🎓 <strong>${t.nome}</strong><br><small>📍 ${t.local} | 👤 ${t.pessoa}</small></span>
+                            `;
+                            tasksCont.appendChild(divTreino);
+                            
+                            conteudo.semanas[semanaKey] = tempDiv.innerHTML;
+
+                            await supabaseClient
+                                .from('app_dados_programacao')
+                                .upsert({ id: '1', conteudo: conteudo });
+
+                            alert(`✅ Treinamento enviado com sucesso para a Semana ${semanaNo} (${ano})!`);
+                        } else {
+                            alert("⚠️ Este treinamento já consta na programação desta semana.");
+                        }
+                    }
+                } else {
+                    alert("⚠️ A data de início deste treinamento cai num fim de semana (Sábado/Domingo), portanto não entra na grade de Segunda a Sexta.");
+                }
+
+            } catch (err) {
+                console.error("Erro ao enviar treinamento para programação:", err);
+                alert("❌ Erro ao enviar para a programação.");
+            }
+        }
+
         function renderizarListaTreinamentos() {
             const container = document.getElementById('listaTreinamentos');
             container.innerHTML = '';
@@ -217,7 +297,8 @@
                         <small class="text-gray-400 block mt-0.5">Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</small>
                     </div>
                     <div class="flex gap-1.5 self-end sm:self-center">
-                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold" title="Duplicar para outra pessoa/data">📋 Duplicar</button>
+                        <button onclick="enviarParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2.5 py-1 rounded-lg font-bold shadow-sm" title="Enviar para a Programação Semanal">✅ OK (Enviar)</button>
+                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold" title="Duplicar">📋 Duplicar</button>
                         <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
                         <button onclick="apagarTreinamento('${t.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
                     </div>
@@ -295,7 +376,7 @@
                     <title>Relatório de Treinamentos</title>
                     <style>
                         body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 30px; background: #fff; color: #333; }
-                        h2 { color: #1b5e20; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
+                        <h2>Relatório de Treinamentos</h2>
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
                         th { background-color: #1b5e20; color: white; padding: 10px; text-align: left; }
                         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
