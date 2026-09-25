@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.86 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.87 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -234,20 +234,6 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- INDICADOR / BARRA DE PROGRESSO NO TOPO -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <span class="text-sm">📊</span>
-                <div>
-                    <h4 class="text-xs font-bold uppercase text-green-800 dark:text-green-300">Indicador de Conclusão da Semana</h4>
-                    <span id="textoIndicadorProgresso" class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold">0 de 0 concluídas (0%)</span>
-                </div>
-            </div>
-            <div class="w-36 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                <div id="barraProgressoIndicador" class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-        </div>
-
         <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -276,6 +262,8 @@
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
             <button onclick="exportarParaExcel()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel</button>
+            <input type="file" id="inputImportarCSV" accept=".csv" style="display:none" onchange="importarPlanilhaCSV(event)">
+            <button onclick="document.getElementById('inputImportarCSV').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📤 Importar Planilha</button>
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
             <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
         </div>
@@ -318,7 +306,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (RECOLOCADO AQUI) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -416,7 +404,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.86 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.87 Nuvem</span>
         </div>
     </div>
 
@@ -473,15 +461,6 @@
             checkboxes.forEach(cb => {
                 if (cb.checked) concluidas++;
             });
-            const percentual = total > 0 ? Math.round((concluidas / total) * 100) : 0;
-            
-            const texto = document.getElementById('textoIndicadorProgresso');
-            const barra = document.getElementById('barraProgressoIndicador');
-            
-            if (texto && barra) {
-                texto.innerText = `${concluidas} de ${total} concluídas (${percentual}%)`;
-                barra.style.width = `${percentual}%`;
-            }
         }
 
         function abrirModalIndicador() {
@@ -514,6 +493,73 @@
 
         function fecharModalIndicador() {
             document.getElementById('modalIndicador').classList.add('hidden');
+        }
+
+        // Função para importar planilha no formato CSV padrão enviado
+        function importarPlanilhaCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const linhas = text.split('\n');
+                
+                let importados = 0;
+                for (let i = 1; i < linhas.length; i++) {
+                    let linha = linhas[i].trim();
+                    if (!linha) continue;
+                    
+                    // Suporta separadores por vírgula ou ponto e vírgula
+                    let cols = linha.includes(';') ? linha.split(';') : linha.split(',');
+                    if (cols.length >= 5) {
+                        let atividade = aplicarCorrecao(cols[3] || '');
+                        let dataExec = (cols[6] || '').trim(); // ex: 28/set
+                        let diaSemana = (cols[7] || '').toLowerCase().trim(); // ex: segunda-feira
+                        let recursos = aplicarCorrecao(cols[13] || ''); // ex: EMPILHADEIRA...
+
+                        if (atividade) {
+                            // Mapeia dia da semana para o card correto
+                            let mapaDias = { 'segunda-feira': 'Segunda', 'terça-feira': 'Terça', 'quarta-feira': 'Quarta', 'quinta-feira': 'Quinta', 'sexta-feira': 'Sexta' };
+                            let nomeDiaCard = mapaDias[diaSemana];
+
+                            if (nomeDiaCard) {
+                                let card = document.querySelector(`.day-card[data-dia-nome="${nomeDiaCard}"]`);
+                                if (card) {
+                                    let tasksCont = card.querySelector('.tasks-container');
+                                    let resCont = card.querySelector('.day-resources');
+                                    let handle = `<span class="drag-handle">⠿</span>`;
+                                    let checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
+                                    let controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+
+                                    // Adiciona Atividade
+                                    let divTask = document.createElement('div');
+                                    divTask.className = 'task-box';
+                                    divTask.setAttribute('draggable', 'true');
+                                    divTask.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                                    divTask.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${atividade}</span></span>${controls}`;
+                                    tasksCont.appendChild(divTask);
+
+                                    // Adiciona Recursos se houver
+                                    if (recursos && recursos.length > 2) {
+                                        let divRes = document.createElement('div');
+                                        divRes.className = 'resource-tag';
+                                        divRes.setAttribute('draggable', 'true');
+                                        divRes.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                                        divRes.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${recursos}</span></span>${controls}`;
+                                        resCont.appendChild(divRes);
+                                    }
+                                    importados++;
+                                }
+                            }
+                        }
+                    }
+                }
+                await salvarNaNuvem();
+                alert(`✅ ${importados} itens importados com sucesso da planilha!`);
+                event.target.value = ''; // Reseta o input
+            };
+            reader.readAsText(file, 'UTF-8');
         }
 
         function exportarParaExcel() {
