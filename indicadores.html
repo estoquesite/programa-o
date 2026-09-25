@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v4.9 Memória Permanente)</title>
+    <title>Painel de Indicadores & Gráficos (v5.0 Layout Impressão A4)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -44,25 +44,56 @@
         .btn-edit-title:hover {
             opacity: 1;
         }
+
+        /* REGRAS RÍGIDAS DE ENQUADRAMENTO E IMPRESSÃO EM A4 */
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm 10mm 10mm 10mm;
+            }
             .print-hidden, .btn-edit-title {
                 display: none !important;
             }
             body {
                 background-color: #ffffff !important;
                 color: #000000 !important;
-                padding: 10px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: 11px !important;
             }
             .container {
                 max-width: 100% !important;
+                width: 100% !important;
                 margin: 0 !important;
+                padding: 0 !important;
             }
-            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56 {
+            /* Remove barras de rolagem e abre tudo */
+            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56, .max-h-40 {
                 max-height: none !important;
                 overflow: visible !important;
             }
+            /* Quebra de página controlada: Página 1 (Operação) e Página 2 (Recursos + Tabela) */
+            .pagina-a4-bloco {
+                page-break-after: always;
+                break-after: page;
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            .pagina-a4-quebra {
+                page-break-before: always;
+                break-before: page;
+            }
+            /* Redimensionamento equilibrado de gráficos para não vazar a folha */
+            .chart-wrapper {
+                height: 190px !important;
+            }
             canvas {
-                max-height: 250px !important;
+                max-height: 190px !important;
+                width: 100% !important;
+            }
+            .card-a4-impresso {
+                border: 1px solid #d1d5db !important;
+                box-shadow: none !important;
             }
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -74,290 +105,302 @@
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
 
     <div class="container space-y-5">
-        <!-- CABEÇALHO -->
-        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
-            <div class="flex items-center gap-1.5">
-                <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Central de Indicadores Operacionais</h2>
-                <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="window.print()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir Seleção</button>
-                <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
-            </div>
-        </div>
-
-        <!-- PAINEL DE CONTROLE DE FILTROS COM GAVETAS RETRÁTEIS -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+        
+        <!-- ========================================== -->
+        <!-- PÁGINA 1 NA IMPRESSÃO: VISÃO GERAL & TAREFAS -->
+        <!-- ========================================== -->
+        <div class="pagina-a4-bloco space-y-4">
             
-            <!-- LINHA 1: ESCOLHA DE ANO -->
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
-                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
-                        <button type="button" onclick="alterarAnoPasso(-1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">◀</button>
-                        <select id="selectAnoDinamico" onchange="mudarAno(this.value)" class="text-xs p-1.5 bg-transparent border-0 font-extrabold text-green-900 dark:text-green-300 cursor-pointer">
-                        </select>
-                        <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white">
-                        <button type="button" onclick="alterarAnoPasso(1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">▶</button>
-                    </div>
-                    <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Vigente</button>
-                </div>
-            </div>
-
-            <!-- LINHA 2: GAVETA RETRÁTIL DOS 12 MESES -->
-            <div class="space-y-1.5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-1.5">
-                        <span id="lbl_filtro_meses" class="text-[10px] font-bold uppercase tracking-wider text-green-800 dark:text-green-400">📅 Filtrar Meses:</span>
-                        <button type="button" onclick="editarTexto('lbl_filtro_meses')" class="btn-edit-title">✏️</button>
-                        <span id="labelContadorMeses" class="text-[10px] font-extrabold text-green-700 dark:text-green-300 uppercase ml-1">12 Meses Marcados</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="marcarTodosMeses(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold">Marcar Todos</button>
-                        <button type="button" onclick="marcarTodosMeses(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold">Desmarcar</button>
-                        <button type="button" onclick="alternarGaveta('boxContainerMesesCheck', 'btnToggleMeses')" id="btnToggleMeses" class="text-xs text-green-700 dark:text-green-400 font-bold underline ml-1">Mostrar caixas ▾</button>
-                    </div>
-                </div>
-                <div id="boxContainerMesesCheck" class="hidden p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 text-xs font-bold">
-                </div>
-            </div>
-
-            <!-- LINHA 3: GAVETA RETRÁTIL DAS 53 SEMANAS DO ANO -->
-            <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-1.5">
-                        <span id="lbl_filtro_semanas" class="text-[10px] font-bold uppercase tracking-wider text-blue-800 dark:text-blue-400">🗓️ Filtrar Semanas (1 a 53):</span>
-                        <button type="button" onclick="editarTexto('lbl_filtro_semanas')" class="btn-edit-title">✏️</button>
-                        <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 uppercase ml-1">0 Semanas Marcadas</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <button type="button" onclick="selecionarSemanasPredefinicao('ate_vigente')" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-blue-200">⚡ Até Vigente</button>
-                        <button type="button" onclick="selecionarSemanasPredefinicao('todas')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todas</button>
-                        <button type="button" onclick="selecionarSemanasPredefinicao('limpar')" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
-                        <button type="button" onclick="alternarGaveta('gridUniversalSemanas', 'btnToggleSemanas')" id="btnToggleSemanas" class="text-xs text-blue-700 dark:text-blue-400 font-bold underline ml-1">Mostrar caixas ▾</button>
-                    </div>
-                </div>
-                <div id="gridUniversalSemanas" class="hidden max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1.5 text-xs">
-                </div>
-            </div>
-
-            <!-- LINHA 4: GAVETA RETRÁTIL DE RECURSOS COM ÍCONES -->
-            <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex items-center gap-1.5">
-                        <span id="lbl_filtro_recursos" class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">🚜 Filtrar Recursos / Equipamentos:</span>
-                        <button type="button" onclick="editarTexto('lbl_filtro_recursos')" class="btn-edit-title">✏️</button>
-                        <span id="labelContadorRecursosFiltro" class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase ml-1">Todos Ativos</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="marcarTodosRecursosFiltro(true)" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todos</button>
-                        <button type="button" onclick="marcarTodosRecursosFiltro(false)" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
-                        <button type="button" onclick="alternarGaveta('containerFiltroRecursos', 'btnToggleRecursos')" id="btnToggleRecursos" class="text-xs text-emerald-700 dark:text-emerald-400 font-bold underline ml-1">Mostrar caixas ▾</button>
-                    </div>
-                </div>
-                <div id="containerFiltroRecursos" class="hidden p-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 text-xs font-bold">
-                </div>
-            </div>
-
-            <!-- LINHA 5: CANAIS DE TAREFA -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
-                    <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
-                        <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
-                        <span id="lbl_canal_total">Total Planeado</span>
-                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_total')" class="btn-edit-title">✏️</button>
-                    </label>
-                    <label class="flex items-center gap-1.5 cursor-pointer bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 px-2.5 py-1.5 rounded-xl border border-green-200 dark:border-green-900">
-                        <input type="checkbox" id="checkCanalConcluidas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-green-600 cursor-pointer">
-                        <span id="lbl_canal_realizadas">Realizadas</span>
-                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_realizadas')" class="btn-edit-title">✏️</button>
-                    </label>
-                    <label class="flex items-center gap-1.5 cursor-pointer bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-2.5 py-1.5 rounded-xl border border-red-200 dark:border-red-900">
-                        <input type="checkbox" id="checkCanalNaoRealizadas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-red-600 cursor-pointer">
-                        <span id="lbl_canal_nao_realizadas">Não Realizadas</span>
-                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_nao_realizadas')" class="btn-edit-title">✏️</button>
-                    </label>
-                    <label class="flex items-center gap-1.5 cursor-pointer bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-900">
-                        <input type="checkbox" id="checkCanalExtras" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                        <span id="lbl_canal_extras">Extras</span>
-                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_extras')" class="btn-edit-title">✏️</button>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- CARDS DE RESUMO OPERACIONAL -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <div class="flex items-center justify-center gap-1">
-                    <span id="lbl_card_total" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Itens</span>
-                    <button type="button" onclick="editarTexto('lbl_card_total')" class="btn-edit-title">✏️</button>
-                </div>
-                <h3 id="cardTotalPlaneadas" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
-                <p class="text-[10px] text-gray-500 font-semibold" id="cardSubInfoEscopo">Período Selecionado</p>
-            </div>
-            
-            <div id="cardBoxConcluidas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <div class="flex items-center justify-center gap-1">
-                    <span id="lbl_card_concluidas" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Concluídas</span>
-                    <button type="button" onclick="editarTexto('lbl_card_concluidas')" class="btn-edit-title">✏️</button>
-                </div>
-                <h3 id="cardTotalConcluidas" class="text-2xl font-black text-green-600 dark:text-green-400">0</h3>
-                <p id="cardSubTaxaConcluidas" class="text-[10px] text-green-600 font-bold">0% do total</p>
-            </div>
-
-            <div id="cardBoxNaoRealizadas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <div class="flex items-center justify-center gap-1">
-                    <span id="lbl_card_nao_realizadas" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Não Realizadas</span>
-                    <button type="button" onclick="editarTexto('lbl_card_nao_realizadas')" class="btn-edit-title">✏️</button>
-                </div>
-                <h3 id="cardTotalNaoRealizadas" class="text-2xl font-black text-red-600 dark:text-red-400">0</h3>
-                <p id="cardSubTaxaNaoRealizadas" class="text-[10px] text-red-600 font-bold">0% pendente</p>
-            </div>
-
-            <div id="cardBoxExtras" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <div class="flex items-center justify-center gap-1">
-                    <span id="lbl_card_extras" class="text-[10px] font-bold uppercase text-amber-500 tracking-wider">Demandas Extras</span>
-                    <button type="button" onclick="editarTexto('lbl_card_extras')" class="btn-edit-title">✏️</button>
-                </div>
-                <h3 id="cardTotalExtras" class="text-2xl font-black text-amber-600 dark:text-amber-400">0</h3>
-                <p id="cardSubTaxaExtras" class="text-[10px] text-amber-600 font-bold">0% do volume</p>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1">
-                <div class="flex items-center justify-center gap-1">
-                    <span id="lbl_card_aproveitamento" class="text-[10px] font-bold uppercase text-purple-500 tracking-wider">Aproveitamento</span>
-                    <button type="button" onclick="editarTexto('lbl_card_aproveitamento')" class="btn-edit-title">✏️</button>
-                </div>
-                <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
-                <p class="text-[10px] text-gray-500 font-semibold" id="cardSubLabelAno">Ano 2026</p>
-            </div>
-        </div>
-
-        <!-- BLOCO DE RECURSOS -->
-        <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-4">
-            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
+            <!-- CABEÇALHO -->
+            <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 card-a4-impresso">
+                <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
                 <div class="flex items-center gap-1.5">
-                    <h3 id="lbl_titulo_bloco_recursos" class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300">
-                        🚜 Painel de Recursos & Equipamentos
-                    </h3>
-                    <button type="button" onclick="editarTexto('lbl_titulo_bloco_recursos')" class="btn-edit-title">✏️</button>
+                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Indicadores Operacionais</h2>
+                    <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
                 </div>
-                <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-1 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <div class="flex items-center gap-1">
-                        <span id="lbl_card_rec_total" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total de Recursos Utilizados</span>
-                        <button type="button" onclick="editarTexto('lbl_card_rec_total')" class="btn-edit-title">✏️</button>
-                    </div>
-                    <h4 id="cardRecursoTotal" class="text-2xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
-                    <p id="cardRecursoTotalSub" class="text-[10px] text-gray-500 font-semibold">Caixinhas marcadas</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <div class="flex items-center gap-1">
-                        <span id="lbl_card_rec_mais" class="text-[10px] font-bold uppercase text-green-600 tracking-wider">Recurso Mais Utilizado</span>
-                        <button type="button" onclick="editarTexto('lbl_card_rec_mais')" class="btn-edit-title">✏️</button>
-                    </div>
-                    <h4 id="cardRecursoMaisNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                    <p id="cardRecursoMaisQtd" class="text-[10px] text-green-700 font-bold">0 utilizações (0%)</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <div class="flex items-center gap-1">
-                        <span id="lbl_card_rec_menos" class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Recurso Menos Utilizado</span>
-                        <button type="button" onclick="editarTexto('lbl_card_rec_menos')" class="btn-edit-title">✏️</button>
-                    </div>
-                    <h4 id="cardRecursoMenosNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                    <p id="cardRecursoMenosQtd" class="text-[10px] text-amber-700 font-bold">0 utilizações</p>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir em A4</button>
+                    <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                    <div class="flex items-center gap-1 mb-2">
-                        <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Gráfico de Recursos</h4>
-                        <button type="button" onclick="editarTexto('lbl_grafico_rec')" class="btn-edit-title">✏️</button>
-                    </div>
-                    <div class="relative h-60 w-full flex items-center justify-center">
-                        <canvas id="graficoRecursosCanvas"></canvas>
-                        <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado nas semanas selecionadas.</p>
+            <!-- PAINEL DE CONTROLE DE FILTROS COM GAVETAS (OCULTADO NA IMPRESSÃO) -->
+            <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+                <!-- LINHA 1: ESCOLHA DE ANO -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
+                        <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
+                            <button type="button" onclick="alterarAnoPasso(-1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">◀</button>
+                            <select id="selectAnoDinamico" onchange="mudarAno(this.value)" class="text-xs p-1.5 bg-transparent border-0 font-extrabold text-green-900 dark:text-green-300 cursor-pointer">
+                            </select>
+                            <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white">
+                            <button type="button" onclick="alterarAnoPasso(1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">▶</button>
+                        </div>
+                        <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Vigente</button>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2">
-                    <div class="flex items-center gap-1">
-                        <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela de Recursos</h4>
-                        <button type="button" onclick="editarTexto('lbl_tabela_rec')" class="btn-edit-title">✏️</button>
+                <!-- LINHA 2: GAVETA RETRÁTIL DOS 12 MESES -->
+                <div class="space-y-1.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span id="lbl_filtro_meses" class="text-[10px] font-bold uppercase tracking-wider text-green-800 dark:text-green-400">📅 Filtrar Meses:</span>
+                            <button type="button" onclick="editarTexto('lbl_filtro_meses')" class="btn-edit-title">✏️</button>
+                            <span id="labelContadorMeses" class="text-[10px] font-extrabold text-green-700 dark:text-green-300 uppercase ml-1">12 Meses Marcados</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="marcarTodosMeses(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold">Marcar Todos</button>
+                            <button type="button" onclick="marcarTodosMeses(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold">Desmarcar</button>
+                            <button type="button" onclick="alternarGaveta('boxContainerMesesCheck', 'btnToggleMeses')" id="btnToggleMeses" class="text-xs text-green-700 dark:text-green-400 font-bold underline ml-1">Mostrar caixas ▾</button>
+                        </div>
                     </div>
-                    <div class="overflow-x-auto max-h-56 overflow-y-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
-                                    <th class="py-2 px-3">Recurso / Equipamento</th>
-                                    <th class="py-2 px-3 text-center">Vezes Marcado</th>
-                                    <th class="py-2 px-3 text-right">% do Uso</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaRecursosCorpo">
-                            </tbody>
-                        </table>
+                    <div id="boxContainerMesesCheck" class="hidden p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 text-xs font-bold">
+                    </div>
+                </div>
+
+                <!-- LINHA 3: GAVETA RETRÁTIL DAS 53 SEMANAS DO ANO -->
+                <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span id="lbl_filtro_semanas" class="text-[10px] font-bold uppercase tracking-wider text-blue-800 dark:text-blue-400">🗓️ Filtrar Semanas (1 a 53):</span>
+                            <button type="button" onclick="editarTexto('lbl_filtro_semanas')" class="btn-edit-title">✏️</button>
+                            <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 uppercase ml-1">0 Semanas Marcadas</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <button type="button" onclick="selecionarSemanasPredefinicao('ate_vigente')" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-blue-200">⚡ Até Vigente</button>
+                            <button type="button" onclick="selecionarSemanasPredefinicao('todas')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todas</button>
+                            <button type="button" onclick="selecionarSemanasPredefinicao('limpar')" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
+                            <button type="button" onclick="alternarGaveta('gridUniversalSemanas', 'btnToggleSemanas')" id="btnToggleSemanas" class="text-xs text-blue-700 dark:text-blue-400 font-bold underline ml-1">Mostrar caixas ▾</button>
+                        </div>
+                    </div>
+                    <div id="gridUniversalSemanas" class="hidden max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1.5 text-xs">
+                    </div>
+                </div>
+
+                <!-- LINHA 4: GAVETA RETRÁTIL DE RECURSOS -->
+                <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span id="lbl_filtro_recursos" class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">🚜 Filtrar Recursos / Equipamentos:</span>
+                            <button type="button" onclick="editarTexto('lbl_filtro_recursos')" class="btn-edit-title">✏️</button>
+                            <span id="labelContadorRecursosFiltro" class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 uppercase ml-1">Todos Ativos</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="marcarTodosRecursosFiltro(true)" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todos</button>
+                            <button type="button" onclick="marcarTodosRecursosFiltro(false)" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
+                            <button type="button" onclick="alternarGaveta('containerFiltroRecursos', 'btnToggleRecursos')" id="btnToggleRecursos" class="text-xs text-emerald-700 dark:text-emerald-400 font-bold underline ml-1">Mostrar caixas ▾</button>
+                        </div>
+                    </div>
+                    <div id="containerFiltroRecursos" class="hidden p-2.5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 text-xs font-bold">
+                    </div>
+                </div>
+
+                <!-- LINHA 5: CANAIS DE TAREFA -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
+                            <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
+                            <span id="lbl_canal_total">Total Planeado</span>
+                            <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_total')" class="btn-edit-title">✏️</button>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 px-2.5 py-1.5 rounded-xl border border-green-200 dark:border-green-900">
+                            <input type="checkbox" id="checkCanalConcluidas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-green-600 cursor-pointer">
+                            <span id="lbl_canal_realizadas">Realizadas</span>
+                            <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_realizadas')" class="btn-edit-title">✏️</button>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-2.5 py-1.5 rounded-xl border border-red-200 dark:border-red-900">
+                            <input type="checkbox" id="checkCanalNaoRealizadas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-red-600 cursor-pointer">
+                            <span id="lbl_canal_nao_realizadas">Não Realizadas</span>
+                            <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_nao_realizadas')" class="btn-edit-title">✏️</button>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-900">
+                            <input type="checkbox" id="checkCanalExtras" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-amber-500 cursor-pointer">
+                            <span id="lbl_canal_extras">Extras</span>
+                            <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_extras')" class="btn-edit-title">✏️</button>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS DE RESUMO OPERACIONAL (PÁGINA 1) -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
+                    <div class="flex items-center justify-center gap-1">
+                        <span id="lbl_card_total" class="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Total Itens</span>
+                        <button type="button" onclick="editarTexto('lbl_card_total')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <h3 id="cardTotalPlaneadas" class="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
+                    <p class="text-[9px] text-gray-500 font-semibold" id="cardSubInfoEscopo">Período Selecionado</p>
+                </div>
+                
+                <div id="cardBoxConcluidas" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
+                    <div class="flex items-center justify-center gap-1">
+                        <span id="lbl_card_concluidas" class="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Concluídas</span>
+                        <button type="button" onclick="editarTexto('lbl_card_concluidas')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <h3 id="cardTotalConcluidas" class="text-xl sm:text-2xl font-black text-green-600 dark:text-green-400">0</h3>
+                    <p id="cardSubTaxaConcluidas" class="text-[9px] text-green-600 font-bold">0% do total</p>
+                </div>
+
+                <div id="cardBoxNaoRealizadas" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
+                    <div class="flex items-center justify-center gap-1">
+                        <span id="lbl_card_nao_realizadas" class="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Não Realizadas</span>
+                        <button type="button" onclick="editarTexto('lbl_card_nao_realizadas')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <h3 id="cardTotalNaoRealizadas" class="text-xl sm:text-2xl font-black text-red-600 dark:text-red-400">0</h3>
+                    <p id="cardSubTaxaNaoRealizadas" class="text-[9px] text-red-600 font-bold">0% pendente</p>
+                </div>
+
+                <div id="cardBoxExtras" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
+                    <div class="flex items-center justify-center gap-1">
+                        <span id="lbl_card_extras" class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Demandas Extras</span>
+                        <button type="button" onclick="editarTexto('lbl_card_extras')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <h3 id="cardTotalExtras" class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">0</h3>
+                    <p id="cardSubTaxaExtras" class="text-[9px] text-amber-600 font-bold">0% do volume</p>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1 card-a4-impresso">
+                    <div class="flex items-center justify-center gap-1">
+                        <span id="lbl_card_aproveitamento" class="text-[10px] font-bold uppercase text-purple-600 tracking-wider">Aproveitamento</span>
+                        <button type="button" onclick="editarTexto('lbl_card_aproveitamento')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <h3 id="cardTaxaExecucao" class="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
+                    <p class="text-[9px] text-gray-500 font-semibold" id="cardSubLabelAno">Ano 2026</p>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) (PÁGINA 1) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                    <div class="flex items-center gap-1 mb-1">
+                        <h3 id="lbl_grafico_mensal" class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho)</h3>
+                        <button type="button" onclick="editarTexto('lbl_grafico_mensal')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <div class="relative chart-wrapper h-56 w-full">
+                        <canvas id="graficoAnualCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                    <div class="flex items-center gap-1 mb-1">
+                        <h3 id="lbl_grafico_semanal" class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Gráfico Semanal</h3>
+                        <button type="button" onclick="editarTexto('lbl_grafico_semanal')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <div class="relative chart-wrapper h-56 w-full">
+                        <canvas id="graficoSemanalCanvas"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                <div class="flex items-center gap-1 mb-2">
-                    <h3 id="lbl_grafico_mensal" class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho)</h3>
-                    <button type="button" onclick="editarTexto('lbl_grafico_mensal')" class="btn-edit-title">✏️</button>
+        <!-- ============================================================== -->
+        <!-- PÁGINA 2 NA IMPRESSÃO: RECURSOS & TABELA DETALHADA DAS SEMANAS -->
+        <!-- ============================================================== -->
+        <div class="pagina-a4-quebra space-y-4 pt-2">
+            
+            <!-- BLOCO DE RECURSOS (PÁGINA 2) -->
+            <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-3 card-a4-impresso">
+                <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
+                    <div class="flex items-center gap-1.5">
+                        <h3 id="lbl_titulo_bloco_recursos" class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300">
+                            🚜 Painel de Recursos & Equipamentos
+                        </h3>
+                        <button type="button" onclick="editarTexto('lbl_titulo_bloco_recursos')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2 py-0.5 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
                 </div>
-                <div class="relative h-64 w-full">
-                    <canvas id="graficoAnualCanvas"></canvas>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_rec_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Total de Recursos Utilizados</span>
+                            <button type="button" onclick="editarTexto('lbl_card_rec_total')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardRecursoTotal" class="text-xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
+                        <p id="cardRecursoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_rec_mais" class="text-[9px] font-bold uppercase text-green-700 tracking-wider">Recurso Mais Utilizado</span>
+                            <button type="button" onclick="editarTexto('lbl_card_rec_mais')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardRecursoMaisNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardRecursoMaisQtd" class="text-[9px] text-green-700 font-bold">0 utilizações (0%)</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_rec_menos" class="text-[9px] font-bold uppercase text-amber-700 tracking-wider">Recurso Menos Utilizado</span>
+                            <button type="button" onclick="editarTexto('lbl_card_rec_menos')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardRecursoMenosNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardRecursoMenosQtd" class="text-[9px] text-amber-700 font-bold">0 utilizações</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                        <div class="flex items-center gap-1 mb-1">
+                            <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Gráfico de Recursos</h4>
+                            <button type="button" onclick="editarTexto('lbl_grafico_rec')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <div class="relative chart-wrapper h-48 w-full flex items-center justify-center">
+                            <canvas id="graficoRecursosCanvas"></canvas>
+                            <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado nas semanas selecionadas.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-1.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela de Recursos</h4>
+                            <button type="button" onclick="editarTexto('lbl_tabela_rec')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
+                                        <th class="py-1.5 px-2">Recurso / Equipamento</th>
+                                        <th class="py-1.5 px-2 text-center">Vezes</th>
+                                        <th class="py-1.5 px-2 text-right">% Uso</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaRecursosCorpo">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                <div class="flex items-center gap-1 mb-2">
-                    <h3 id="lbl_grafico_semanal" class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Gráfico Semanal</h3>
-                    <button type="button" onclick="editarTexto('lbl_grafico_semanal')" class="btn-edit-title">✏️</button>
+            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS (PÁGINA 2) -->
+            <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-1">
+                        <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento das Semanas Selecionadas</h3>
+                        <button type="button" onclick="editarTexto('lbl_tabela_semanas')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <span class="text-[10px] text-gray-400 print-hidden">Exibindo apenas as semanas ativas marcadas no filtro superior.</span>
                 </div>
-                <div class="relative h-64 w-full">
-                    <canvas id="graficoSemanalCanvas"></canvas>
+                <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
+                                <th class="py-2 px-2.5">Semana</th>
+                                <th class="py-2 px-2.5 col-total">Total</th>
+                                <th class="py-2 px-2.5 text-green-600 col-concluidas">Feitas</th>
+                                <th class="py-2 px-2.5 text-red-600 col-naorealizadas">Não Feitas</th>
+                                <th class="py-2 px-2.5 text-amber-600 col-extras">Extras</th>
+                                <th class="py-2 px-2.5 text-emerald-700">Recursos</th>
+                                <th class="py-2 px-2.5">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaIndicadoresCorpo">
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
-
-        <!-- TABELA FILTRADA APENAS COM AS SEMANAS SELECIONADAS -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-1">
-                    <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento das Semanas Selecionadas</h3>
-                    <button type="button" onclick="editarTexto('lbl_tabela_semanas')" class="btn-edit-title">✏️</button>
-                </div>
-                <span class="text-[11px] text-gray-400">Exibindo apenas as semanas ativas marcadas no filtro superior.</span>
-            </div>
-            <div class="overflow-x-auto max-h-96 overflow-y-auto">
-                <table class="w-full text-left text-xs">
-                    <thead>
-                        <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Semana</th>
-                            <th class="py-2.5 px-3 col-total">Total Itens</th>
-                            <th class="py-2.5 px-3 text-green-600 col-concluidas">Concluídas</th>
-                            <th class="py-2.5 px-3 text-red-600 col-naorealizadas">Não Realizadas</th>
-                            <th class="py-2.5 px-3 text-amber-600 col-extras">Extras (OK / Total)</th>
-                            <th class="py-2.5 px-3 text-emerald-700">Recursos Marcados</th>
-                            <th class="py-2.5 px-3">Status de Execução</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaIndicadoresCorpo">
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -717,7 +760,6 @@
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
 
-            // Apenas semanas marcadas no filtro superior serão processadas
             let semanasOrdenadas = Array.from(semanasSelecionadasSet).sort((a,b) => a - b);
 
             semanasOrdenadas.forEach(numSemana => {
@@ -726,7 +768,6 @@
                 let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                 let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
 
-                // Só considera ativa se o mês correspondente estiver marcado
                 if (!mesesSelecionados.has(mesIdx)) return;
 
                 let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0;
@@ -756,7 +797,7 @@
                             let check = tag.querySelector('input[type="checkbox"]');
                             let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
-                            // Se marcado, computa no ranking de recursos
+                            // Se marcado, soma imediatamente
                             if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
                                 totalRecursosUtilizadosGeral++;
@@ -877,13 +918,13 @@
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-emerald-50/40 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-2 px-3 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
                             <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
-                            <span class="text-base">${icone}</span>
+                            <span class="text-sm">${icone}</span>
                             <span>${r.nome}</span>
                         </td>
-                        <td class="py-2 px-3 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
-                        <td class="py-2 px-3 text-right">
+                        <td class="py-1.5 px-2 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
+                        <td class="py-1.5 px-2 text-right">
                             <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">${perc}%</span>
                         </td>
                     `;
@@ -921,8 +962,8 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } },
-                        y: { ticks: { font: { size: 10, weight: 'bold' } } }
+                        x: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } },
+                        y: { ticks: { font: { size: 9, weight: 'bold' } } }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -950,9 +991,8 @@
             const tbody = document.getElementById('tabelaIndicadoresCorpo');
             tbody.innerHTML = '';
 
-            // Exibe exclusivamente as semanas selecionadas
             if (cacheDadosProcessados.semanasLista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-gray-400 italic">Nenhuma semana selecionada no filtro. Marque as semanas desejadas acima.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-400 italic">Nenhuma semana selecionada no filtro. Marque as semanas desejadas acima.</td></tr>`;
             } else {
                 cacheDadosProcessados.semanasLista.forEach(s => {
                     let percentualExec = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
@@ -961,22 +1001,22 @@
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">
+                        <td class="py-2 px-2.5 font-bold text-gray-800 dark:text-gray-200">
                             <label class="flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" checked onchange="alternarSemanaManual(${s.numSemana}, false)" class="w-3.5 h-3.5 accent-blue-600 cursor-pointer" title="Desmarcar esta semana">
+                                <input type="checkbox" checked onchange="alternarSemanaManual(${s.numSemana}, false)" class="w-3.5 h-3.5 accent-blue-600 cursor-pointer print-hidden" title="Desmarcar esta semana">
                                 <span>Semana ${String(s.numSemana).padStart(2,'0')}</span>
                                 ${!s.temDadosSalvos ? '<span class="text-[9px] text-gray-400 font-normal">(Sem Registos)</span>' : ''}
                                 ${s.ehFuturoReal ? '<span class="text-[9px] text-blue-500 font-normal">(Programada)</span>' : ''}
                             </label>
                         </td>
-                        <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
-                        <td class="py-2.5 px-3 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
-                        <td class="py-2.5 px-3 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
-                        <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400 col-extras" style="${mostrarExtras ? '' : 'display:none;'}">⚡ ${s.extrasConcluidas} / ${s.extrasCount}</td>
-                        <td class="py-2.5 px-3 font-extrabold text-emerald-800 dark:text-emerald-400">🚙 ${s.recursosCount}</td>
-                        <td class="py-2.5 px-3">
+                        <td class="py-2 px-2.5 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
+                        <td class="py-2 px-2.5 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
+                        <td class="py-2 px-2.5 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
+                        <td class="py-2 px-2.5 font-semibold text-amber-600 dark:text-amber-400 col-extras" style="${mostrarExtras ? '' : 'display:none;'}">⚡ ${s.extrasConcluidas} / ${s.extrasCount}</td>
+                        <td class="py-2 px-2.5 font-extrabold text-emerald-800 dark:text-emerald-400">🚙 ${s.recursosCount}</td>
+                        <td class="py-2 px-2.5">
                             <div class="flex items-center gap-2">
-                                <div class="w-20 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
+                                <div class="w-16 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
                                     <div class="bg-green-600 h-2" style="width: ${percentualExec}%" title="${percentualExec}% Concluído"></div>
                                     <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Pendente"></div>
                                 </div>
@@ -1003,10 +1043,10 @@
                     data: meses.map(m => m.planeadas > 0 ? Math.round((m.concluidas / m.planeadas) * 100) : 0),
                     borderColor: '#16a34a',
                     backgroundColor: 'rgba(22, 163, 74, 0.08)',
-                    borderWidth: 2.2,
+                    borderWidth: 2,
                     fill: true,
                     tension: 0.35,
-                    pointRadius: 3,
+                    pointRadius: 2.5,
                     pointBackgroundColor: '#15803d'
                 });
             }
@@ -1017,25 +1057,25 @@
                     data: meses.map(m => m.planeadas > 0 ? Math.round((m.naoRealizadas / m.planeadas) * 100) : 0),
                     borderColor: '#dc2626',
                     backgroundColor: 'rgba(220, 38, 38, 0.05)',
-                    borderWidth: 2,
+                    borderWidth: 1.8,
                     borderDash: [4, 4],
                     fill: true,
                     tension: 0.35,
-                    pointRadius: 3,
+                    pointRadius: 2.5,
                     pointBackgroundColor: '#b91c1c'
                 });
             }
 
             if (mostrarExtras) {
                 datasetsAnual.push({
-                    label: 'Demandas Extras (%)',
+                    label: 'Extras (%)',
                     data: meses.map(m => m.planeadas > 0 ? Math.round((m.extras / m.planeadas) * 100) : 0),
                     borderColor: '#f59e0b',
                     backgroundColor: 'rgba(245, 158, 11, 0.05)',
-                    borderWidth: 2,
+                    borderWidth: 1.8,
                     fill: false,
                     tension: 0.35,
-                    pointRadius: 3,
+                    pointRadius: 2.5,
                     pointBackgroundColor: '#d97706'
                 });
             }
@@ -1045,7 +1085,7 @@
                     label: 'Meta Planeada (100%)',
                     data: Array(12).fill(100),
                     borderColor: '#3b82f6',
-                    borderWidth: 1.5,
+                    borderWidth: 1.2,
                     borderDash: [6, 6],
                     fill: false,
                     pointRadius: 0
@@ -1066,17 +1106,17 @@
                             beginAtZero: true,
                             max: 100,
                             ticks: { 
-                                font: { size: 10 },
+                                font: { size: 9 },
                                 callback: function(val) { return val + '%'; }
                             }
                         },
-                        x: { ticks: { font: { size: 10 } } }
+                        x: { ticks: { font: { size: 9 } } }
                     },
                     plugins: { 
                         legend: { 
                             display: datasetsAnual.length > 0,
                             position: 'top',
-                            labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
+                            labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } }
                         } 
                     }
                 }
@@ -1090,7 +1130,7 @@
                     label: 'Total Planeado',
                     data: semanasAtivas.map(s => s.planeadas),
                     backgroundColor: '#93c5fd',
-                    borderRadius: 4
+                    borderRadius: 3
                 });
             }
 
@@ -1099,7 +1139,7 @@
                     label: 'Concluídas',
                     data: semanasAtivas.map(s => s.executadas),
                     backgroundColor: '#22c55e',
-                    borderRadius: 4
+                    borderRadius: 3
                 });
             }
 
@@ -1108,7 +1148,7 @@
                     label: 'Não Realizadas',
                     data: semanasAtivas.map(s => s.naoRealizadas),
                     backgroundColor: '#ef4444',
-                    borderRadius: 4
+                    borderRadius: 3
                 });
             }
 
@@ -1117,7 +1157,7 @@
                     label: 'Extras',
                     data: semanasAtivas.map(s => s.extrasCount),
                     backgroundColor: '#f59e0b',
-                    borderRadius: 4
+                    borderRadius: 3
                 });
             }
 
@@ -1131,14 +1171,14 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { stacked: false, ticks: { font: { size: 10 } } },
-                        y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 } }
+                        x: { stacked: false, ticks: { font: { size: 9 } } },
+                        y: { beginAtZero: true, ticks: { font: { size: 9 }, precision: 0 } }
                     },
                     plugins: { 
                         legend: { 
                             display: datasetsSemanal.length > 0,
                             position: 'top',
-                            labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } }
+                            labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } }
                         } 
                     }
                 }
