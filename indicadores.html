@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v4.5 Personalizável)</title>
+    <title>Painel de Indicadores & Gráficos (v4.6 Gavetas Retráteis)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -78,7 +78,7 @@
         <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
             <div class="flex items-center gap-1.5">
-                <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores</h2>
+                <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Central de Indicadores Operacionais</h2>
                 <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
             </div>
             <div class="flex items-center gap-2">
@@ -87,42 +87,64 @@
             </div>
         </div>
 
-        <!-- PAINEL DE CONTROLE DE FILTROS -->
+        <!-- PAINEL DE CONTROLE DE FILTROS COM GAVETAS RETRÁTEIS -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
             
-            <!-- LINHA 1: ESCOLHA DE ANO -->
+            <!-- LINHA 1: ESCOLHA LIVRE DE ANO -->
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
                     <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
                         <button type="button" onclick="alterarAnoPasso(-1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">◀</button>
-                        <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-20 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white">
+                        <select id="selectAnoDinamico" onchange="mudarAno(this.value)" class="text-xs p-1.5 bg-transparent border-0 font-extrabold text-green-900 dark:text-green-300 cursor-pointer">
+                        </select>
+                        <input type="number" id="inputAnoIndicador" value="2026" min="2020" max="2099" onchange="mudarAno(this.value)" class="w-16 text-xs p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md font-bold text-center dark:text-white">
                         <button type="button" onclick="alterarAnoPasso(1)" class="px-2 py-1 bg-white dark:bg-gray-800 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">▶</button>
                     </div>
                     <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Vigente</button>
                 </div>
-
-                <div class="flex items-center gap-1.5 flex-wrap">
-                    <button type="button" onclick="selecionarSemanasPredefinicao('ate_vigente')" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded-lg text-[10px] font-bold hover:bg-blue-200">⚡ Até Vigente</button>
-                    <button type="button" onclick="selecionarSemanasPredefinicao('todas')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2.5 py-1 rounded-lg text-[10px] font-bold hover:bg-emerald-100">Ano Todo (1 a 53)</button>
-                    <button type="button" onclick="selecionarSemanasPredefinicao('limpar')" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded-lg text-[10px] font-bold hover:bg-gray-200">Limpar</button>
-                </div>
             </div>
 
-            <!-- LINHA 2: CAIXINHAS DAS 53 SEMANAS -->
+            <!-- LINHA 2: GAVETA RETRÁTIL DOS 12 MESES -->
             <div class="space-y-1.5">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-1">
-                        <span id="lbl_filtro_semanas" class="text-[10px] font-bold uppercase tracking-wider text-blue-800 dark:text-blue-400">Filtro de Semanas do Ano:</span>
-                        <button type="button" onclick="editarTexto('lbl_filtro_semanas')" class="btn-edit-title" title="Editar nome">✏️</button>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <span id="lbl_filtro_meses" class="text-[10px] font-bold uppercase tracking-wider text-green-800 dark:text-green-400">📅 Filtrar Meses:</span>
+                        <button type="button" onclick="editarTexto('lbl_filtro_meses')" class="btn-edit-title">✏️</button>
+                        <span id="labelContadorMeses" class="text-[10px] font-extrabold text-green-700 dark:text-green-300 uppercase ml-1">12 Meses Marcados</span>
                     </div>
-                    <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 uppercase">0 Semanas Marcadas</span>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="marcarTodosMeses(true)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold">Marcar Todos</button>
+                        <button type="button" onclick="marcarTodosMeses(false)" class="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold">Desmarcar</button>
+                        <button type="button" onclick="alternarGaveta('boxContainerMesesCheck', 'btnToggleMeses')" id="btnToggleMeses" class="text-xs text-green-700 dark:text-green-400 font-bold underline ml-1">Mostrar caixas ▾</button>
+                    </div>
                 </div>
-                <div id="gridUniversalSemanas" class="max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1.5 text-xs">
+                <!-- CAIXA ESCONDIDA DOS MESES -->
+                <div id="boxContainerMesesCheck" class="hidden p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 text-xs font-bold">
                 </div>
             </div>
 
-            <!-- LINHA 3: FILTROS DE VISUALIZAÇÃO DE CANAIS -->
+            <!-- LINHA 3: GAVETA RETRÁTIL DAS 53 SEMANAS DO ANO -->
+            <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <span id="lbl_filtro_semanas" class="text-[10px] font-bold uppercase tracking-wider text-blue-800 dark:text-blue-400">🗓️ Filtrar Semanas (1 a 53):</span>
+                        <button type="button" onclick="editarTexto('lbl_filtro_semanas')" class="btn-edit-title">✏️</button>
+                        <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 uppercase ml-1">0 Semanas Marcadas</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button type="button" onclick="selecionarSemanasPredefinicao('ate_vigente')" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-blue-200">⚡ Até Vigente</button>
+                        <button type="button" onclick="selecionarSemanasPredefinicao('todas')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todas</button>
+                        <button type="button" onclick="selecionarSemanasPredefinicao('limpar')" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
+                        <button type="button" onclick="alternarGaveta('gridUniversalSemanas', 'btnToggleSemanas')" id="btnToggleSemanas" class="text-xs text-blue-700 dark:text-blue-400 font-bold underline ml-1">Mostrar caixas ▾</button>
+                    </div>
+                </div>
+                <!-- CAIXA ESCONDIDA DAS 53 SEMANAS -->
+                <div id="gridUniversalSemanas" class="hidden max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1.5 text-xs">
+                </div>
+            </div>
+
+            <!-- LINHA 4: CANAIS DE TAREFA (TOTAL, FEITAS, PENDENTES, EXTRAS) -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -209,7 +231,6 @@
                 <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-1 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
             </div>
 
-            <!-- CARDS DE RECURSOS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
                     <div class="flex items-center gap-1">
@@ -239,7 +260,6 @@
                 </div>
             </div>
 
-            <!-- GRÁFICO E TABELA DE RECURSOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
                     <div class="flex items-center gap-1 mb-2">
@@ -342,9 +362,24 @@
         let graficoRecursosInstance = null;
         let cacheDadosProcessados = null;
 
+        let mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
         let semanasSelecionadasSet = new Set();
 
-        // FUNÇÃO DE EDIÇÃO COM LÁPIS
+        // CONTROLE DE ABRIR/FECHAR GAVETAS (SANFONAS)
+        function alternarGaveta(containerId, botaoId) {
+            const box = document.getElementById(containerId);
+            const btn = document.getElementById(botaoId);
+            if (!box || !btn) return;
+
+            if (box.classList.contains('hidden')) {
+                box.classList.remove('hidden');
+                btn.innerText = "Ocultar caixas ▴";
+            } else {
+                box.classList.add('hidden');
+                btn.innerText = "Mostrar caixas ▾";
+            }
+        }
+
         function editarTexto(elementoId) {
             const el = document.getElementById(elementoId);
             if (!el) return;
@@ -388,6 +423,46 @@
             return d.getMonth();
         }
 
+        // MONTA OS 12 MESES
+        function renderizarCheckboxesMeses() {
+            const cont = document.getElementById('boxContainerMesesCheck');
+            cont.innerHTML = '';
+            nomesMesesCurtos.forEach((m, idx) => {
+                const label = document.createElement('label');
+                const isChecked = mesesSelecionados.has(idx);
+                label.className = `flex items-center gap-1.5 p-1.5 rounded-lg border cursor-pointer transition text-center justify-center ${isChecked ? 'bg-green-50 border-green-300 text-green-900 dark:bg-green-950/40 dark:border-green-800 dark:text-green-300' : 'bg-white border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700'}`;
+                label.innerHTML = `
+                    <input type="checkbox" value="${idx}" ${isChecked ? 'checked' : ''} onchange="alternarMesIndividual(${idx}, this.checked)" class="w-3.5 h-3.5 accent-green-600 cursor-pointer">
+                    <span class="text-[11px] font-bold">${m}</span>
+                `;
+                cont.appendChild(label);
+            });
+            atualizarLabelMeses();
+        }
+
+        function alternarMesIndividual(idx, marcar) {
+            if (marcar) mesesSelecionados.add(idx);
+            else mesesSelecionados.delete(idx);
+            renderizarCheckboxesMeses();
+            carregarIndicadores();
+        }
+
+        function marcarTodosMeses(marcar) {
+            if (marcar) mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+            else mesesSelecionados.clear();
+            renderizarCheckboxesMeses();
+            carregarIndicadores();
+        }
+
+        function atualizarLabelMeses() {
+            const qtd = mesesSelecionados.size;
+            const el = document.getElementById('labelContadorMeses');
+            if (qtd === 12) el.innerText = "Todos os 12 Meses";
+            else if (qtd === 0) el.innerText = "Nenhum Mês Marcado";
+            else el.innerText = `${qtd} Mês(es) Marcado(s)`;
+        }
+
+        // MONTA AS 53 SEMANAS
         function renderizarGridUniversalSemanas() {
             const cont = document.getElementById('gridUniversalSemanas');
             cont.innerHTML = '';
@@ -449,6 +524,34 @@
             carregarIndicadores();
         }
 
+        function popularSelectAnos(anoAtualSelecionado) {
+            const select = document.getElementById('selectAnoDinamico');
+            select.innerHTML = '';
+            
+            let anosDetectados = new Set();
+            const semanas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
+            
+            Object.keys(semanas).forEach(k => {
+                let m = k.match(/prog_grid_(\d{4})_/);
+                if (m && m[1]) anosDetectados.add(parseInt(m[1]));
+            });
+
+            anosDetectados.add(2025);
+            anosDetectados.add(2026);
+            anosDetectados.add(2027);
+            anosDetectados.add(2028);
+            if (anoAtualSelecionado) anosDetectados.add(parseInt(anoAtualSelecionado));
+
+            let anosOrdenados = Array.from(anosDetectados).sort((a,b) => a - b);
+            anosOrdenados.forEach(a => {
+                let opt = document.createElement('option');
+                opt.value = a;
+                opt.innerText = `Ano ${a}`;
+                if (a === parseInt(anoAtualSelecionado)) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
         function alterarAnoPasso(delta) {
             let anoAtual = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             mudarAno(anoAtual + delta);
@@ -458,12 +561,14 @@
             ano = parseInt(ano);
             if (!ano || isNaN(ano)) ano = 2026;
             document.getElementById('inputAnoIndicador').value = ano;
+            popularSelectAnos(ano);
             document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
             selecionarSemanasPredefinicao('ate_vigente');
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
             carregarTextosCustomizados();
+            renderizarCheckboxesMeses();
             selecionarSemanasPredefinicao('ate_vigente');
             await carregarIndicadoresDaNuvem();
         });
@@ -482,6 +587,7 @@
             } catch (e) {
                 console.error("Erro ao buscar dados:", e);
             }
+            popularSelectAnos(document.getElementById('inputAnoIndicador').value);
             carregarIndicadores();
         }
 
@@ -517,7 +623,8 @@
                 let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                 let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
 
-                let estaSelecionada = semanasSelecionadasSet.has(numSemana);
+                // Só considera ativa se a semana E o mês estiverem selecionados
+                let estaAtiva = semanasSelecionadasSet.has(numSemana) && mesesSelecionados.has(mesIdx);
 
                 let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0;
 
@@ -544,7 +651,7 @@
                             let check = tag.querySelector('input[type="checkbox"]');
                             let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
-                            if (estaConcluido && !ehFuturoReal && estaSelecionada) {
+                            if (estaConcluido && !ehFuturoReal && estaAtiva) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
                                 totalRecursosUtilizadosGeral++;
                                 recursosNestaSemanaFeitos++;
@@ -558,7 +665,7 @@
                     extrasCount = tarefasExtras.length;
                 }
 
-                if (estaSelecionada) {
+                if (estaAtiva) {
                     totalPlaneadasAno += planeadas;
                     totalConcluidasAno += executadas;
                     totalNaoRealizadasAno += naoRealizadas;
@@ -581,11 +688,12 @@
                     recursosCount: recursosNestaSemanaFeitos,
                     temDadosSalvos: !!htmlCard,
                     ehFuturoReal,
-                    ativa: estaSelecionada
+                    ativa: estaAtiva
                 });
             }
 
-            document.getElementById('cardSubInfoEscopo').innerText = `${semanasSelecionadasSet.size} Semanas Analisadas`;
+            let semanasAtivasQtd = semanasLista.filter(s => s.ativa).length;
+            document.getElementById('cardSubInfoEscopo').innerText = `${semanasAtivasQtd} Semanas Analisadas`;
 
             document.getElementById('cardTotalPlaneadas').innerText = totalPlaneadasAno;
             document.getElementById('cardTotalConcluidas').innerText = totalConcluidasAno;
@@ -709,7 +817,9 @@
                         x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } },
                         y: { ticks: { font: { size: 10, weight: 'bold' } } }
                     },
-                    plugins: { legend: { display: false } }
+                    plugins: { 
+                        legend: { display: false } 
+                    }
                 }
             });
         }
