@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.0 Layout Impressão A4)</title>
+    <title>Painel de Indicadores & Gráficos (v5.2 Cursos & Treinamentos)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -59,7 +59,7 @@
                 color: #000000 !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                font-size: 11px !important;
+                font-size: 10px !important;
             }
             .container {
                 max-width: 100% !important;
@@ -67,12 +67,10 @@
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            /* Remove barras de rolagem e abre tudo */
             .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56, .max-h-40 {
                 max-height: none !important;
                 overflow: visible !important;
             }
-            /* Quebra de página controlada: Página 1 (Operação) e Página 2 (Recursos + Tabela) */
             .pagina-a4-bloco {
                 page-break-after: always;
                 break-after: page;
@@ -83,12 +81,11 @@
                 page-break-before: always;
                 break-before: page;
             }
-            /* Redimensionamento equilibrado de gráficos para não vazar a folha */
             .chart-wrapper {
-                height: 190px !important;
+                height: 180px !important;
             }
             canvas {
-                max-height: 190px !important;
+                max-height: 180px !important;
                 width: 100% !important;
             }
             .card-a4-impresso {
@@ -106,16 +103,14 @@
 
     <div class="container space-y-5">
         
-        <!-- ========================================== -->
         <!-- PÁGINA 1 NA IMPRESSÃO: VISÃO GERAL & TAREFAS -->
-        <!-- ========================================== -->
         <div class="pagina-a4-bloco space-y-4">
             
             <!-- CABEÇALHO -->
             <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 card-a4-impresso">
                 <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
                 <div class="flex items-center gap-1.5">
-                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Indicadores Operacionais</h2>
+                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Desempenho & Capacitação</h2>
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
                 </div>
                 <div class="flex items-center gap-2">
@@ -168,9 +163,9 @@
                             <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 uppercase ml-1">0 Semanas Marcadas</span>
                         </div>
                         <div class="flex items-center gap-1.5 flex-wrap">
-                            <button type="button" onclick="selecionarSemanasPredefinicao('ate_vigente')" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-blue-200">⚡ Até Vigente</button>
-                            <button type="button" onclick="selecionarSemanasPredefinicao('todas')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todas</button>
-                            <button type="button" onclick="selecionarSemanasPredefinicao('limpar')" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
+                            <button type="button" onclick="selecionarSemanasPredefinicao('ate_vigente')" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded text-[10px] font-bold hover:bg-blue-200">⚡ Até Vigente</button>
+                            <button type="button" onclick="selecionarSemanasPredefinicao('todas')" class="bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2.5 py-1 rounded text-[10px] font-bold hover:bg-emerald-100">Marcar Todas</button>
+                            <button type="button" onclick="selecionarSemanasPredefinicao('limpar')" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded text-[10px] font-bold hover:bg-gray-200">Desmarcar</button>
                             <button type="button" onclick="alternarGaveta('gridUniversalSemanas', 'btnToggleSemanas')" id="btnToggleSemanas" class="text-xs text-blue-700 dark:text-blue-400 font-bold underline ml-1">Mostrar caixas ▾</button>
                         </div>
                     </div>
@@ -178,7 +173,7 @@
                     </div>
                 </div>
 
-                <!-- LINHA 4: GAVETA RETRÁTIL DE RECURSOS -->
+                <!-- LINHA 4: GAVETA DINÂMICA DE RECURSOS -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -375,6 +370,80 @@
                 </div>
             </div>
 
+            <!-- NOVO BLOCO: CAPACITAÇÃO & CURSOS / TREINAMENTOS -->
+            <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-3 card-a4-impresso">
+                <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
+                    <div class="flex items-center gap-1.5">
+                        <h3 id="lbl_titulo_bloco_treinos" class="text-xs font-black uppercase text-purple-900 dark:text-purple-300">
+                            🎓 Painel de Cursos & Treinamentos
+                        </h3>
+                        <button type="button" onclick="editarTexto('lbl_titulo_bloco_treinos')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <span class="text-[10px] font-bold bg-purple-200/60 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 px-2 py-0.5 rounded-full" id="tagTotalTreinamentos">0 Cursos Concluídos</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_treino_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Total de Cursos Concluídos</span>
+                            <button type="button" onclick="editarTexto('lbl_card_treino_total')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardTreinoTotal" class="text-xl font-black text-purple-700 dark:text-purple-400">0</h4>
+                        <p id="cardTreinoTotalSub" class="text-[9px] text-gray-500 font-semibold">Participações validadas</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_treino_mais" class="text-[9px] font-bold uppercase text-purple-700 tracking-wider">Curso Mais Realizado</span>
+                            <button type="button" onclick="editarTexto('lbl_card_treino_mais')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardTreinoMaisNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardTreinoMaisQtd" class="text-[9px] text-purple-700 font-bold">0 participações (0%)</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_treino_mes" class="text-[9px] font-bold uppercase text-purple-700 tracking-wider">Mês com Mais Cursos</span>
+                            <button type="button" onclick="editarTexto('lbl_card_treino_mes')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardTreinoMesPico" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardTreinoMesPicoQtd" class="text-[9px] text-purple-700 font-bold">Pico de capacitação</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                        <div class="flex items-center gap-1 mb-1">
+                            <h4 id="lbl_grafico_treinos_mensal" class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">📈 Carga de Cursos por Mês</h4>
+                            <button type="button" onclick="editarTexto('lbl_grafico_treinos_mensal')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <div class="relative chart-wrapper h-48 w-full flex items-center justify-center">
+                            <canvas id="graficoTreinosMensalCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-1.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <h4 id="lbl_tabela_treinos" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Ranking de Cursos Concluídos</h4>
+                            <button type="button" onclick="editarTexto('lbl_tabela_treinos')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
+                                        <th class="py-1.5 px-2">Curso / Treinamento</th>
+                                        <th class="py-1.5 px-2 text-center">Concluídos</th>
+                                        <th class="py-1.5 px-2 text-right">% do Ano</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaTreinamentosCorpo">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS (PÁGINA 2) -->
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
                 <div class="flex justify-between items-center">
@@ -392,9 +461,10 @@
                                 <th class="py-2 px-2.5 col-total">Total</th>
                                 <th class="py-2 px-2.5 text-green-600 col-concluidas">Feitas</th>
                                 <th class="py-2 px-2.5 text-red-600 col-naorealizadas">Não Feitas</th>
-                                <th class="py-2 px-2.5 text-amber-600 col-extras">Extras</th>
-                                <th class="py-2 px-2.5 text-emerald-700">Recursos</th>
-                                <th class="py-2 px-2.5">Status</th>
+                                <th class="py-2.5 px-2.5 text-amber-600 col-extras">Extras</th>
+                                <th class="py-2.5 px-2.5 text-purple-700">Cursos</th>
+                                <th class="py-2.5 px-2.5 text-emerald-700">Recursos</th>
+                                <th class="py-2.5 px-2.5">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaIndicadoresCorpo">
@@ -410,10 +480,12 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const nomesMesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const nomesMesesCompletos = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         
         let graficoAnualInstance = null;
         let graficoSemanalInstance = null;
         let graficoRecursosInstance = null;
+        let graficoTreinosMensalInstance = null;
         let cacheDadosProcessados = null;
 
         let mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
@@ -455,6 +527,10 @@
             if (n.includes('MOTO')) return '🏍️';
             if (n.includes('VAN')) return '🚐';
             if (n.includes('GUINCHO')) return '🏗️';
+            if (n.includes('TRATOR') || n.includes('RETRO') || n.includes('PÁ')) return '🚜';
+            if (n.includes('BARCO') || n.includes('LANCHA')) return '🚤';
+            if (n.includes('GERADOR')) return '⚡';
+            if (n.includes('FERRAMENTA') || n.includes('ALMOXARIFADO')) return '🧰';
             return '🚙';
         }
 
@@ -494,7 +570,7 @@
             if (!texto) return "";
             return texto
                 .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2300}-\u{23FF}]/gu, '')
-                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡🚗🚚🚜🏍️🏗️]/g, '')
+                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡🚗🚚🚜🏍️🏗️🚤]/g, '')
                 .replace(/\[.*?\]/g, '')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -757,6 +833,19 @@
             let totalRecursosUtilizadosGeral = 0;
             let todosRecursosNomes = new Set();
 
+            // Mapeamentos para o módulo de Treinamentos/Cursos
+            let mapaCursosConcluidos = {};
+            let mesesCursosConcluidos = Array(12).fill(0);
+            let totalCursosConcluidosGeral = 0;
+
+            let frequentesSalvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || [];
+            frequentesSalvos.forEach(item => {
+                let itemLimpo = limparSimbolosTexto(item).toUpperCase();
+                if (itemLimpo.includes('CAMINHÃO') || itemLimpo.includes('EMPILHADEIRA') || itemLimpo.includes('CARRO') || itemLimpo.includes('MOTO') || itemLimpo.includes('VEICULO') || itemLimpo.includes('EQUIP')) {
+                    todosRecursosNomes.add(itemLimpo);
+                }
+            });
+
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
 
@@ -770,7 +859,7 @@
 
                 if (!mesesSelecionados.has(mesIdx)) return;
 
-                let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0;
+                let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0, cursosNestaSemanaFeitos = 0;
 
                 if (htmlCard) {
                     const parser = new DOMParser();
@@ -785,6 +874,23 @@
                         if (ext.classList.contains('task-done') || (check && check.checked)) extrasConcluidas++;
                     });
 
+                    // IDENTIFICAÇÃO DE CURSOS / TREINAMENTOS CONCLUÍDOS
+                    let boxesTreinos = doc.querySelectorAll('.treinamento-box');
+                    boxesTreinos.forEach(tBox => {
+                        let check = tBox.querySelector('input[type="checkbox"]');
+                        let estaFeito = tBox.classList.contains('task-done') || (check && check.checked);
+                        let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
+                        let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
+
+                        if (estaFeito && !ehFuturoReal) {
+                            mapaCursosConcluidos[nomeTreino] = (mapaCursosConcluidos[nomeTreino] || 0) + 1;
+                            mesesCursosConcluidos[mesIdx]++;
+                            totalCursosConcluidosGeral++;
+                            cursosNestaSemanaFeitos++;
+                        }
+                    });
+
+                    // IDENTIFICAÇÃO DE RECURSOS CONCLUÍDOS
                     let tagsRecursos = doc.querySelectorAll('.resource-tag');
                     tagsRecursos.forEach(tag => {
                         let descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
@@ -797,7 +903,6 @@
                             let check = tag.querySelector('input[type="checkbox"]');
                             let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
-                            // Se marcado, soma imediatamente
                             if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
                                 totalRecursosUtilizadosGeral++;
@@ -831,6 +936,7 @@
                     extrasCount,
                     extrasConcluidas,
                     recursosCount: recursosNestaSemanaFeitos,
+                    cursosCount: cursosNestaSemanaFeitos,
                     temDadosSalvos: !!htmlCard,
                     ehFuturoReal
                 });
@@ -856,6 +962,7 @@
 
             renderizarFiltroDeRecursos(todosRecursosNomes);
             processarIndicadoresDeRecursos(mapaRecursosUtilizados, totalRecursosUtilizadosGeral);
+            processarIndicadoresDeTreinamentos(mapaCursosConcluidos, mesesCursosConcluidos, totalCursosConcluidosGeral);
 
             cacheDadosProcessados = {
                 anoSelecionado,
@@ -863,10 +970,108 @@
                 mesesDados,
                 todosRecursosNomes,
                 mapaRecursosUtilizados,
-                totalRecursosUtilizadosGeral
+                totalRecursosUtilizadosGeral,
+                mapaCursosConcluidos,
+                mesesCursosConcluidos,
+                totalCursosConcluidosGeral
             };
 
             atualizarVisualizacao();
+        }
+
+        // PROCESSAMENTO DE CURSOS E TREINAMENTOS
+        function processarIndicadoresDeTreinamentos(mapaCursos, mesesCursos, totalCursos) {
+            document.getElementById('cardTreinoTotal').innerText = totalCursos;
+            document.getElementById('cardTreinoTotalSub').innerText = totalCursos > 0 ? "Participações validadas" : "Nenhum curso marcado";
+            document.getElementById('tagTotalTreinamentos').innerText = `${totalCursos} Cursos Concluídos`;
+
+            let cursosOrdenados = Object.keys(mapaCursos).map(nome => ({
+                nome: nome,
+                qtd: mapaCursos[nome]
+            })).sort((a, b) => b.qtd - a.qtd);
+
+            if (cursosOrdenados.length > 0 && totalCursos > 0) {
+                let mais = cursosOrdenados[0];
+                let percMais = Math.round((mais.qtd / totalCursos) * 100);
+                document.getElementById('cardTreinoMaisNome').innerText = mais.nome;
+                document.getElementById('cardTreinoMaisQtd').innerText = `${mais.qtd} participações (${percMais}%)`;
+            } else {
+                document.getElementById('cardTreinoMaisNome').innerText = "Nenhum";
+                document.getElementById('cardTreinoMaisQtd').innerText = "0 participações";
+            }
+
+            // Identifica o mês com maior carga de treinamentos
+            let maiorMesIdx = 0;
+            let maiorMesValor = 0;
+            mesesCursos.forEach((val, idx) => {
+                if (val > maiorMesValor) {
+                    maiorMesValor = val;
+                    maiorMesIdx = idx;
+                }
+            });
+
+            if (maiorMesValor > 0) {
+                document.getElementById('cardTreinoMesPico').innerText = nomesMesesCompletos[maiorMesIdx];
+                document.getElementById('cardTreinoMesPicoQtd').innerText = `${maiorMesValor} cursos realizados (${nomesMesesCurtos[maiorMesIdx]})`;
+            } else {
+                document.getElementById('cardTreinoMesPico').innerText = "Nenhum";
+                document.getElementById('cardTreinoMesPicoQtd').innerText = "Sem cursos registrados";
+            }
+
+            // Preenchimento da Tabela de Cursos
+            const tbodyTreinos = document.getElementById('tabelaTreinamentosCorpo');
+            tbodyTreinos.innerHTML = '';
+
+            if (cursosOrdenados.length === 0 || totalCursos === 0) {
+                tbodyTreinos.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-400 italic">Nenhum treinamento concluído nas semanas ativas.</td></tr>`;
+            } else {
+                cursosOrdenados.forEach((c, idx) => {
+                    let perc = Math.round((c.qtd / totalCursos) * 100);
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-purple-50/40 dark:hover:bg-gray-700/20';
+                    tr.innerHTML = `
+                        <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                            <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
+                            <span class="text-sm">🎓</span>
+                            <span>${c.nome}</span>
+                        </td>
+                        <td class="py-1.5 px-2 text-center font-extrabold text-purple-700 dark:text-purple-400">${c.qtd}</td>
+                        <td class="py-1.5 px-2 text-right">
+                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300">${perc}%</span>
+                        </td>
+                    `;
+                    tbodyTreinos.appendChild(tr);
+                });
+            }
+
+            renderizarGraficoTreinosMensal(mesesCursos);
+        }
+
+        function renderizarGraficoTreinosMensal(mesesCursos) {
+            const ctx = document.getElementById('graficoTreinosMensalCanvas').getContext('2d');
+            if (graficoTreinosMensalInstance) graficoTreinosMensalInstance.destroy();
+
+            graficoTreinosMensalInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: nomesMesesCurtos,
+                    datasets: [{
+                        label: 'Cursos Realizados',
+                        data: mesesCursos,
+                        backgroundColor: '#9333ea',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0, font: { size: 9 } } },
+                        x: { ticks: { font: { size: 9, weight: 'bold' } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
 
         function processarIndicadoresDeRecursos(mapaUtilizados, totalUtilizados) {
@@ -918,9 +1123,9 @@
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-emerald-50/40 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                        <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                             <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
-                            <span class="text-sm">${icone}</span>
+                            <span class="text-base">${icone}</span>
                             <span>${r.nome}</span>
                         </td>
                         <td class="py-1.5 px-2 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
@@ -992,7 +1197,7 @@
             tbody.innerHTML = '';
 
             if (cacheDadosProcessados.semanasLista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-400 italic">Nenhuma semana selecionada no filtro. Marque as semanas desejadas acima.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-gray-400 italic">Nenhuma semana selecionada no filtro. Marque as semanas desejadas acima.</td></tr>`;
             } else {
                 cacheDadosProcessados.semanasLista.forEach(s => {
                     let percentualExec = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
@@ -1013,6 +1218,7 @@
                         <td class="py-2 px-2.5 font-bold text-green-600 dark:text-green-400 col-concluidas" style="${mostrarConcluidas ? '' : 'display:none;'}">${s.executadas}</td>
                         <td class="py-2 px-2.5 font-bold text-red-600 dark:text-red-400 col-naorealizadas" style="${mostrarNaoRealizadas ? '' : 'display:none;'}">${s.naoRealizadas}</td>
                         <td class="py-2 px-2.5 font-semibold text-amber-600 dark:text-amber-400 col-extras" style="${mostrarExtras ? '' : 'display:none;'}">⚡ ${s.extrasConcluidas} / ${s.extrasCount}</td>
+                        <td class="py-2 px-2.5 font-extrabold text-purple-700 dark:text-purple-400">🎓 ${s.cursosCount}</td>
                         <td class="py-2 px-2.5 font-extrabold text-emerald-800 dark:text-emerald-400">🚙 ${s.recursosCount}</td>
                         <td class="py-2 px-2.5">
                             <div class="flex items-center gap-2">
