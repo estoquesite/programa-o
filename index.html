@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.24 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.26 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -67,7 +67,7 @@
             grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
-            align-items: stretch; 
+            align-items: stretch; /* Garante que todas as colunas tenham a mesma altura */
         }
         .day-card {
             background: var(--card-bg);
@@ -80,15 +80,17 @@
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
-            min-height: 300px;
+            min-height: 380px; /* Altura padrão para manter todos iguaizinhos */
         }
         .day-content {
-            flex-grow: 1;
             display: flex;
             flex-direction: column;
+            flex-grow: 1;
         }
         .tasks-container {
             flex-grow: 1;
+            overflow-y: auto;
+            max-height: 200px;
         }
         .day-title {
             font-size: 15px;
@@ -101,6 +103,7 @@
             padding: 6px;
             margin-bottom: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            flex-shrink: 0;
         }
         .day-title small {
             font-weight: 700;
@@ -128,8 +131,8 @@
             gap: 4px;
             border-top: 2px dashed #c8e6c9;
             padding-top: 10px;
-            margin-top: 16px; 
-            margin-bottom: 0;
+            margin-top: auto; /* Empurra a seção de recursos sempre para a mesma altura alinhada no rodapé do card */
+            flex-shrink: 0;
         }
         .resources-title {
             font-size: 9px;
@@ -265,7 +268,7 @@
             </div>
         </div>
 
-        <!-- CALENDÁRIO SEMANAL (COM "CARRO" AUTOMÁTICO EM TODOS OS DIAS) -->
+        <!-- CALENDÁRIO SEMANAL (COM CARRO E EMPILHADEIRA AUTOMÁTICOS EM TODOS OS DIAS) -->
         <div class="week-grid" id="weekGridContainer">
             <!-- Segunda -->
             <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda">
@@ -279,6 +282,7 @@
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
                     <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -294,6 +298,7 @@
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
                     <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -310,6 +315,7 @@
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
                     <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -325,6 +331,7 @@
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
                     <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
 
@@ -340,6 +347,7 @@
                 <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                     <div class="resources-title">Recursos</div>
                     <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                 </div>
             </div>
         </div>
@@ -377,8 +385,7 @@
             </div>
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
-                <!-- DIGITAÇÃO LIVRE SEM TRAVA DE ENTER -->
-                <input type="text" id="inputDesc" placeholder="Ex: CAMINHÃO PARTE DA MANHÃ..." oninput="corrigirOrtografiaAutomaticamente(this)" class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
+                <input type="text" id="inputDesc" placeholder="Ex: CAMINHÃO PARTE DA MANHÃ..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
             </div>
             <div class="flex gap-2 pt-1">
                 <button onclick="adicionarItemPorData()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2 rounded-lg text-xs transition">✓ Adicionar (OK)</button>
@@ -386,7 +393,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.24) -->
+        <!-- ANALISADOR INTELIGENTE DE SCRIPT (v3.26) -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -429,7 +436,7 @@
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
             <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600 dark:text-red-400">🔒 Sair</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.24 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.26 Nuvem</span>
         </div>
         <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg transition transform hover:scale-105">🎤</button>
     </div>
@@ -447,7 +454,6 @@
         let deferredPrompt = null;
         let dadosGlobaisNuvem = {};
 
-        // ITENS FREQUENTES COM ACENTUAÇÃO ORTOGRÁFICA CORRETA
         let itensFrequentesPadrao = [
             "🕒 HORA CERTA", "📦 MOVIMENTAÇÃO G4", "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
             "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO", 
@@ -455,7 +461,7 @@
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // CORREÇÃO ORTOGRÁFICA INTELIGENTE (ACENTOS AUTOMÁTICOS)
+        // DICIONÁRIO DE CORREÇÃO ORTOGRÁFICA (APLICADO AO ADICIONAR)
         const dicionarioCorrecao = {
             "ALMOÇEGIFADO": "ALMOXARIFADO",
             "ALMOCEDIFADO": "ALMOXARIFADO",
@@ -466,18 +472,17 @@
             "MANUTENCAO": "MANUTENÇÃO",
             "EQUIPE": "EQUIPE",
             "CAMINHAO": "CAMINHÃO",
-            "ARRUMACAO": "ARRUMAÇÃO",
-            "FERRAMENTARIA": "FERRAMENTARIA"
+            "ARRUMACAO": "ARRUMAÇÃO"
         };
 
-        function corrigirOrtografiaAutomaticamente(input) {
-            let texto = input.value.trim().toUpperCase();
+        function aplicarCorrecao(texto) {
+            let resultado = texto.trim().toUpperCase();
             for (let errada in dicionarioCorrecao) {
-                if (texto.includes(errada)) {
-                    texto = texto.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
+                if (resultado.includes(errada)) {
+                    resultado = resultado.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
                 }
             }
-            input.value = texto;
+            return resultado;
         }
 
         function getWeekKey() {
@@ -810,7 +815,7 @@
             }
         }
 
-        // ANALISADOR INTELIGENTE DE SCRIPT (v3.24)
+        // ANALISADOR INTELIGENTE DE SCRIPT (v3.26)
         function analisarScript() {
             const textoScript = document.getElementById('inputScriptTexto').value;
             const containerSugestoes = document.getElementById('resultadoSugestoes');
@@ -827,12 +832,7 @@
             let jaAdicionadas = new Set();
 
             linhas.forEach(linha => {
-                let linhaUp = linha.toUpperCase();
-                for (let errada in dicionarioCorrecao) {
-                    if (linhaUp.includes(errada)) {
-                        linhaUp = linhaUp.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
-                    }
-                }
+                let linhaUp = aplicarCorrecao(linha);
                 
                 const contem = palavrasChave.some(p => {
                     const regex = new RegExp("\\b" + p + "\\b", "i");
@@ -862,13 +862,7 @@
         }
 
         function usarSugestao(botao) {
-            let texto = botao.getAttribute('data-texto').toUpperCase();
-            for (let errada in dicionarioCorrecao) {
-                if (texto.includes(errada)) {
-                    texto = texto.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
-                }
-            }
-            
+            let texto = aplicarCorrecao(botao.getAttribute('data-texto'));
             document.getElementById('inputDesc').value = texto;
             if (/caminhão|empilhadeira|carro|recurso/i.test(texto)) {
                 document.getElementById('inputTipo').value = 'resource';
@@ -995,8 +989,7 @@
                 document.getElementById('weekGridContainer').innerHTML = salvoSemana;
                 reativarEventosDragDrop();
             } else {
-                // Se a semana estiver vazia, garante que o CARRO venha em todos os dias automaticamente
-                inicializarCarroAutomatico();
+                inicializarRecursosAutomaticos();
             }
 
             const datas = getDateRangeOfWeek(semana, ano);
@@ -1014,22 +1007,30 @@
             guardarEstadoDOM();
         }
 
-        // GARANTE QUE O "CARRO" ESTEJA PRESENTE EM TODOS OS DIAS CASO A SEMANA SEJA NOVA
-        function inicializarCarroAutomatico() {
+        // GARANTE QUE CARRO E EMPILHADEIRA ESTEJAM EM TODOS OS DIAS NAS SEMANAS NOVAS
+        function inicializarRecursosAutomaticos() {
             document.querySelectorAll('.day-card').forEach(card => {
                 const recursosCont = card.querySelector('.day-resources');
-                const temCarro = [...recursosCont.querySelectorAll('.item-text')].some(el => el.innerText.trim() === 'CARRO');
-                if (!temCarro) {
-                    const handleHtml = `<span class="drag-handle">⠿</span>`;
-                    const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-                    const div = document.createElement('div');
-                    div.className = 'resource-tag';
-                    div.setAttribute('draggable', 'true');
-                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span>${handleHtml} <span class="item-text">CARRO</span></span>${controlsHtml}`;
-                    recursosCont.appendChild(div);
+                const textosExistentes = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
+                
+                if (!textosExistentes.includes('CARRO')) {
+                    adicionarTagRecurso(recursosCont, 'CARRO');
+                }
+                if (!textosExistentes.includes('EMPILHADEIRA G4')) {
+                    adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
                 }
             });
+        }
+
+        function adicionarTagRecurso(container, nome) {
+            const handleHtml = `<span class="drag-handle">⠿</span>`;
+            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+            const div = document.createElement('div');
+            div.className = 'resource-tag';
+            div.setAttribute('draggable', 'true');
+            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            div.innerHTML = `<span>${handleHtml} <span class="item-text">${nome}</span></span>${controlsHtml}`;
+            container.appendChild(div);
         }
 
         function alternarDarkMode() {
@@ -1050,15 +1051,9 @@
         async function adicionarItemPorData() {
             const dataStr = document.getElementById('inputDataEvento').value;
             const tipo = document.getElementById('inputTipo').value;
-            let desc = document.getElementById('inputDesc').value.trim().toUpperCase();
+            let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
 
             if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
-
-            for (let errada in dicionarioCorrecao) {
-                if (desc.includes(errada)) {
-                    desc = desc.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
-                }
-            }
 
             const dataObj = new Date(dataStr + 'T00:00:00');
             const diaSemanaNum = dataObj.getDay();
@@ -1090,13 +1085,7 @@
             const itemSpan = itemBox.querySelector('.item-text');
             let novoTexto = prompt("Editar descrição:", itemSpan.innerText);
             if (novoTexto !== null && novoTexto.trim() !== "") {
-                novoTexto = novoTexto.toUpperCase();
-                for (let errada in dicionarioCorrecao) {
-                    if (novoTexto.includes(errada)) {
-                        novoTexto = novoTexto.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
-                    }
-                }
-                itemSpan.innerText = novoTexto;
+                itemSpan.innerText = aplicarCorrecao(novoTexto);
                 await guardarEstadoDOM();
             }
         }
@@ -1129,12 +1118,7 @@
 
             recognition.onstart = () => { btnVoz.classList.add('animate-pulse', 'bg-amber-500'); };
             recognition.onresult = (event) => {
-                let textoVoz = event.results[0][0].transcript.toUpperCase();
-                for (let errada in dicionarioCorrecao) {
-                    if (textoVoz.includes(errada)) {
-                        textoVoz = textoVoz.replace(new RegExp(errada, 'g'), dicionarioCorrecao[errada]);
-                    }
-                }
+                let textoVoz = aplicarCorrecao(event.results[0][0].transcript);
                 document.getElementById('inputDesc').value = textoVoz;
                 adicionarItemPorData();
             };
@@ -1153,10 +1137,10 @@
                     <style>
                         body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background: #fff; color: #333; }
                         .week-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
-                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; min-height: 250px; }
+                        .day-card { background: #fff; border: 1px solid #ccc; border-top: 4px solid #1b5e20; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; min-height: 380px; }
                         .day-title { font-size: 14px; font-weight: bold; color: #1b5e20; text-align: center; background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%) !important; border: 1px solid #a3e4d7 !important; border-radius: 4px; padding: 4px; margin-bottom: 8px; }
                         .task-box { font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border-left: 2px solid #2e7d32; }
-                        .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: 14px; }
+                        .day-resources { display: flex; flex-direction: column; gap: 3px; border-top: 2px dashed #c8e6c9; padding-top: 8px; margin-top: auto; }
                         .resources-title { font-size: 8px; font-weight: 800; color: #2e7d32; text-transform: uppercase; margin-bottom: 3px; }
                         .resource-tag { background: #e8f5e9; color: #1b5e20; padding: 3px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
                         .drag-handle, .item-controls { display: none !important; }
