@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.88 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.89 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -252,6 +252,7 @@
                 <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📁 Histórico</button>
                 <button onclick="abrirModalTreinamentos()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🎓 Treinamentos</button>
                 <button onclick="abrirModalFeriados()" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🍃 Feriados</button>
+                <button onclick="resetTotalNuvem()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm" title="Limpar Cache Total da Nuvem">🗑️ Limpar Nuvem</button>
             </div>
         </div>
 
@@ -402,7 +403,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.88 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.89 Nuvem</span>
         </div>
     </div>
 
@@ -439,6 +440,17 @@
             let limpo = texto.trim();
             let convertido = limpo.split('').map(char => mapaAcentos[char] || char).join('');
             return convertido.toLocaleUpperCase('pt-PT');
+        }
+
+        // Função auxiliar para remover emojis e símbolos indesejados antes de exportar para o Excel
+        function limparSimbolosTexto(texto) {
+            if (!texto) return "";
+            return texto
+                .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2300}-\u{23FF}]/gu, '') // Remove emojis
+                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡]/g, '') // Remove símbolos específicos do app
+                .replace(/\[.*?\]/g, '') // Remove tags entre colchetes como [EXTRA]
+                .replace(/\s+/g, ' ') // Normaliza espaços duplos
+                .trim();
         }
 
         function getWeekKey() {
@@ -493,7 +505,7 @@
             document.getElementById('modalIndicador').classList.add('hidden');
         }
 
-        // Exportação EXATAMENTE igual ao padrão da planilha da Vale enviada na foto
+        // Exportação EXATAMENTE igual ao padrão da Vale, agora sem símbolos nas colunas de atividade e recursos
         function exportarParaExcelTabelaVale() {
             let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
@@ -511,18 +523,20 @@
                 // Varre Tarefas
                 card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
                     let descEl = box.querySelector('.item-text') || box.querySelector('strong');
-                    let atividade = descEl ? descEl.innerText.trim() : '';
-                    let statusConcluido = box.querySelector('input[type="checkbox"]').checked ? 'SIM' : 'NÃO';
-                    
-                    // Pega recursos daquele dia para alinhar na mesma linha se necessário
+                    let atividadeBruta = descEl ? descEl.innerText.trim() : '';
+                    let atividade = limparSimbolosTexto(atividadeBruta);
+
+                    // Pega recursos daquele dia
                     let recursosDia = [];
                     card.querySelectorAll('.resource-tag').forEach(tag => {
                         let rEl = tag.querySelector('.item-text');
-                        if (rEl) recursosDia.push(rEl.innerText.trim());
+                        if (rEl) {
+                            let recursoLimpo = limparSimbolosTexto(rEl.innerText.trim());
+                            if (recursoLimpo) recursosDia.push(recursoLimpo);
+                        }
                     });
                     let necessidadeRecurso = recursosDia.join(', ');
 
-                    // ITEM; OS; Área Responsável; Atividade; Local; Sala; Data; Dia da Semana; Bloq Eletrico; Bloq Mec; PTS; Almoxarifado; Recursos
                     csvContent += `1;;ALMOXARIFADO;"${atividade}";;;"${dataExec}";"${diaSemanaStr}";NÃO;NÃO;NÃO;NÃO;"${necessidadeRecurso}"\n`;
                 });
             });
