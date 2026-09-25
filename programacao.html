@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.76 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.77 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -64,7 +64,7 @@
         }
         .week-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
             align-items: stretch;
@@ -78,8 +78,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            height: 480px !important;
-            max-height: 480px !important;
+            height: 520px !important;
+            max-height: 520px !important;
             position: relative;
         }
         .day-content {
@@ -87,7 +87,7 @@
             flex-direction: column;
             flex-grow: 1;
             overflow: hidden;
-            padding-bottom: 100px;
+            padding-bottom: 110px;
         }
         .tasks-container {
             flex-grow: 1;
@@ -117,14 +117,14 @@
             font-weight: 600;
             color: #1b5e20;
             background-color: #f1f8e9;
-            padding: 4px 6px;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            padding: 7px 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 10px;
-            border-left: 2px solid #2e7d32;
+            font-size: 11px;
+            border-left: 3px solid #2e7d32;
             cursor: grab;
             flex-shrink: 0;
         }
@@ -133,14 +133,14 @@
             font-weight: 600;
             color: #9a3412;
             background-color: #ffedd5;
-            padding: 4px 6px;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            padding: 7px 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 10px;
-            border-left: 2px solid #c2410c;
+            font-size: 11px;
+            border-left: 3px solid #c2410c;
             cursor: grab;
             flex-shrink: 0;
         }
@@ -149,14 +149,14 @@
             font-weight: 600;
             color: #1b5e20;
             background-color: #e8f5e9;
-            padding: 5px 6px;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 10px;
-            border-left: 2px solid #2e7d32;
+            font-size: 11px;
+            border-left: 3px solid #2e7d32;
             flex-shrink: 0;
             cursor: grab;
         }
@@ -174,15 +174,15 @@
             right: 12px;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
             border-top: 2px dashed #c8e6c9;
             padding-top: 6px;
-            height: 90px;
+            height: 105px;
             background: #ffffff;
             overflow-y: auto;
         }
         .resources-title {
-            font-size: 8px;
+            font-size: 9px;
             font-weight: 800;
             color: #2e7d32;
             text-transform: uppercase;
@@ -192,27 +192,28 @@
         .resource-tag {
             background: var(--secondary-color);
             color: var(--primary-color);
-            padding: 3px 5px;
-            border-radius: 3px;
-            font-size: 10px;
+            padding: 5px 7px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: grab;
             flex-shrink: 0;
+            border-left: 3px solid #2e7d32;
         }
         .resource-tag:active { cursor: grabbing; }
         .item-controls {
             display: flex;
-            gap: 2px;
+            gap: 3px;
             align-items: center;
         }
         .drag-handle {
             cursor: grab;
-            font-size: 12px;
+            font-size: 13px;
             color: #888;
-            padding: 0 2px;
+            padding: 0 3px;
             user-select: none;
         }
         .drag-handle:active { cursor: grabbing; }
@@ -220,15 +221,15 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 10px;
-            padding: 0 2px;
+            font-size: 11px;
+            padding: 1px 3px;
             border-radius: 3px;
         }
         .btn-edit-item:hover { background-color: rgba(0, 0, 0, 0.1); }
         .btn-delete-item {
             color: #c62828;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
         }
         .btn-delete-item:hover { background-color: rgba(198, 40, 40, 0.1); }
         .dragging { opacity: 0.4; }
@@ -245,6 +246,20 @@
                 <button onclick="sincronizarComNuvemManual()" class="print-hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-2.5 py-1 rounded-lg text-xs font-bold transition">🔄 Sincronizar</button>
             </div>
             <div class="week-badge" id="badgeSemana">Semana --</div>
+        </div>
+
+        <!-- INDICADOR / BARRA DE PROGRESSO NO TOPO -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-sm">📊</span>
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-green-800 dark:text-green-300">Indicador de Conclusão da Semana</h4>
+                    <span id="textoIndicadorProgresso" class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold">0 de 0 concluídas (0%)</span>
+                </div>
+            </div>
+            <div class="w-36 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div id="barraProgressoIndicador" class="bg-green-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
         </div>
 
         <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO -->
@@ -400,7 +415,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.76 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.77 Nuvem</span>
         </div>
     </div>
 
@@ -450,13 +465,29 @@
             deferredPrompt = e;
         });
 
-        // Função que injeta caixinhas em HTMLs salvos antigos que porventura não as tenham
+        function atualizarIndicadorProgresso() {
+            const checkboxes = document.querySelectorAll('#weekGridContainer input[type="checkbox"].task-check');
+            const total = checkboxes.length;
+            let concluidas = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) concluidas++;
+            });
+            const percentual = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+            
+            const texto = document.getElementById('textoIndicadorProgresso');
+            const barra = document.getElementById('barraProgressoIndicador');
+            
+            if (texto && barra) {
+                texto.innerText = `${concluidas} de ${total} concluídas (${percentual}%)`;
+                barra.style.width = `${percentual}%`;
+            }
+        }
+
         function garantirCaixinhasEmHtmlSalvo(htmlString) {
             if (!htmlString) return htmlString;
             let parser = new DOMParser();
             let doc = parser.parseFromString(htmlString, 'text/html');
             
-            // Verifica todas as task-box, tarefa-extra-box, recurso-tag, treinamento-box
             let caixas = doc.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
             caixas.forEach(box => {
                 if (!box.querySelector('input[type="checkbox"]')) {
@@ -464,10 +495,9 @@
                     if (innerSpan && !innerSpan.classList.contains('item-controls')) {
                         let check = doc.createElement('input');
                         check.type = 'checkbox';
-                        check.className = 'task-check w-3.5 h-3.5 accent-green-700 cursor-pointer mr-1.5';
+                        check.className = 'task-check w-4 h-4 accent-green-700 cursor-pointer mr-2';
                         check.setAttribute('onchange', 'alternarConclusaoTarefa(this)');
                         innerSpan.insertBefore(check, innerSpan.firstChild);
-                        // Garante flex alinhado
                         innerSpan.classList.add('flex', 'items-center', 'gap-1.5');
                     }
                 }
@@ -485,14 +515,11 @@
 
                 if (data && data.conteudo) {
                     dadosGlobaisNuvem = data.conteudo;
-                    
-                    // Varre e corrige todas as semanas salvas na nuvem para garantir que todas tenham caixinhas
                     if (dadosGlobaisNuvem.semanas) {
                         for (let k in dadosGlobaisNuvem.semanas) {
                             dadosGlobaisNuvem.semanas[k] = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[k]);
                         }
                     }
-
                     if (dadosGlobaisNuvem.historico) {
                         localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
                     }
@@ -668,9 +695,9 @@
                         divTreino.setAttribute('draggable', 'true');
                         divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
                         divTreino.innerHTML = `
-                            <span class="${identificadorUnico} flex items-center gap-1.5">
-                                <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
-                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
+                            <span class="${identificadorUnico} flex items-center gap-2">
+                                <input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
+                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-6">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
                             </span>
                             <span class="item-controls">
                                 <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
@@ -679,6 +706,7 @@
                         `;
                         tasksCont.appendChild(divTreino);
                         await salvarNaNuvem();
+                        atualizarIndicadorProgresso();
                         fecharModalTreinamentos();
                         alert(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
                     } else { alert("⚠️ Este treinamento já consta nesta semana."); }
@@ -755,6 +783,7 @@
                     `;
                     cardDia.querySelector('.day-resources').innerHTML = '';
                     await salvarNaNuvem();
+                    atualizarIndicadorProgresso();
                     fecharModalFeriados();
                     alert(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
                 }
@@ -771,13 +800,13 @@
             const resCont = card.querySelector('.day-resources');
 
             tasksCont.innerHTML = `
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
             `;
             resCont.innerHTML = `
                 <div class="resources-title">Recursos</div>
-                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
             `;
             guardarEstadoDOM();
         }
@@ -790,6 +819,7 @@
             } else {
                 taskBox.classList.remove('task-done');
             }
+            atualizarIndicadorProgresso();
             guardarEstadoDOM();
         }
 
@@ -820,6 +850,7 @@
                 document.getElementById('weekGridContainer').innerHTML = historico[id].html;
                 await guardarEstadoDOM();
                 reativarEventosDragDrop();
+                atualizarIndicadorProgresso();
                 fecharModalHistorico();
                 alert("Semana carregada com sucesso!");
             }
@@ -936,6 +967,7 @@
             } else {
                 restaurarDiaNormal(checkbox);
             }
+            atualizarIndicadorProgresso();
             guardarEstadoDOM();
         }
 
@@ -954,7 +986,7 @@
                     divAPC.setAttribute('draggable', 'true');
                     divAPC.setAttribute('ondragstart', 'iniciarArrasto(event)');
                     divAPC.innerHTML = `
-                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
+                        <span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
                         <span class="item-controls">
                             <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
                             <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
@@ -971,7 +1003,7 @@
                     div5S.setAttribute('draggable', 'true');
                     div5S.setAttribute('ondragstart', 'iniciarArrasto(event)');
                     div5S.innerHTML = `
-                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
+                        <span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
                         <span class="item-controls">
                             <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
                             <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
@@ -1071,15 +1103,15 @@
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-feriado w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Feriado</label>
                             <label class="flex items-center gap-1 font-bold cursor-pointer"><input type="checkbox" class="check-emenda w-3.5 h-3.5" onchange="alternarBloqueioDia(this)"> Emenda</label>
                         </div>
-                        <div class="tasks-container space-y-1" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="tasks-container space-y-1.5" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                            <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                         </div>
                     </div>
                     <div class="day-resources" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
                         <div class="resources-title">Recursos</div>
-                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                        <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     </div>
                 </div>
             `;
@@ -1094,9 +1126,8 @@
 
             let semanaKey = getWeekKey();
             if (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey]) {
-                // Garante que o HTML salvo na nuvem venha com as caixinhas injetadas
-                let htmlNuvenCorrigido = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[semanaKey]);
-                document.getElementById('weekGridContainer').innerHTML = htmlNuvenCorrigido;
+                let htmlNuvemCorrigido = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[semanaKey]);
+                document.getElementById('weekGridContainer').innerHTML = htmlNuvemCorrigido;
             }
 
             const datas = getDateRangeOfWeek(semana, ano);
@@ -1110,6 +1141,7 @@
             injetarRotinasFixas(datas);
             forcarRecursosFixos();
             reativarEventosDragDrop();
+            atualizarIndicadorProgresso();
         }
 
         function forcarRecursosFixos() {
@@ -1127,7 +1159,7 @@
             div.className = 'resource-tag';
             div.setAttribute('draggable', 'true');
             div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            div.innerHTML = `<span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">${nome}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+            div.innerHTML = `<span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">${nome}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
             container.appendChild(div);
         }
 
@@ -1147,7 +1179,7 @@
 
             if (card) {
                 const handle = `<span class="drag-handle">⠿</span>`;
-                const checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
+                const checkbox = `<input type="checkbox" class="task-check w-4 h-4 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
                 const controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
                 const div = document.createElement('div');
 
@@ -1155,24 +1187,25 @@
                     div.className = 'tarefa-extra-box';
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-orange-600 cursor-pointer" onchange="alternarConclusaoTarefa(this)">⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    div.innerHTML = `<span class="flex items-center gap-2"><input type="checkbox" class="task-check w-4 h-4 accent-orange-600 cursor-pointer" onchange="alternarConclusaoTarefa(this)">⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.tasks-container').appendChild(div);
                 } else if (tipo === 'task') {
                     div.className = 'task-box';
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    div.innerHTML = `<span class="flex items-center gap-2">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.tasks-container').appendChild(div);
                 } else {
                     div.className = 'resource-tag';
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    div.innerHTML = `<span class="flex items-center gap-2">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.day-resources').appendChild(div);
                 }
 
                 document.getElementById('inputDesc').value = "";
                 await salvarNaNuvem();
+                atualizarIndicadorProgresso();
                 alert("✅ Adicionado com sucesso!");
             }
         }
@@ -1190,7 +1223,11 @@
 
         async function removerElemento(botao) {
             const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
-            if (box) { box.remove(); await salvarNaNuvem(); }
+            if (box) { 
+                box.remove(); 
+                await salvarNaNuvem(); 
+                atualizarIndicadorProgresso();
+            }
         }
 
         async function guardarEstadoDOM() { await salvarNaNuvem(); }
@@ -1210,7 +1247,7 @@
 
         function imprimirProgramacao() {
             const w = window.open('', '_blank', 'width=900,height=700');
-            w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',Tahoma,sans-serif;padding:20px;background:#fff;color:#333;text-align:center;}.print-container{max-width:1100px;margin:0 auto;}.header-print{display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:20px;border-bottom:2px solid #1b5e20;padding-bottom:12px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;text-align:left;}.day-card{background:#fff;border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:10px;display:flex;flex-direction:column;height:480px!important;position:relative;}.day-title{font-size:14px;font-weight:bold;color:#1b5e20;text-align:center;background:#e8f5e9!important;border:1px solid #a3e4d7!important;border-radius:4px;padding:4px;margin-bottom:6px;flex-shrink:0;}.day-content{display:flex;flex-direction:column;flex-grow:1;overflow:hidden;padding-bottom:95px;}.tasks-container{flex-grow:1;overflow:hidden;}.task-box,.tarefa-extra-box,.treinamento-box{font-weight:600;color:#1b5e20!important;background:#f1f8e9!important;padding:4px 6px;border-radius:4px;margin-bottom:4px;font-size:10px;border-left:2px solid #2e7d32!important;}.tarefa-extra-box{color:#9a3412!important;background:#ffedd5!important;border-left-color:#c2410c!important;}.day-resources{position:absolute;bottom:10px;left:10px;right:10px;display:flex;flex-direction:column;gap:3px;border-top:2px dashed #c8e6c9;padding-top:6px;height:85px;background:#fff;}.resources-title{font-size:8px;font-weight:800;color:#2e7d32;text-transform:uppercase;margin-bottom:2px;}.resource-tag{background:#e8f5e9!important;color:#1b5e20!important;padding:3px 5px;border-radius:3px;font-size:10px;font-weight:600;}.flex.items-center.justify-between.gap-1.mb-2,.drag-handle,.item-controls,button,input[type="checkbox"]{display:none!important;}h2{color:#1b5e20;text-transform:uppercase;margin:0;font-size:22px;}.week-badge{background:#1b5e20;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:bold;text-transform:uppercase;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style></head><body><div class="print-container"><div class="header-print"><h2>Programação Semanal</h2><div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div></div><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div></div><script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>`);
+            w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',Tahoma,sans-serif;padding:20px;background:#fff;color:#333;text-align:center;}.print-container{max-width:1100px;margin:0 auto;}.header-print{display:flex;justify-content:center;align-items:center;gap:20px;margin-bottom:20px;border-bottom:2px solid #1b5e20;padding-bottom:12px;}.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:stretch;text-align:left;}.day-card{background:#fff;border:1px solid #ccc;border-top:4px solid #1b5e20;border-radius:6px;padding:10px;display:flex;flex-direction:column;height:520px!important;position:relative;}.day-title{font-size:14px;font-weight:bold;color:#1b5e20;text-align:center;background:#e8f5e9!important;border:1px solid #a3e4d7!important;border-radius:4px;padding:4px;margin-bottom:6px;flex-shrink:0;}.day-content{display:flex;flex-direction:column;flex-grow:1;overflow:hidden;padding-bottom:105px;}.tasks-container{flex-grow:1;overflow:hidden;}.task-box,.tarefa-extra-box,.treinamento-box{font-weight:600;color:#1b5e20!important;background:#f1f8e9!important;padding:7px 8px;border-radius:5px;margin-bottom:5px;font-size:11px;border-left:3px solid #2e7d32!important;}.tarefa-extra-box{color:#9a3412!important;background:#ffedd5!important;border-left-color:#c2410c!important;}.day-resources{position:absolute;bottom:10px;left:10px;right:10px;display:flex;flex-direction:column;gap:4px;border-top:2px dashed #c8e6c9;padding-top:6px;height:95px;background:#fff;}.resources-title{font-size:9px;font-weight:800;color:#2e7d32;text-transform:uppercase;margin-bottom:2px;}.resource-tag{background:#e8f5e9!important;color:#1b5e20!important;padding:5px 7px;border-radius:4px;font-size:11px;font-weight:600;border-left:3px solid #2e7d32!important;}.flex.items-center.justify-between.gap-1.mb-2,.drag-handle,.item-controls,button{display:none!important;}h2{color:#1b5e20;text-transform:uppercase;margin:0;font-size:22px;}.week-badge{background:#1b5e20;color:#fff;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:bold;text-transform:uppercase;}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}</style></head><body><div class="print-container"><div class="header-print"><h2>Programação Semanal</h2><div class="week-badge">${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</div></div><div class="week-grid">${document.getElementById('weekGridContainer').innerHTML}</div></div><script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>`);
             w.document.close();
         }
     </script>
