@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.87 Nuvem)</title>
+    <title>Programação Semanal Interativa (v3.88 Nuvem)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -234,7 +234,7 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA UNIDOS NO TOPO + BOTÕES -->
+        <!-- SELETOR DE ANO E SEMANA + BOTÕES -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1.5">
@@ -261,9 +261,7 @@
         <!-- BARRA DE AÇÕES DA SEMANA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
-            <button onclick="exportarParaExcel()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel</button>
-            <input type="file" id="inputImportarCSV" accept=".csv" style="display:none" onchange="importarPlanilhaCSV(event)">
-            <button onclick="document.getElementById('inputImportarCSV').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📤 Importar Planilha</button>
+            <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
             <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
         </div>
@@ -404,7 +402,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.87 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.88 Nuvem</span>
         </div>
     </div>
 
@@ -495,124 +493,45 @@
             document.getElementById('modalIndicador').classList.add('hidden');
         }
 
-        // Função para importar planilha no formato CSV padrão enviado
-        function importarPlanilhaCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const text = e.target.result;
-                const linhas = text.split('\n');
-                
-                let importados = 0;
-                for (let i = 1; i < linhas.length; i++) {
-                    let linha = linhas[i].trim();
-                    if (!linha) continue;
-                    
-                    // Suporta separadores por vírgula ou ponto e vírgula
-                    let cols = linha.includes(';') ? linha.split(';') : linha.split(',');
-                    if (cols.length >= 5) {
-                        let atividade = aplicarCorrecao(cols[3] || '');
-                        let dataExec = (cols[6] || '').trim(); // ex: 28/set
-                        let diaSemana = (cols[7] || '').toLowerCase().trim(); // ex: segunda-feira
-                        let recursos = aplicarCorrecao(cols[13] || ''); // ex: EMPILHADEIRA...
-
-                        if (atividade) {
-                            // Mapeia dia da semana para o card correto
-                            let mapaDias = { 'segunda-feira': 'Segunda', 'terça-feira': 'Terça', 'quarta-feira': 'Quarta', 'quinta-feira': 'Quinta', 'sexta-feira': 'Sexta' };
-                            let nomeDiaCard = mapaDias[diaSemana];
-
-                            if (nomeDiaCard) {
-                                let card = document.querySelector(`.day-card[data-dia-nome="${nomeDiaCard}"]`);
-                                if (card) {
-                                    let tasksCont = card.querySelector('.tasks-container');
-                                    let resCont = card.querySelector('.day-resources');
-                                    let handle = `<span class="drag-handle">⠿</span>`;
-                                    let checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
-                                    let controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-
-                                    // Adiciona Atividade
-                                    let divTask = document.createElement('div');
-                                    divTask.className = 'task-box';
-                                    divTask.setAttribute('draggable', 'true');
-                                    divTask.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                                    divTask.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${atividade}</span></span>${controls}`;
-                                    tasksCont.appendChild(divTask);
-
-                                    // Adiciona Recursos se houver
-                                    if (recursos && recursos.length > 2) {
-                                        let divRes = document.createElement('div');
-                                        divRes.className = 'resource-tag';
-                                        divRes.setAttribute('draggable', 'true');
-                                        divRes.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                                        divRes.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${recursos}</span></span>${controls}`;
-                                        resCont.appendChild(divRes);
-                                    }
-                                    importados++;
-                                }
-                            }
-                        }
-                    }
-                }
-                await salvarNaNuvem();
-                alert(`✅ ${importados} itens importados com sucesso da planilha!`);
-                event.target.value = ''; // Reseta o input
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
-
-        function exportarParaExcel() {
+        // Exportação EXATAMENTE igual ao padrão da planilha da Vale enviada na foto
+        function exportarParaExcelTabelaVale() {
             let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
-            let diasMap = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
             
-            let dadosPorDia = {};
-            diasMap.forEach(d => dadosPorDia[d] = { tarefas: [], recursos: [] });
+            // Cabeçalho idêntico à imagem oficial da Vale
+            let csvContent = "\uFEFFITEM;OS;Área Responsável;Atividade;Local de execução;Sala/Equipamento;Data de execução;Dia da Semana;Tem Bloqueio elétrico?;Tem Bloqueio mecânico?;Tem PTS?;Tem solicitação ao almoxarifado;Necessidade de Recurso (Equip. moveis)?\n";
+
+            let diasMap = { "Segunda": "segunda-feira", "Terça": "terça-feira", "Quarta": "quarta-feira", "Quinta": "quinta-feira", "Sexta": "sexta-feira" };
 
             document.querySelectorAll('.day-card').forEach(card => {
-                let diaNome = card.querySelector('.day-title').innerText.split('\n')[0].trim();
-                if (!dadosPorDia[diaNome]) dadosPorDia[diaNome] = { tarefas: [], recursos: [] };
+                let diaNomePt = card.querySelector('.day-title').innerText.split('\n')[0].trim();
+                let diaSemanaStr = diasMap[diaNomePt] || diaNomePt.toLowerCase();
+                let dataExec = card.querySelector('.day-title small') ? card.querySelector('.day-title small').innerText : '';
 
+                // Varre Tarefas
                 card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
                     let descEl = box.querySelector('.item-text') || box.querySelector('strong');
-                    let desc = descEl ? descEl.innerText.trim() : '';
-                    let status = box.querySelector('input[type="checkbox"]').checked ? '[OK]' : '[Pendente]';
-                    let tipo = box.classList.contains('tarefa-extra-box') ? '⚡ [EXTRA]' : (box.classList.contains('treinamento-box') ? '🎓 [Treinamento]' : '🟢');
-                    dadosPorDia[diaNome].tarefas.push(`${tipo} ${desc}${status}`);
-                });
+                    let atividade = descEl ? descEl.innerText.trim() : '';
+                    let statusConcluido = box.querySelector('input[type="checkbox"]').checked ? 'SIM' : 'NÃO';
+                    
+                    // Pega recursos daquele dia para alinhar na mesma linha se necessário
+                    let recursosDia = [];
+                    card.querySelectorAll('.resource-tag').forEach(tag => {
+                        let rEl = tag.querySelector('.item-text');
+                        if (rEl) recursosDia.push(rEl.innerText.trim());
+                    });
+                    let necessidadeRecurso = recursosDia.join(', ');
 
-                card.querySelectorAll('.resource-tag').forEach(tag => {
-                    let descEl = tag.querySelector('.item-text');
-                    let desc = descEl ? descEl.innerText.trim() : '';
-                    let status = tag.querySelector('input[type="checkbox"]').checked ? '[OK]' : '[Pendente]';
-                    dadosPorDia[diaNome].recursos.push(`🚙 ${desc}${status}`);
+                    // ITEM; OS; Área Responsável; Atividade; Local; Sala; Data; Dia da Semana; Bloq Eletrico; Bloq Mec; PTS; Almoxarifado; Recursos
+                    csvContent += `1;;ALMOXARIFADO;"${atividade}";;;"${dataExec}";"${diaSemanaStr}";NÃO;NÃO;NÃO;NÃO;"${necessidadeRecurso}"\n`;
                 });
             });
-
-            let csvContent = "\uFEFF";
-            diasMap.forEach(d => {
-                csvContent += `${d} (Tarefas);${d} (Recursos);;`;
-            });
-            csvContent += "\n";
-
-            let maxLinhas = Math.max(...diasMap.map(d => Math.max(dadosPorDia[d].tarefas.length, dadosPorDia[d].recursos.length)));
-
-            for (let i = 0; i < maxLinhas; i++) {
-                let linha = "";
-                diasMap.forEach(d => {
-                    let t = dadosPorDia[d].tarefas[i] ? `"${dadosPorDia[d].tarefas[i]}"` : '""';
-                    let r = dadosPorDia[d].recursos[i] ? `"${dadosPorDia[d].recursos[i]}"` : '""';
-                    linha += `${t};${r};;`;
-                });
-                csvContent += linha + "\n";
-            }
 
             let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             let url = URL.createObjectURL(blob);
             let a = document.createElement('a');
             a.href = url;
-            a.download = `Programacao_LadoALado_Semana_${semana}_${ano}.csv`;
+            a.download = `PROGRAMACAO_SEMANAL_SEMANA_${semana}_VALE.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
