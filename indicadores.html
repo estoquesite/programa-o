@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores de Produtividade (v2.0)</title>
+    <title>Painel de Indicadores & Gráficos (v3.0)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,6 +11,8 @@
     </script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js para os gráficos dinâmicos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #1b5e20;
@@ -29,7 +31,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 950px;
+            max-width: 1000px;
             margin: 0 auto;
         }
     </style>
@@ -39,67 +41,78 @@
     <div class="container space-y-6">
         <!-- CABEÇALHO -->
         <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <a href="index.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar ao Menu</a>
-            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores & Visão Anual</h2>
-            <button onclick="carregarIndicadoresDaNuvem()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar Dados</button>
+            <a href="programacao.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
+            <h2 class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores & Gráficos</h2>
+            <button onclick="carregarIndicadoresDaNuvem()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
         </div>
 
-        <!-- FILTRO DE PERÍODO -->
+        <!-- FILTRO DE ANO -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Selecionar Ano de Análise</h3>
-                <p class="text-[11px] text-gray-500">Consolida o desempenho anual, mensal e detalhamento semanal.</p>
+                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📅 Ano de Análise</h3>
+                <p class="text-[11px] text-gray-500">Acompanhamento visual da evolução de desempenho.</p>
             </div>
             <div class="flex items-center gap-2">
                 <input type="number" id="inputAnoIndicador" value="2026" onchange="carregarIndicadores()" class="w-20 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold text-center">
             </div>
         </div>
 
-        <!-- CARDS DE RESUMO GERAL -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Planeadas (Ano)</span>
-                <h3 id="cardTotalPlaneadas" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
+        <!-- CARDS DE RESUMO + GRÁFICO ANUAL COMPACTO -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Cards de Resumo na Esquerda (1 coluna) -->
+            <div class="flex flex-col gap-3 justify-between">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Planeadas (Ano)</span>
+                    <h3 id="cardTotalPlaneadas" class="text-xl font-black text-blue-600 dark:text-blue-400">0</h3>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Concluídas (Ano)</span>
+                    <h3 id="cardTotalConcluidas" class="text-xl font-black text-green-600 dark:text-green-400">0</h3>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Taxa de Execução Anual</span>
+                    <h3 id="cardTaxaExecucao" class="text-xl font-black text-purple-600 dark:text-purple-400">0%</h3>
+                </div>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Concluídas (Ano)</span>
-                <h3 id="cardTotalConcluidas" class="text-2xl font-black text-green-600 dark:text-green-400">0</h3>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Taxa de Execução Anual</span>
-                <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
+
+            <!-- Gráfico Anual Compacto na Direita (2 colunas) -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
+                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400 mb-2">📈 Evolução Anual (Curva de Desempenho Mensal)</h3>
+                <div class="relative h-56 w-full">
+                    <canvas id="graficoAnualCanvas"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- VISÃO ANUAL / GRÁFICO DE BARRAS POR MÊS -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-            <div>
-                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Desempenho Anual por Mês (Gráfico de Execução)</h3>
-                <p class="text-[11px] text-gray-500">Acompanhamento consolidado do volume executado em relação ao planejado por mês.</p>
+        <!-- GRÁFICO SEMANAL + TABELA DETALHADA -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Gráfico Semanal Compacto (1 coluna) -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
+                <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400 mb-2">⚡ Taxa por Semana (%)</h3>
+                <div class="relative h-56 w-full">
+                    <canvas id="graficoSemanalCanvas"></canvas>
+                </div>
             </div>
-            <div id="graficoMensalContainer" class="space-y-3 pt-2">
-                <!-- Preenchido dinamicamente por mês -->
-            </div>
-        </div>
 
-        <!-- TABELA DE INDICADORES POR SEMANA -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento por Semana</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead>
-                        <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Semana</th>
-                            <th class="py-2.5 px-3">Planeadas</th>
-                            <th class="py-2.5 px-3">Concluídas</th>
-                            <th class="py-2.5 px-3">Extras</th>
-                            <th class="py-2.5 px-3">Desempenho</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaIndicadoresCorpo">
-                        <!-- Preenchido dinamicamente -->
-                    </tbody>
-                </table>
+            <!-- Tabela Detalhada por Semana (2 colunas) -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+                <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento por Semana</h3>
+                <div class="overflow-x-auto max-h-56 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[10px]">
+                                <th class="py-2 px-3">Semana</th>
+                                <th class="py-2 px-3">Planeadas</th>
+                                <th class="py-2 px-3">Concluídas</th>
+                                <th class="py-2 px-3">Extras</th>
+                                <th class="py-2 px-3">Desempenho</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaIndicadoresCorpo">
+                            <!-- Preenchido dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -108,7 +121,10 @@
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const nomesMesesCompletos = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const nomesMesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        
+        let graficoAnualInstance = null;
+        let graficoSemanalInstance = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await carregarIndicadoresDaNuvem();
@@ -131,10 +147,9 @@
             carregarIndicadores();
         }
 
-        // Função auxiliar para estimar o mês com base no número da semana do ano
         function obterMesPelaSemana(ano, numSemana) {
             let d = new Date(ano, 0, 1 + (numSemana - 1) * 7);
-            return d.getMonth(); // 0 a 11
+            return d.getMonth();
         }
 
         function carregarIndicadores() {
@@ -144,10 +159,11 @@
             let totalPlaneadasAno = 0;
             let totalConcluidasAno = 0;
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0 }));
+            let semanasLabels = [];
+            let semanasTaxas = [];
 
             let tbody = document.getElementById('tabelaIndicadoresCorpo');
             tbody.innerHTML = '';
-
             let encontrouAlguma = false;
 
             Object.keys(semanasSalvas).forEach(key => {
@@ -171,23 +187,25 @@
                     totalPlaneadasAno += planeadas;
                     totalConcluidasAno += executadas;
 
-                    // Agrupar dados por mês estimado da semana
                     let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
                     mesesDados[mesIdx].planeadas += planeadas;
                     mesesDados[mesIdx].concluidas += executadas;
 
                     let percentual = planeadas > 0 ? Math.round((executadas / planeadas) * 100) : 0;
 
+                    semanasLabels.push(`S${numSemana}`);
+                    semanasTaxas.push(percentual);
+
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-3 px-3 font-bold text-gray-800 dark:text-gray-200">Semana ${numSemana}</td>
-                        <td class="py-3 px-3 font-semibold text-blue-600 dark:text-blue-400">${planeadas}</td>
-                        <td class="py-3 px-3 font-semibold text-green-600 dark:text-green-400">${executadas}</td>
-                        <td class="py-3 px-3 font-semibold text-amber-600 dark:text-amber-400">${extrasCount}</td>
-                        <td class="py-3 px-3">
+                        <td class="py-2.5 px-3 font-bold text-gray-800 dark:text-gray-200">Semana ${numSemana}</td>
+                        <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">${planeadas}</td>
+                        <td class="py-2.5 px-3 font-semibold text-green-600 dark:text-green-400">${executadas}</td>
+                        <td class="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400">${extrasCount}</td>
+                        <td class="py-2.5 px-3">
                             <div class="flex items-center gap-2">
-                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                                <div class="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                                     <div class="bg-green-600 h-2 rounded-full" style="width: ${percentual > 100 ? 100 : percentual}%"></div>
                                 </div>
                                 <span class="font-bold text-[11px] text-gray-600 dark:text-gray-300">${percentual}%</span>
@@ -199,36 +217,89 @@
             });
 
             if (!encontrouAlguma) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 italic">Nenhum dado de programação encontrado para o ano ${anoSelecionado}.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 italic">Nenhum dado encontrado para o ano ${anoSelecionado}.</td></tr>`;
             }
 
-            // Atualiza os cards gerais do topo
             document.getElementById('cardTotalPlaneadas').innerText = totalPlaneadasAno;
             document.getElementById('cardTotalConcluidas').innerText = totalConcluidasAno;
             let taxaGeral = totalPlaneadasAno > 0 ? Math.round((totalConcluidasAno / totalPlaneadasAno) * 100) : 0;
             document.getElementById('cardTaxaExecucao').innerText = `${taxaGeral}%`;
 
-            // Renderiza o Gráfico Anual por Mês em barras
-            let graficoContainer = document.getElementById('graficoMensalContainer');
-            graficoContainer.innerHTML = '';
+            // Montar dados para os gráficos Chart.js
+            let mesesTaxas = mesesDados.map(m => m.planeadas > 0 ? Math.round((m.concluidas / m.planeadas) * 100) : 0);
 
-            mesesDados.forEach((m, idx) => {
-                let pMes = m.planeadas;
-                let cMes = m.concluidas;
-                let taxaMes = pMes > 0 ? Math.round((cMes / pMes) * 100) : 0;
+            renderizarGraficoAnual(mesesTaxas);
+            renderizarGraficoSemanal(semanasLabels, semanasTaxas);
+        }
 
-                const barraDiv = document.createElement('div');
-                barraDiv.className = 'space-y-1';
-                barraDiv.innerHTML = `
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-gray-700 dark:text-gray-300">${nomesMesesCompletos[idx]}</span>
-                        <span class="text-gray-400 font-medium">${cMes} de ${pMes} concluídas (${taxaMes}%)</span>
-                    </div>
-                    <div class="w-full bg-gray-100 dark:bg-gray-700/60 rounded-full h-3 overflow-hidden p-0.5 border border-gray-200 dark:border-gray-700">
-                        <div class="bg-gradient-to-r from-green-600 to-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${taxaMes > 100 ? 100 : taxaMes}%"></div>
-                    </div>
-                `;
-                graficoContainer.appendChild(barraDiv);
+        function renderizarGraficoAnual(dadosTaxas) {
+            const ctx = document.getElementById('graficoAnualCanvas').getContext('2d');
+            if (graficoAnualInstance) graficoAnualInstance.destroy();
+
+            graficoAnualInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: nomesMesesCurtos,
+                    datasets: [{
+                        label: 'Desempenho (%)',
+                        data: dadosTaxas,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#15803d'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { font: { size: 10 } }
+                        },
+                        x: {
+                            ticks: { font: { size: 10 } }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderizarGraficoSemanal(labels, taxas) {
+            const ctx = document.getElementById('graficoSemanalCanvas').getContext('2d');
+            if (graficoSemanalInstance) graficoSemanalInstance.destroy();
+
+            graficoSemanalInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Semana (%)',
+                        data: taxas,
+                        backgroundColor: '#22c55e',
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { font: { size: 10 } }
+                        },
+                        x: {
+                            ticks: { font: { size: 10 } }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
             });
         }
     </script>
