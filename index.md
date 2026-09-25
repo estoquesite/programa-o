@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Central - Gestão Integrada (v3.36)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #1b5e20;
+            --secondary-color: #e8f5e9;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col justify-between">
+
+    <div class="container space-y-8 my-auto py-10">
+        <!-- CABEÇALHO DO PAINEL -->
+        <div class="text-center space-y-2">
+            <div class="w-20 h-20 bg-green-100 dark:bg-green-950/60 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-sm border border-green-200 dark:border-green-900">🗂️</div>
+            <h1 class="text-3xl font-black uppercase text-green-800 dark:text-green-400">Painel Central</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Selecione o módulo que deseja aceder</p>
+        </div>
+
+        <!-- CARTÕES DE NAVEGAÇÃO -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <!-- BOTÃO PROGRAMAÇÃO -->
+            <a href="programacao.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-green-500 dark:hover:border-green-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1">
+                <div class="w-14 h-14 bg-green-50 dark:bg-green-950/50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition">📅</div>
+                <div>
+                    <h2 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Programação</h2>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Gestão semanal de tarefas, recursos, feriados e emendas.</p>
+                </div>
+                <span class="text-xs font-bold text-green-700 dark:text-green-400 pt-2 flex items-center gap-1">Aceder ➔</span>
+            </a>
+
+            <!-- BOTÃO TREINAMENTOS -->
+            <a href="treinamentos.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-green-500 dark:hover:border-green-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1">
+                <div class="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition">🎓</div>
+                <div>
+                    <h2 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Treinamentos</h2>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Registo e alocação de treinos por período e participantes.</p>
+                </div>
+                <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 pt-2 flex items-center gap-1">Aceder ➔</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- RODAPÉ -->
+    <footer class="text-center text-[10px] text-gray-400 dark:text-gray-500 py-4">
+        Painel Integrado v3.36 Nuvem • Todos os direitos reservados
+    </footer>
+
+</body>
+</html>
