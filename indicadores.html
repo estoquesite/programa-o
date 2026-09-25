@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v4.4 Controle Total de Semanas)</title>
+    <title>Painel de Indicadores & Gráficos (v4.5 Personalizável)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,8 +34,18 @@
             max-width: 1150px;
             margin: 0 auto;
         }
+        .btn-edit-title {
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            font-size: 11px;
+            padding: 1px 3px;
+        }
+        .btn-edit-title:hover {
+            opacity: 1;
+        }
         @media print {
-            .print-hidden {
+            .print-hidden, .btn-edit-title {
                 display: none !important;
             }
             body {
@@ -67,17 +77,20 @@
         <!-- CABEÇALHO -->
         <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
-            <h2 class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Central de Indicadores Operacionais</h2>
+            <div class="flex items-center gap-1.5">
+                <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Painel de Indicadores</h2>
+                <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
+            </div>
             <div class="flex items-center gap-2">
                 <button onclick="window.print()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir Seleção</button>
                 <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
             </div>
         </div>
 
-        <!-- PAINEL DE CONTROLE: SELETOR DE ANO E TODAS AS 53 SEMANAS -->
+        <!-- PAINEL DE CONTROLE DE FILTROS -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
             
-            <!-- LINHA 1: ESCOLHA LIVRE DE ANO -->
+            <!-- LINHA 1: ESCOLHA DE ANO -->
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                 <div class="flex items-center gap-2 flex-wrap">
                     <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
@@ -96,10 +109,13 @@
                 </div>
             </div>
 
-            <!-- LINHA 2: CAIXINHAS DAS 53 SEMANAS DO ANO (MARCAÇÃO RÁPIDA ESTILO EXCEL) -->
+            <!-- LINHA 2: CAIXINHAS DAS 53 SEMANAS -->
             <div class="space-y-1.5">
                 <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-800 dark:text-blue-400">Filtro de Semanas do Ano:</span>
+                    <div class="flex items-center gap-1">
+                        <span id="lbl_filtro_semanas" class="text-[10px] font-bold uppercase tracking-wider text-blue-800 dark:text-blue-400">Filtro de Semanas do Ano:</span>
+                        <button type="button" onclick="editarTexto('lbl_filtro_semanas')" class="btn-edit-title" title="Editar nome">✏️</button>
+                    </div>
                     <span id="labelContadorSemanas" class="text-[10px] font-extrabold text-blue-700 dark:text-blue-300 uppercase">0 Semanas Marcadas</span>
                 </div>
                 <div id="gridUniversalSemanas" class="max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-13 gap-1.5 text-xs">
@@ -111,19 +127,23 @@
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                     <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
                         <input type="checkbox" id="checkCanalTotal" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-blue-600 cursor-pointer">
-                        <span>Total Planeado</span>
+                        <span id="lbl_canal_total">Total Planeado</span>
+                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_total')" class="btn-edit-title">✏️</button>
                     </label>
                     <label class="flex items-center gap-1.5 cursor-pointer bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 px-2.5 py-1.5 rounded-xl border border-green-200 dark:border-green-900">
                         <input type="checkbox" id="checkCanalConcluidas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-green-600 cursor-pointer">
-                        <span>Realizadas</span>
+                        <span id="lbl_canal_realizadas">Realizadas</span>
+                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_realizadas')" class="btn-edit-title">✏️</button>
                     </label>
                     <label class="flex items-center gap-1.5 cursor-pointer bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-2.5 py-1.5 rounded-xl border border-red-200 dark:border-red-900">
                         <input type="checkbox" id="checkCanalNaoRealizadas" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-red-600 cursor-pointer">
-                        <span>Não Realizadas</span>
+                        <span id="lbl_canal_nao_realizadas">Não Realizadas</span>
+                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_nao_realizadas')" class="btn-edit-title">✏️</button>
                     </label>
                     <label class="flex items-center gap-1.5 cursor-pointer bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 px-2.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-900">
                         <input type="checkbox" id="checkCanalExtras" checked onchange="atualizarVisualizacao()" class="w-4 h-4 accent-amber-500 cursor-pointer">
-                        <span>Extras</span>
+                        <span id="lbl_canal_extras">Extras</span>
+                        <button type="button" onclick="event.preventDefault(); editarTexto('lbl_canal_extras')" class="btn-edit-title">✏️</button>
                     </label>
                 </div>
             </div>
@@ -132,67 +152,100 @@
         <!-- CARDS DE RESUMO OPERACIONAL -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Itens</span>
+                <div class="flex items-center justify-center gap-1">
+                    <span id="lbl_card_total" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total Itens</span>
+                    <button type="button" onclick="editarTexto('lbl_card_total')" class="btn-edit-title">✏️</button>
+                </div>
                 <h3 id="cardTotalPlaneadas" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
                 <p class="text-[10px] text-gray-500 font-semibold" id="cardSubInfoEscopo">Período Selecionado</p>
             </div>
+            
             <div id="cardBoxConcluidas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Concluídas</span>
+                <div class="flex items-center justify-center gap-1">
+                    <span id="lbl_card_concluidas" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Concluídas</span>
+                    <button type="button" onclick="editarTexto('lbl_card_concluidas')" class="btn-edit-title">✏️</button>
+                </div>
                 <h3 id="cardTotalConcluidas" class="text-2xl font-black text-green-600 dark:text-green-400">0</h3>
                 <p id="cardSubTaxaConcluidas" class="text-[10px] text-green-600 font-bold">0% do total</p>
             </div>
+
             <div id="cardBoxNaoRealizadas" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Não Realizadas</span>
+                <div class="flex items-center justify-center gap-1">
+                    <span id="lbl_card_nao_realizadas" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Não Realizadas</span>
+                    <button type="button" onclick="editarTexto('lbl_card_nao_realizadas')" class="btn-edit-title">✏️</button>
+                </div>
                 <h3 id="cardTotalNaoRealizadas" class="text-2xl font-black text-red-600 dark:text-red-400">0</h3>
                 <p id="cardSubTaxaNaoRealizadas" class="text-[10px] text-red-600 font-bold">0% pendente</p>
             </div>
+
             <div id="cardBoxExtras" class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 transition-opacity">
-                <span class="text-[10px] font-bold uppercase text-amber-500 tracking-wider">⚡ Demandas Extras</span>
+                <div class="flex items-center justify-center gap-1">
+                    <span id="lbl_card_extras" class="text-[10px] font-bold uppercase text-amber-500 tracking-wider">Demandas Extras</span>
+                    <button type="button" onclick="editarTexto('lbl_card_extras')" class="btn-edit-title">✏️</button>
+                </div>
                 <h3 id="cardTotalExtras" class="text-2xl font-black text-amber-600 dark:text-amber-400">0</h3>
                 <p id="cardSubTaxaExtras" class="text-[10px] text-amber-600 font-bold">0% do volume</p>
             </div>
+
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1">
-                <span class="text-[10px] font-bold uppercase text-purple-500 tracking-wider">Aproveitamento</span>
+                <div class="flex items-center justify-center gap-1">
+                    <span id="lbl_card_aproveitamento" class="text-[10px] font-bold uppercase text-purple-500 tracking-wider">Aproveitamento</span>
+                    <button type="button" onclick="editarTexto('lbl_card_aproveitamento')" class="btn-edit-title">✏️</button>
+                </div>
                 <h3 id="cardTaxaExecucao" class="text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
                 <p class="text-[10px] text-gray-500 font-semibold" id="cardSubLabelAno">Ano 2026</p>
             </div>
         </div>
 
-        <!-- BLOCO DE RECURSOS: EXIBE SOMENTE O QUE FOI MARCADO/CONCLUÍDO -->
+        <!-- BLOCO DE RECURSOS -->
         <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
-                <div>
-                    <h3 class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
-                        <span>🚙</span> Painel de Utilização de Recursos (Caixinhas Marcadas)
+                <div class="flex items-center gap-1.5">
+                    <h3 id="lbl_titulo_bloco_recursos" class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300">
+                        🚙 Painel de Recursos
                     </h3>
-                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400">Computa apenas recursos efetivamente validados com caixinha marcada nas semanas ativas.</p>
+                    <button type="button" onclick="editarTexto('lbl_titulo_bloco_recursos')" class="btn-edit-title">✏️</button>
                 </div>
                 <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-1 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
             </div>
 
+            <!-- CARDS DE RECURSOS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Recursos Efetivamente Utilizados</span>
+                    <div class="flex items-center gap-1">
+                        <span id="lbl_card_rec_total" class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Total de Recursos Utilizados</span>
+                        <button type="button" onclick="editarTexto('lbl_card_rec_total')" class="btn-edit-title">✏️</button>
+                    </div>
                     <h4 id="cardRecursoTotal" class="text-2xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
                     <p id="cardRecursoTotalSub" class="text-[10px] text-gray-500 font-semibold">Caixinhas marcadas</p>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <span class="text-[10px] font-bold uppercase text-green-600 tracking-wider">🏆 Recurso Mais Utilizado</span>
+                    <div class="flex items-center gap-1">
+                        <span id="lbl_card_rec_mais" class="text-[10px] font-bold uppercase text-green-600 tracking-wider">Recurso Mais Utilizado</span>
+                        <button type="button" onclick="editarTexto('lbl_card_rec_mais')" class="btn-edit-title">✏️</button>
+                    </div>
                     <h4 id="cardRecursoMaisNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
                     <p id="cardRecursoMaisQtd" class="text-[10px] text-green-700 font-bold">0 utilizações (0%)</p>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1">
-                    <span class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">📉 Recurso Menos Utilizado</span>
+                    <div class="flex items-center gap-1">
+                        <span id="lbl_card_rec_menos" class="text-[10px] font-bold uppercase text-amber-600 tracking-wider">Recurso Menos Utilizado</span>
+                        <button type="button" onclick="editarTexto('lbl_card_rec_menos')" class="btn-edit-title">✏️</button>
+                    </div>
                     <h4 id="cardRecursoMenosNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
                     <p id="cardRecursoMenosQtd" class="text-[10px] text-amber-700 font-bold">0 utilizações</p>
                 </div>
             </div>
 
+            <!-- GRÁFICO E TABELA DE RECURSOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                    <h4 class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300 mb-2">📊 Ranking de Utilização</h4>
+                    <div class="flex items-center gap-1 mb-2">
+                        <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Gráfico de Recursos</h4>
+                        <button type="button" onclick="editarTexto('lbl_grafico_rec')" class="btn-edit-title">✏️</button>
+                    </div>
                     <div class="relative h-60 w-full flex items-center justify-center">
                         <canvas id="graficoRecursosCanvas"></canvas>
                         <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado nas semanas selecionadas.</p>
@@ -200,7 +253,10 @@
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2">
-                    <h4 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Recursos Utilizados no Período</h4>
+                    <div class="flex items-center gap-1">
+                        <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela de Recursos</h4>
+                        <button type="button" onclick="editarTexto('lbl_tabela_rec')" class="btn-edit-title">✏️</button>
+                    </div>
                     <div class="overflow-x-auto max-h-56 overflow-y-auto">
                         <table class="w-full text-left text-xs">
                             <thead>
@@ -221,18 +277,19 @@
         <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho por Canal)</h3>
+                <div class="flex items-center gap-1 mb-2">
+                    <h3 id="lbl_grafico_mensal" class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho)</h3>
+                    <button type="button" onclick="editarTexto('lbl_grafico_mensal')" class="btn-edit-title">✏️</button>
                 </div>
                 <div class="relative h-64 w-full">
                     <canvas id="graficoAnualCanvas"></canvas>
                 </div>
             </div>
 
-            <!-- GRÁFICO DINÂMICO DE TODAS AS SEMANAS SELECIONADAS -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Gráfico Semanal (Atualiza Conforme Marcação)</h3>
+                <div class="flex items-center gap-1 mb-2">
+                    <h3 id="lbl_grafico_semanal" class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Gráfico Semanal</h3>
+                    <button type="button" onclick="editarTexto('lbl_grafico_semanal')" class="btn-edit-title">✏️</button>
                 </div>
                 <div class="relative h-64 w-full">
                     <canvas id="graficoSemanalCanvas"></canvas>
@@ -240,11 +297,14 @@
             </div>
         </div>
 
-        <!-- TABELA COM AS 53 SEMANAS DO ANO E CONTROLE DIRETO DE CHECKBOXES -->
+        <!-- TABELA COM AS 53 SEMANAS DO ANO -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
             <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento de Semanas do Ano (Marque / Desmarque)</h3>
-                <span class="text-[11px] text-gray-400">As semanas marcadas aqui definem os dados exibidos nos gráficos e na impressão.</span>
+                <div class="flex items-center gap-1">
+                    <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento Semanal</h3>
+                    <button type="button" onclick="editarTexto('lbl_tabela_semanas')" class="btn-edit-title">✏️</button>
+                </div>
+                <span class="text-[11px] text-gray-400">Marque ou desmarque qualquer semana para refinar o relatório.</span>
             </div>
             <div class="overflow-x-auto max-h-96 overflow-y-auto">
                 <table class="w-full text-left text-xs">
@@ -282,8 +342,26 @@
         let graficoRecursosInstance = null;
         let cacheDadosProcessados = null;
 
-        // Conjunto global que guarda quais das 53 semanas estão selecionadas
         let semanasSelecionadasSet = new Set();
+
+        // FUNÇÃO DE EDIÇÃO COM LÁPIS
+        function editarTexto(elementoId) {
+            const el = document.getElementById(elementoId);
+            if (!el) return;
+            const textoAtual = el.innerText.trim();
+            const novoTexto = prompt("Editar nome / título:", textoAtual);
+            if (novoTexto !== null && novoTexto.trim() !== "") {
+                el.innerText = novoTexto.trim();
+                localStorage.setItem(`custom_lbl_${elementoId}`, novoTexto.trim());
+            }
+        }
+
+        function carregarTextosCustomizados() {
+            document.querySelectorAll('[id^="lbl_"]').forEach(el => {
+                const salvo = localStorage.getItem(`custom_lbl_${el.id}`);
+                if (salvo) el.innerText = salvo;
+            });
+        }
 
         function limparSimbolosTexto(texto) {
             if (!texto) return "";
@@ -310,7 +388,6 @@
             return d.getMonth();
         }
 
-        // MONTA O GRID COM AS 53 SEMANAS
         function renderizarGridUniversalSemanas() {
             const cont = document.getElementById('gridUniversalSemanas');
             cont.innerHTML = '';
@@ -386,6 +463,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            carregarTextosCustomizados();
             selecionarSemanasPredefinicao('ate_vigente');
             await carregarIndicadoresDaNuvem();
         });
@@ -433,7 +511,6 @@
             let mesesDados = Array(12).fill(0).map(() => ({ planeadas: 0, concluidas: 0, naoRealizadas: 0, extras: 0 }));
             let semanasLista = [];
 
-            // Varre rigorosamente de 1 a 53 para permitir auditoria total
             for (let numSemana = 1; numSemana <= 53; numSemana++) {
                 let key = `prog_grid_${anoSelecionado}_semana_${numSemana}`;
                 let htmlCard = semanasSalvas[key];
@@ -457,7 +534,6 @@
                         if (ext.classList.contains('task-done') || (check && check.checked)) extrasConcluidas++;
                     });
 
-                    // Lê os recursos que foram marcados
                     let tagsRecursos = doc.querySelectorAll('.resource-tag');
                     tagsRecursos.forEach(tag => {
                         let descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
@@ -468,7 +544,6 @@
                             let check = tag.querySelector('input[type="checkbox"]');
                             let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
-                            // Só acumula nos totais se a semana estiver marcada no filtro
                             if (estaConcluido && !ehFuturoReal && estaSelecionada) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
                                 totalRecursosUtilizadosGeral++;
@@ -483,7 +558,6 @@
                     extrasCount = tarefasExtras.length;
                 }
 
-                // Só soma nos cartões e gráficos gerais se o usuário manteve a semana marcada
                 if (estaSelecionada) {
                     totalPlaneadasAno += planeadas;
                     totalConcluidasAno += executadas;
@@ -699,7 +773,6 @@
 
         function renderizarGraficosComFiltros(mostrarTotal, mostrarConcluidas, mostrarNaoRealizadas, mostrarExtras) {
             const meses = cacheDadosProcessados.mesesDados;
-            // Filtra estritamente as semanas que o usuário marcou para irem ao gráfico
             const semanasAtivas = cacheDadosProcessados.semanasLista.filter(s => s.ativa);
 
             let datasetsAnual = [];
@@ -789,7 +862,6 @@
                 }
             });
 
-            // GRÁFICO SEMANAL DINÂMICO
             let datasetsSemanal = [];
             let labelsSemanais = semanasAtivas.map(s => `S${String(s.numSemana).padStart(2,'0')}`);
 
