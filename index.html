@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Central - Gestão Integrada (v3.80 Auto-Lock)</title>
+    <title>Painel Central - Gestão Integrada (v4.00 Hub Inteligente)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,7 +28,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
         }
     </style>
@@ -47,7 +47,7 @@
             
             <div>
                 <h2 class="text-base font-black uppercase text-green-400 tracking-wide">Acesso Protegido</h2>
-                <p class="text-[11px] text-gray-400 mt-0.5">Autentique sua biometria para acessar</p>
+                <p class="text-[11px] text-gray-400 mt-0.5">Autentique sua biometria ou digite o PIN</p>
             </div>
 
             <!-- BOTÃO DE DISPARO DA BIOMETRIA (DIGITAL / FACE ID) -->
@@ -63,27 +63,42 @@
                 <hr class="w-full border-gray-800">
             </div>
 
-            <!-- ENTRADA DE SENHA / PIN DE CONTINGÊNCIA -->
+            <!-- ENTRADA DE SENHA / PIN DE CONTINGÊNCIA (COM TECLADO NUMÉRICO NATIVO) -->
             <div class="space-y-2">
-                <input type="password" id="inputPinAcesso" placeholder="Digite o PIN" maxlength="8"
-                    class="w-full text-center text-sm tracking-widest p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-white outline-none focus:border-green-500 transition">
+                <input type="password" id="inputPinAcesso" placeholder="••••" maxlength="8" inputmode="numeric" pattern="[0-9]*"
+                    class="w-full text-center text-base tracking-widest p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-white outline-none focus:border-green-500 transition font-bold">
                 
                 <button type="button" onclick="validarPinManual()" 
-                    class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 py-2 rounded-xl text-xs font-bold transition border border-gray-700">
+                    class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 py-2.5 rounded-xl text-xs font-bold transition border border-gray-700 active:scale-95">
                     Desbloquear com PIN
                 </button>
             </div>
 
             <p id="msgErroAcesso" class="text-[10px] text-red-400 font-bold hidden"></p>
 
-            <div class="pt-2 text-[9px] text-gray-500 border-t border-gray-800/80">
-                Bloqueio automático ao minimizar ou bloquear tela
+            <div class="pt-2 flex justify-between items-center text-[9px] text-gray-500 border-t border-gray-800/80">
+                <span>Auto-lock ao minimizar</span>
+                <button onclick="redefinirBiometriaChave()" class="text-green-500 hover:underline">Recadastrar biometria</button>
             </div>
         </div>
     </div>
 
+    <!-- TOPO DE STATUS & CONTROLES -->
+    <div class="max-w-5xl mx-auto w-full flex justify-between items-center px-2 py-1 text-xs">
+        <div class="flex items-center gap-2">
+            <span id="badgeStatusNuvem" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                <span>Conectando à nuvem...</span>
+            </span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="abrirModalConfigPin()" class="px-2.5 py-1 rounded-xl bg-gray-200 dark:bg-gray-800 text-[11px] font-bold hover:bg-gray-300 dark:hover:bg-gray-700 transition">⚙️ PIN</button>
+            <button onclick="alternarDarkMode()" class="px-2.5 py-1 rounded-xl bg-gray-200 dark:bg-gray-800 text-[11px] font-bold hover:bg-gray-300 dark:hover:bg-gray-700 transition">🌙/☀️ Tema</button>
+        </div>
+    </div>
+
     <!-- CONTEÚDO PRINCIPAL DO PAINEL -->
-    <div class="container space-y-8 my-auto py-10">
+    <div class="container space-y-8 my-auto py-6">
         <!-- CABEÇALHO DO PAINEL -->
         <div class="text-center space-y-2">
             <div class="w-20 h-20 bg-green-100 dark:bg-green-950/60 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-sm border border-green-200 dark:border-green-900">🗂️</div>
@@ -91,10 +106,11 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Selecione o módulo que deseja aceder</p>
         </div>
 
-        <!-- CARTÕES DE NAVEGAÇÃO -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <!-- CARTÕES DE NAVEGAÇÃO COM BADGES DINÂMICOS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
             <!-- BOTÃO PROGRAMAÇÃO -->
-            <a href="programacao.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-green-500 dark:hover:border-green-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1">
+            <a href="programacao.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-green-500 dark:hover:border-green-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1 relative">
+                <span id="badgeProgSemana" class="absolute top-3 right-3 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">Semana --</span>
                 <div class="w-14 h-14 bg-green-50 dark:bg-green-950/50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition">📅</div>
                 <div>
                     <h2 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Programação</h2>
@@ -104,7 +120,8 @@
             </a>
 
             <!-- BOTÃO INDICADORES -->
-            <a href="indicadores.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1">
+            <a href="indicadores.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1 relative">
+                <span class="absolute top-3 right-3 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">BI & Gráficos</span>
                 <div class="w-14 h-14 bg-purple-50 dark:bg-purple-950/50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition">📊</div>
                 <div>
                     <h2 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Indicadores</h2>
@@ -114,7 +131,8 @@
             </a>
 
             <!-- BOTÃO TREINAMENTOS -->
-            <a href="treinamentos.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1">
+            <a href="treinamentos.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1 relative">
+                <span id="badgeTotalTreinos" class="absolute top-3 right-3 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">-- Registados</span>
                 <div class="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition">🎓</div>
                 <div>
                     <h2 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Treinamentos</h2>
@@ -124,7 +142,8 @@
             </a>
 
             <!-- BOTÃO FERIADOS E EMENDAS -->
-            <a href="feriados.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1">
+            <a href="feriados.html" class="group bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-teal-500 dark:hover:border-teal-500 transition-all flex flex-col items-center text-center space-y-3 transform hover:-translate-y-1 relative">
+                <span id="badgeTotalFeriados" class="absolute top-3 right-3 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">-- Cadastrados</span>
                 <div class="w-14 h-14 bg-teal-50 dark:bg-teal-950/50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition">🍃</div>
                 <div>
                     <h2 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">Feriados</h2>
@@ -135,13 +154,42 @@
         </div>
     </div>
 
+    <!-- MODAL DE CONFIGURAÇÃO DE NOVO PIN -->
+    <div id="modalConfigPin" class="fixed inset-0 z-50 bg-gray-900/70 backdrop-blur-xs hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xs w-full space-y-3 border border-gray-100 dark:border-gray-700 text-center">
+            <h3 class="text-xs font-black uppercase text-gray-700 dark:text-gray-200">⚙️ Alterar PIN de Acesso</h3>
+            <p class="text-[10px] text-gray-500">Defina um novo PIN de 4 a 8 números</p>
+            <div class="space-y-2">
+                <input type="password" id="inputPinAtual" placeholder="PIN atual" maxlength="8" inputmode="numeric" pattern="[0-9]*" class="w-full text-center text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-xl dark:text-white">
+                <input type="password" id="inputNovoPin" placeholder="Novo PIN" maxlength="8" inputmode="numeric" pattern="[0-9]*" class="w-full text-center text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-xl dark:text-white">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="fecharModalConfigPin()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">Cancelar</button>
+                <button onclick="salvarNovoPin()" class="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-bold">Salvar PIN</button>
+            </div>
+        </div>
+    </div>
+
     <!-- RODAPÉ -->
-    <footer class="text-center text-[10px] text-gray-400 dark:text-gray-500 py-4">
-        Painel Integrado v3.80 Nuvem • Todos os direitos reservados
+    <footer class="text-center text-[10px] text-gray-400 dark:text-gray-500 py-3">
+        Painel Integrado v4.00 Hub Inteligente • Todos os direitos reservados
     </footer>
 
     <script>
-        const PIN_MESTRE_PADRAO = "1234"; // Defina o seu PIN de contingência aqui
+        const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const PIN_PADRAO_CONTINGENCIA = "1234";
+
+        function obterPinAtivo() {
+            return localStorage.getItem('app_pin_acesso_custom') || PIN_PADRAO_CONTINGENCIA;
+        }
+
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
+        }
 
         function liberarAcessoMobile() {
             const capa = document.getElementById('capaBloqueioMobile');
@@ -155,7 +203,6 @@
         }
 
         function bloquearAcessoMobile() {
-            // Só executa o bloqueio se for dispositivo mobile
             if (window.innerWidth >= 768) return;
 
             const capa = document.getElementById('capaBloqueioMobile');
@@ -166,17 +213,16 @@
             }
         }
 
-        // 1. MONITORAMENTO: Bloqueia na hora que a tela do celular apaga ou o app vai para segundo plano
+        // 1. MONITORAMENTO: Bloqueia na hora que a tela do celular apaga ou vai para segundo plano
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bloquearAcessoMobile();
             } else {
-                // Ao reabrir ou desbloquear a tela do celular, dispara a biometria na hora
                 setTimeout(autenticarBiometria, 300);
             }
         });
 
-        // 2. MONITORAMENTO: Bloqueia caso perca o foco (ex: puxar a barra de notificações)
+        // 2. MONITORAMENTO: Bloqueia ao perder o foco (ex.: arrastar a barra superior)
         window.addEventListener('blur', () => {
             bloquearAcessoMobile();
         });
@@ -185,8 +231,9 @@
         function validarPinManual() {
             const pinDigitado = document.getElementById('inputPinAcesso').value.trim();
             const msgErro = document.getElementById('msgErroAcesso');
+            const pinCorreto = obterPinAtivo();
 
-            if (pinDigitado === PIN_MESTRE_PADRAO) {
+            if (pinDigitado === pinCorreto) {
                 msgErro.classList.add('hidden');
                 liberarAcessoMobile();
             } else {
@@ -195,7 +242,12 @@
             }
         }
 
-        // Leitura da biometria nativa do aparelho (Touch ID / Face ID / Digital)
+        function focarInputPin() {
+            const inp = document.getElementById('inputPinAcesso');
+            if (inp) inp.focus();
+        }
+
+        // FLUXO BIOMÉTRICO (CREATE NA PRIMEIRA VEZ E GET NAS SEGUINTES)
         async function autenticarBiometria() {
             const capa = document.getElementById('capaBloqueioMobile');
             if (capa && capa.style.display === 'none') return;
@@ -206,54 +258,175 @@
             if (!window.PublicKeyCredential) {
                 msgErro.innerText = "Biometria indisponível. Use o PIN.";
                 msgErro.classList.remove('hidden');
+                focarInputPin();
                 return;
             }
 
             try {
                 const suporte = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
                 if (!suporte) {
-                    msgErro.innerText = "Biometria não ativa no aparelho. Use o PIN.";
+                    msgErro.innerText = "Biometria não configurada. Use o PIN.";
                     msgErro.classList.remove('hidden');
+                    focarInputPin();
                     return;
                 }
 
+                const credIdB64 = localStorage.getItem('app_webauthn_credential_id');
                 const challenge = new Uint8Array(32);
                 window.crypto.getRandomValues(challenge);
 
-                const options = {
-                    publicKey: {
-                        challenge: challenge,
-                        rp: { name: "Painel Central" },
-                        user: {
-                            id: new Uint8Array([1, 2, 3, 4]),
-                            name: "operador",
-                            displayName: "Operador"
-                        },
-                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                        authenticatorSelection: {
-                            authenticatorAttachment: "platform",
-                            userVerification: "required"
-                        },
-                        timeout: 60000
+                if (credIdB64) {
+                    // 1. AUTENTICAÇÃO COM CHAVE EXISTENTE (GET)
+                    const rawIdBytes = Uint8Array.from(atob(credIdB64), c => c.charCodeAt(0));
+                    const getOptions = {
+                        publicKey: {
+                            challenge: challenge,
+                            allowCredentials: [{
+                                id: rawIdBytes,
+                                type: "public-key"
+                            }],
+                            userVerification: "preferred",
+                            timeout: 60000
+                        }
+                    };
+                    const assertion = await navigator.credentials.get(getOptions);
+                    if (assertion) {
+                        liberarAcessoMobile();
+                        return;
                     }
-                };
-
-                const cred = await navigator.credentials.create(options);
-                if (cred) {
-                    liberarAcessoMobile();
+                } else {
+                    // 2. PRIMEIRO REGISTRO BIOMÉTRICO (CREATE)
+                    const createOptions = {
+                        publicKey: {
+                            challenge: challenge,
+                            rp: { name: "Painel Central Operacional" },
+                            user: {
+                                id: new Uint8Array(),
+                                name: "operador",
+                                displayName: "Operador"
+                            },
+                            pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                            authenticatorSelection: {
+                                authenticatorAttachment: "platform",
+                                userVerification: "required"
+                            },
+                            timeout: 60000
+                        }
+                    };
+                    const cred = await navigator.credentials.create(createOptions);
+                    if (cred && cred.rawId) {
+                        const b64 = btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
+                        localStorage.setItem('app_webauthn_credential_id', b64);
+                        liberarAcessoMobile();
+                        return;
+                    }
                 }
             } catch (err) {
                 if (err.name !== "NotAllowedError") {
                     msgErro.innerText = "Use o PIN de acesso.";
                     msgErro.classList.remove('hidden');
+                    focarInputPin();
                 }
             }
         }
 
+        function redefinirBiometriaChave() {
+            localStorage.removeItem('app_webauthn_credential_id');
+            alert("Chave biométrica redefinida. Na próxima tentativa será feito um novo cadastro.");
+            autenticarBiometria();
+        }
+
+        // GESTÃO DO PIN
+        function abrirModalConfigPin() {
+            document.getElementById('inputPinAtual').value = '';
+            document.getElementById('inputNovoPin').value = '';
+            document.getElementById('modalConfigPin').classList.remove('hidden');
+        }
+
+        function fecharModalConfigPin() {
+            document.getElementById('modalConfigPin').classList.add('hidden');
+        }
+
+        function salvarNovoPin() {
+            const atual = document.getElementById('inputPinAtual').value.trim();
+            const novo = document.getElementById('inputNovoPin').value.trim();
+            const pinCorreto = obterPinAtivo();
+
+            if (atual !== pinCorreto) {
+                alert("O PIN atual informado está incorreto.");
+                return;
+            }
+
+            if (!novo || novo.length < 4 || isNaN(novo)) {
+                alert("O novo PIN deve conter apenas números e no mínimo 4 dígitos.");
+                return;
+            }
+
+            localStorage.setItem('app_pin_acesso_custom', novo);
+            fecharModalConfigPin();
+            alert("✅ PIN alterado com sucesso!");
+        }
+
+        // CÁLCULO E LEITURA DE DADOS RÁPIDOS PARA OS CARDS
+        function calcularSemanaVigente() {
+            const hoje = new Date();
+            let dCalc = new Date(hoje);
+            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) dCalc.setDate(hoje.getDate() + 3);
+            const d = new Date(Date.UTC(dCalc.getFullYear(), dCalc.getMonth(), dCalc.getDate()));
+            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        async function checarStatusNuvemEAtualizarBadges() {
+            const badgeNuvem = document.getElementById('badgeStatusNuvem');
+            const badgeSemana = document.getElementById('badgeProgSemana');
+            const badgeTreinos = document.getElementById('badgeTotalTreinos');
+            const badgeFeriados = document.getElementById('badgeTotalFeriados');
+
+            // Define semana atual no badge
+            const sem = calcularSemanaVigente();
+            badgeSemana.innerText = `Semana ${sem}`;
+
+            try {
+                let { data, error } = await supabaseClient
+                    .from('app_dados_programacao')
+                    .select('conteudo')
+                    .eq('id', '1')
+                    .single();
+
+                if (!error && data && data.conteudo) {
+                    badgeNuvem.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 dark:bg-green-950/60 dark:text-green-300";
+                    badgeNuvem.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span><span>🟢 Nuvem Conectada</span>`;
+
+                    const treinos = data.conteudo.treinamentos || [];
+                    const feriados = data.conteudo.feriados || [];
+
+                    badgeTreinos.innerText = `${treinos.length} Registado(s)`;
+                    badgeFeriados.innerText = `${feriados.length} Cadastrado(s)`;
+                } else {
+                    throw error || new Error("Sem dados");
+                }
+            } catch (err) {
+                badgeNuvem.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300";
+                badgeNuvem.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span>🟡 Modo Local / Cache</span>`;
+
+                let treinosLocais = JSON.parse(localStorage.getItem('modulo_treinamentos_dados_nuvem')) || [];
+                let feriadosLocais = JSON.parse(localStorage.getItem('modulo_feriados_dados_nuvem')) || [];
+                badgeTreinos.innerText = `${treinosLocais.length} Registado(s)`;
+                badgeFeriados.innerText = `${feriadosLocais.length} Cadastrado(s)`;
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+
+            checarStatusNuvemEAtualizarBadges();
+
             if (window.innerWidth < 768) {
                 bloquearAcessoMobile();
-                // Tenta chamar o leitor biométrico assim que a página é carregada
                 setTimeout(autenticarBiometria, 400);
             }
         });
