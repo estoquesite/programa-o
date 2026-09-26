@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.3 Cursos da Programação)</title>
+    <title>Painel de Indicadores & Gráficos (v5.4 Enquadramento A4 Perfeito)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -49,7 +49,7 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 10mm 10mm 10mm 10mm;
+                margin: 8mm 8mm 8mm 8mm;
             }
             .print-hidden, .btn-edit-title {
                 display: none !important;
@@ -67,25 +67,22 @@
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56, .max-h-40 {
+            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56, .max-h-48, .max-h-40 {
                 max-height: none !important;
                 overflow: visible !important;
             }
-            .pagina-a4-bloco {
-                page-break-after: always;
-                break-after: page;
+            /* DIVISÃO DE PÁGINAS A4 LIMPAS */
+            .folha-a4 {
+                page-break-after: always !important;
+                break-after: page !important;
                 margin-bottom: 0 !important;
                 padding-bottom: 0 !important;
             }
-            .pagina-a4-quebra {
-                page-break-before: always;
-                break-before: page;
-            }
             .chart-wrapper {
-                height: 180px !important;
+                height: 190px !important;
             }
             canvas {
-                max-height: 180px !important;
+                max-height: 190px !important;
                 width: 100% !important;
             }
             .card-a4-impresso {
@@ -103,14 +100,16 @@
 
     <div class="container space-y-5">
         
-        <!-- PÁGINA 1 NA IMPRESSÃO: VISÃO GERAL & TAREFAS -->
-        <div class="pagina-a4-bloco space-y-4">
+        <!-- ============================================================== -->
+        <!-- FOLHA 1 NA IMPRESSÃO: CABEÇALHO, CARDS GERAIS E GRÁFICOS SEMANAIS -->
+        <!-- ============================================================== -->
+        <div class="folha-a4 space-y-4">
             
             <!-- CABEÇALHO -->
             <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 card-a4-impresso">
                 <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
                 <div class="flex items-center gap-1.5">
-                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Indicadores & Capacitação</h2>
+                    <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Desempenho Operacional</h2>
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
                 </div>
                 <div class="flex items-center gap-2">
@@ -218,7 +217,7 @@
                 </div>
             </div>
 
-            <!-- CARDS DE RESUMO OPERACIONAL (PÁGINA 1) -->
+            <!-- CARDS DE RESUMO OPERACIONAL -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
                     <div class="flex items-center justify-center gap-1">
@@ -266,24 +265,24 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) (PÁGINA 1) -->
+            <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
                     <div class="flex items-center gap-1 mb-1">
                         <h3 id="lbl_grafico_mensal" class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho)</h3>
                         <button type="button" onclick="editarTexto('lbl_grafico_mensal')" class="btn-edit-title">✏️</button>
                     </div>
-                    <div class="relative chart-wrapper h-56 w-full">
+                    <div class="relative chart-wrapper h-60 w-full">
                         <canvas id="graficoAnualCanvas"></canvas>
                     </div>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
                     <div class="flex items-center gap-1 mb-1">
-                        <h3 id="lbl_grafico_semanal" class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Gráfico Semanal</h3>
+                        <h3 id="lbl_grafico_semanal" class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">⚡ Gráfico Semanal (Volume)</h3>
                         <button type="button" onclick="editarTexto('lbl_grafico_semanal')" class="btn-edit-title">✏️</button>
                     </div>
-                    <div class="relative chart-wrapper h-56 w-full">
+                    <div class="relative chart-wrapper h-60 w-full">
                         <canvas id="graficoSemanalCanvas"></canvas>
                     </div>
                 </div>
@@ -291,75 +290,73 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- PÁGINA 2 NA IMPRESSÃO: RECURSOS, CURSOS & DETALHAMENTO -->
+        <!-- FOLHA 2 NA IMPRESSÃO: RECURSOS & EQUIPAMENTOS (PÁGINA INTEIRA) -->
         <!-- ============================================================== -->
-        <div class="pagina-a4-quebra space-y-4 pt-2">
-            
-            <!-- BLOCO DE RECURSOS (PÁGINA 2) -->
-            <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-3 card-a4-impresso">
+        <div class="folha-a4 space-y-4">
+            <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-4 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
-                        <h3 id="lbl_titulo_bloco_recursos" class="text-xs font-black uppercase text-emerald-900 dark:text-emerald-300">
+                        <h3 id="lbl_titulo_bloco_recursos" class="text-sm font-black uppercase text-emerald-900 dark:text-emerald-300">
                             🚜 Painel de Recursos & Equipamentos
                         </h3>
                         <button type="button" onclick="editarTexto('lbl_titulo_bloco_recursos')" class="btn-edit-title">✏️</button>
                     </div>
-                    <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2 py-0.5 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
+                    <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-1 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1 card-a4-impresso">
                         <div class="flex items-center gap-1">
-                            <span id="lbl_card_rec_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Total de Recursos Utilizados</span>
+                            <span id="lbl_card_rec_total" class="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Total de Recursos Utilizados</span>
                             <button type="button" onclick="editarTexto('lbl_card_rec_total')" class="btn-edit-title">✏️</button>
                         </div>
-                        <h4 id="cardRecursoTotal" class="text-xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
+                        <h4 id="cardRecursoTotal" class="text-2xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
                         <p id="cardRecursoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas</p>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1 card-a4-impresso">
                         <div class="flex items-center gap-1">
-                            <span id="lbl_card_rec_mais" class="text-[9px] font-bold uppercase text-green-700 tracking-wider">Recurso Mais Utilizado</span>
+                            <span id="lbl_card_rec_mais" class="text-[10px] font-bold uppercase text-green-700 tracking-wider">Recurso Mais Utilizado</span>
                             <button type="button" onclick="editarTexto('lbl_card_rec_mais')" class="btn-edit-title">✏️</button>
                         </div>
-                        <h4 id="cardRecursoMaisNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <h4 id="cardRecursoMaisNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
                         <p id="cardRecursoMaisQtd" class="text-[9px] text-green-700 font-bold">0 utilizações (0%)</p>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-1 card-a4-impresso">
                         <div class="flex items-center gap-1">
-                            <span id="lbl_card_rec_menos" class="text-[9px] font-bold uppercase text-amber-700 tracking-wider">Recurso Menos Utilizado</span>
+                            <span id="lbl_card_rec_menos" class="text-[10px] font-bold uppercase text-amber-700 tracking-wider">Recurso Menos Utilizado</span>
                             <button type="button" onclick="editarTexto('lbl_card_rec_menos')" class="btn-edit-title">✏️</button>
                         </div>
-                        <h4 id="cardRecursoMenosNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <h4 id="cardRecursoMenosNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
                         <p id="cardRecursoMenosQtd" class="text-[9px] text-amber-700 font-bold">0 utilizações</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
-                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
-                        <div class="flex items-center gap-1 mb-1">
-                            <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Gráfico de Recursos</h4>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
+                    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                        <div class="flex items-center gap-1 mb-2">
+                            <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Ranking de Utilização de Recursos</h4>
                             <button type="button" onclick="editarTexto('lbl_grafico_rec')" class="btn-edit-title">✏️</button>
                         </div>
-                        <div class="relative chart-wrapper h-48 w-full flex items-center justify-center">
+                        <div class="relative chart-wrapper h-60 w-full flex items-center justify-center">
                             <canvas id="graficoRecursosCanvas"></canvas>
                             <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado nas semanas selecionadas.</p>
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-1.5 card-a4-impresso">
+                    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
                         <div class="flex items-center gap-1">
-                            <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela de Recursos</h4>
+                            <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela Detalhada de Recursos</h4>
                             <button type="button" onclick="editarTexto('lbl_tabela_rec')" class="btn-edit-title">✏️</button>
                         </div>
-                        <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                        <div class="overflow-x-auto max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
-                                        <th class="py-1.5 px-2">Recurso / Equipamento</th>
-                                        <th class="py-1.5 px-2 text-center">Vezes</th>
-                                        <th class="py-1.5 px-2 text-right">% Uso</th>
+                                        <th class="py-2 px-2.5">Recurso / Equipamento</th>
+                                        <th class="py-2 px-2.5 text-center">Vezes</th>
+                                        <th class="py-2 px-2.5 text-right">% Uso</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabelaRecursosCorpo">
@@ -369,8 +366,14 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- BLOCO DE CAPACITAÇÃO: CURSOS / TREINAMENTOS DA PROGRAMAÇÃO -->
+        <!-- ============================================================== -->
+        <!-- FOLHA 3 NA IMPRESSÃO: CURSOS/CAPACITAÇÃO & TABELA DE SEMANAS -->
+        <!-- ============================================================== -->
+        <div class="space-y-4">
+            
+            <!-- BLOCO DE CAPACITAÇÃO: CURSOS / TREINAMENTOS -->
             <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-3 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
@@ -379,7 +382,7 @@
                         </h3>
                         <button type="button" onclick="editarTexto('lbl_titulo_bloco_treinos')" class="btn-edit-title">✏️</button>
                     </div>
-                    <span class="text-[10px] font-bold bg-purple-200/60 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 px-2 py-0.5 rounded-full" id="tagTotalTreinamentos">0 Cursos Concluídos</span>
+                    <span class="text-[10px] font-bold bg-purple-200/60 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 px-2.5 py-0.5 rounded-full" id="tagTotalTreinamentos">0 Cursos Concluídos</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
@@ -444,7 +447,7 @@
                 </div>
             </div>
 
-            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS (PÁGINA 2) -->
+            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS -->
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-1">
@@ -464,7 +467,7 @@
                                 <th class="py-2 px-2.5 text-amber-600 col-extras">Extras</th>
                                 <th class="py-2 px-2.5 text-purple-700">Cursos</th>
                                 <th class="py-2 px-2.5 text-emerald-700">Recursos</th>
-                                <th class="py-2.5 px-2.5">Status</th>
+                                <th class="py-2 px-2.5">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaIndicadoresCorpo">
@@ -833,7 +836,6 @@
             let totalRecursosUtilizadosGeral = 0;
             let todosRecursosNomes = new Set();
 
-            // Mapeamentos para o módulo de Treinamentos/Cursos
             let mapaCursosConcluidos = {};
             let mesesCursosConcluidos = Array(12).fill(0);
             let totalCursosConcluidosGeral = 0;
@@ -882,7 +884,6 @@
                         let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
                         let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
 
-                        // SÓ CONTA SE A CAIXINHA ESTIVER MARCADA COMO FEITA NA PROGRAMAÇÃO!
                         if (estaFeito && !ehFuturoReal) {
                             mapaCursosConcluidos[nomeTreino] = (mapaCursosConcluidos[nomeTreino] || 0) + 1;
                             mesesCursosConcluidos[mesIdx]++;
@@ -1001,7 +1002,6 @@
                 document.getElementById('cardTreinoMaisQtd').innerText = "0 participações";
             }
 
-            // Identifica o mês com maior carga de treinamentos
             let maiorMesIdx = 0;
             let maiorMesValor = 0;
             mesesCursos.forEach((val, idx) => {
@@ -1019,7 +1019,6 @@
                 document.getElementById('cardTreinoMesPicoQtd').innerText = "Sem cursos registrados";
             }
 
-            // Preenchimento da Tabela de Cursos
             const tbodyTreinos = document.getElementById('tabelaTreinamentosCorpo');
             tbodyTreinos.innerHTML = '';
 
@@ -1124,9 +1123,9 @@
                     const tr = document.createElement('tr');
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-emerald-50/40 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
-                        <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
                             <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
-                            <span class="text-base">${icone}</span>
+                            <span class="text-sm">${icone}</span>
                             <span>${r.nome}</span>
                         </td>
                         <td class="py-1.5 px-2 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
