@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v3.90 Nuvem)</title>
+    <title>Programação Semanal Interativa (v4.00 Nuvem Pro)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,6 +11,8 @@
     </script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- SortableJS para suporte a Touch e Mobile no Drag & Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <!-- Manifesto Dinâmico via JavaScript -->
     <link id="pwa-manifest" rel="manifest" href="">
     <style>
@@ -31,7 +33,7 @@
             padding: 10px;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
         }
         .header {
@@ -69,6 +71,10 @@
             margin-bottom: 20px;
             align-items: stretch;
         }
+        @media (max-width: 768px) {
+            .week-grid.mobile-single-day > .day-card { display: none !important; }
+            .week-grid.mobile-single-day > .day-card.active-day { display: flex !important; }
+        }
         .day-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -91,6 +97,7 @@
             flex-direction: column;
             gap: 4px;
             flex-grow: 1;
+            min-height: 40px;
         }
         .day-title {
             font-size: 13px;
@@ -167,6 +174,11 @@
             margin-top: auto;
             background: #ffffff;
             flex-shrink: 0;
+            min-height: 35px;
+        }
+        .dark .day-resources {
+            background: #1f2937;
+            border-top-color: #065f46;
         }
         .resources-title {
             font-size: 8px;
@@ -219,9 +231,13 @@
         }
         .btn-delete-item:hover { background-color: rgba(198, 40, 40, 0.1); }
         .dragging { opacity: 0.4; }
+        .sortable-ghost { opacity: 0.35; background-color: #c8e6c9 !important; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
+
+    <!-- TOASTS DE NOTIFICAÇÃO (NOVO) -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="container">
@@ -234,26 +250,57 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO E SEMANA + BOTÕES -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-1.5">
-                    <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
-                    <input type="number" id="inputAno" value="2026" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+        <!-- SELETOR DE ANO, SEMANA, BUSCA RÁPIDA E MÓDULOS -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-4xl mx-auto mb-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
+                        <input type="number" id="inputAno" value="2026" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Semana:</label>
+                        <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-14 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+                    </div>
+                    <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">🔄 Atual</button>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Semana:</label>
-                    <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-14 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+
+                <!-- BUSCA EM TEMPO REAL (NOVO) -->
+                <div class="flex-1 min-w-[220px] relative">
+                    <input type="text" id="inputBuscaGeral" oninput="filtrarItensEmTempoReal(this.value)" placeholder="🔍 Buscar tarefa, recurso, pessoa ou placa..." class="w-full text-xs p-2 pl-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <button id="btnLimparBusca" onclick="limparBusca()" class="hidden absolute right-2.5 top-2 text-xs text-gray-400 hover:text-gray-600 font-bold">✕</button>
                 </div>
             </div>
-            <div class="flex gap-1.5 items-center flex-wrap">
-                <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded-lg text-xs font-bold hover:bg-blue-200">🔄 Atual</button>
+
+            <!-- BOTÕES DE MÓDULOS -->
+            <div class="flex gap-1.5 items-center flex-wrap pt-2 border-t dark:border-gray-700">
                 <button onclick="abrirModalIndicador()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📊 Indicador</button>
                 <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📁 Histórico</button>
                 <button onclick="abrirModalTreinamentos()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🎓 Treinamentos</button>
                 <button onclick="abrirModalFeriados()" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">🍃 Feriados</button>
-                <button onclick="resetTotalNuvem()" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm" title="Limpar Cache Total da Nuvem">🗑️ Limpar Nuvem</button>
+                <button onclick="resetTotalNuvem()" class="ml-auto bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm" title="Limpar Cache Total da Nuvem">🗑️ Limpar Nuvem</button>
             </div>
+        </div>
+
+        <!-- PAINEL DE OCUPAÇÃO DE RECURSOS DA SEMANA (NOVO) -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-4xl mx-auto mb-3">
+            <div class="flex justify-between items-center mb-1.5">
+                <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">🚙 Balanço de Alocação de Recursos (Semana Atual)</span>
+                <span class="text-[9px] text-gray-400">Totalizadores automáticos</span>
+            </div>
+            <div id="painelResumoRecursos" class="flex flex-wrap gap-1.5 text-xs">
+                <!-- Preenchido automaticamente via JS -->
+            </div>
+        </div>
+
+        <!-- ABAS DIÁRIAS PARA CELULAR / MOBILE (NOVO) -->
+        <div class="print-hidden flex md:hidden items-center justify-between gap-1 mb-3 bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl">
+            <button onclick="mudarAbaDiaMobile('todos')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-green-800 dark:text-green-300">Todos</button>
+            <button onclick="mudarAbaDiaMobile('Segunda')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Seg</button>
+            <button onclick="mudarAbaDiaMobile('Terça')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Ter</button>
+            <button onclick="mudarAbaDiaMobile('Quarta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qua</button>
+            <button onclick="mudarAbaDiaMobile('Quinta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qui</button>
+            <button onclick="mudarAbaDiaMobile('Sexta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Sex</button>
         </div>
 
         <!-- CALENDÁRIO SEMANAL -->
@@ -403,7 +450,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v3.90 Nuvem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.00 Nuvem Pro</span>
         </div>
     </div>
 
@@ -426,6 +473,106 @@
             "CAMINHÃO PARTE DA MANHÃ", "CAMINHÃO PARTE DA TARDE", "CARRO", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS"
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
+
+        // SISTEMA DE NOTIFICAÇÃO TOAST VISUAL
+        function mostrarToast(mensagem, tipo = 'sucesso') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const cores = {
+                sucesso: 'bg-green-700 text-white',
+                aviso: 'bg-amber-600 text-white',
+                erro: 'bg-red-700 text-white',
+                info: 'bg-blue-700 text-white'
+            };
+            toast.className = `${cores[tipo] || cores.sucesso} text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto flex items-center gap-2`;
+            toast.innerHTML = `<span>${mensagem}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // BUSCA RÁPIDA EM TEMPO REAL
+        function filtrarItensEmTempoReal(termo) {
+            termo = termo.trim().toLowerCase();
+            const btnLimpar = document.getElementById('btnLimparBusca');
+            if (termo) btnLimpar.classList.remove('hidden');
+            else btnLimpar.classList.add('hidden');
+
+            const caixas = document.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag');
+            caixas.forEach(cx => {
+                const texto = cx.innerText.toLowerCase();
+                if (!termo || texto.includes(termo)) {
+                    cx.style.display = '';
+                    if (termo) cx.classList.add('ring-2', 'ring-amber-400');
+                    else cx.classList.remove('ring-2', 'ring-amber-400');
+                } else {
+                    cx.style.display = 'none';
+                    cx.classList.remove('ring-2', 'ring-amber-400');
+                }
+            });
+        }
+
+        function limparBusca() {
+            document.getElementById('inputBuscaGeral').value = '';
+            filtrarItensEmTempoReal('');
+        }
+
+        // PAINEL DE OCUPAÇÃO DE RECURSOS DA SEMANA
+        function atualizarPainelDeRecursos() {
+            const painel = document.getElementById('painelResumoRecursos');
+            if (!painel) return;
+
+            const tags = document.querySelectorAll('#weekGridContainer .resource-tag .item-text');
+            const contagem = {};
+
+            tags.forEach(t => {
+                const nome = limparSimbolosTexto(t.innerText);
+                if (nome) contagem[nome] = (contagem[nome] || 0) + 1;
+            });
+
+            if (Object.keys(contagem).length === 0) {
+                painel.innerHTML = '<span class="text-gray-400 italic text-[11px]">Nenhum recurso alocado nesta semana.</span>';
+                return;
+            }
+
+            painel.innerHTML = Object.entries(contagem).map(([recurso, qtd]) => `
+                <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold">
+                    <span>${recurso}</span>
+                    <span class="bg-emerald-700 text-white text-[9.5px] px-1.5 py-0.2 rounded-full">${qtd}x</span>
+                </span>
+            `).join('');
+        }
+
+        // NAVEGAÇÃO POR ABAS NO CELULAR
+        function mudarAbaDiaMobile(diaNome) {
+            document.querySelectorAll('.btn-tab-mobile').forEach(b => {
+                b.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
+                b.classList.add('text-gray-600', 'dark:text-gray-300');
+            });
+            event.target.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
+
+            const container = document.getElementById('weekGridContainer');
+            const cards = container.querySelectorAll('.day-card');
+
+            if (diaNome === 'todos') {
+                container.classList.remove('mobile-single-day');
+                cards.forEach(c => c.classList.remove('active-day'));
+            } else {
+                container.classList.add('mobile-single-day');
+                cards.forEach(c => {
+                    if (c.getAttribute('data-dia-nome') === diaNome) {
+                        c.classList.add('active-day');
+                    } else {
+                        c.classList.remove('active-day');
+                    }
+                });
+            }
+        }
 
         function aplicarCorrecao(texto) {
             if (!texto) return "";
@@ -578,6 +725,7 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            mostrarToast("📊 Exportado para Excel (Padrão Vale)!");
         }
 
         // Função universal que repara o HTML garantindo que TODO dia tenha a barra com ✔️ Dia, Feriado e Emenda
@@ -728,9 +876,9 @@
         async function salvarProgramacaoManualNuvem() {
             let sucesso = await salvarNaNuvem();
             if (sucesso) {
-                alert("✅ Programação salva com sucesso na nuvem!");
+                mostrarToast("✅ Programação salva com sucesso na nuvem!");
             } else {
-                alert("❌ Erro ao salvar na nuvem.");
+                mostrarToast("❌ Erro ao salvar na nuvem.", "erro");
             }
         }
 
@@ -739,14 +887,14 @@
                 dadosGlobaisNuvem.semanas = {};
                 await salvarNaNuvem();
                 atualizarDatasSemana();
-                alert("🔄 Nuvem limpa com sucesso!");
+                mostrarToast("🔄 Nuvem limpa com sucesso!", "info");
             }
         }
 
         async function sincronizarComNuvemManual() {
             await sincronizarComNuvem();
             atualizarDatasSemana();
-            alert("✅ Sincronizado com sucesso!");
+            mostrarToast("✅ Sincronizado com sucesso!");
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -821,7 +969,7 @@
             localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista));
             await salvarNaNuvem();
             renderizarPopTreinamentos();
-            alert("✅ Treinamento guardado!");
+            mostrarToast("✅ Treinamento guardado!");
         }
 
         async function enviarTreinamentoParaProgramacao(id) {
@@ -867,8 +1015,9 @@
                         tasksCont.appendChild(divTreino);
                         await salvarNaNuvem();
                         atualizarIndicadorProgresso();
+                        atualizarPainelDeRecursos();
                         fecharModalTreinamentos();
-                        alert(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
+                        mostrarToast(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
                     } else { alert("⚠️ Este treinamento já consta nesta semana."); }
                 }
             } else { alert("⚠️ A data deste treinamento cai em fim de semana."); }
@@ -905,7 +1054,7 @@
             localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
             await salvarNaNuvem();
             renderizarPopFeriados();
-            alert("✅ Feriado guardado!");
+            mostrarToast("✅ Feriado guardado!");
         }
 
         async function enviarFeriadoParaProgramacao(id) {
@@ -944,8 +1093,9 @@
                     cardDia.querySelector('.day-resources').innerHTML = '';
                     await salvarNaNuvem();
                     atualizarIndicadorProgresso();
+                    atualizarPainelDeRecursos();
                     fecharModalFeriados();
-                    alert(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
+                    mostrarToast(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
                 }
             } else { alert("⚠️ A data deste evento cai em fim de semana."); }
         }
@@ -973,6 +1123,8 @@
                 <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
             `;
             guardarEstadoDOM();
+            reativarEventosDragDrop();
+            atualizarPainelDeRecursos();
         }
 
         function alternarConclusaoTarefa(checkbox) {
@@ -1016,8 +1168,9 @@
                 await guardarEstadoDOM();
                 reativarEventosDragDrop();
                 atualizarIndicadorProgresso();
+                atualizarPainelDeRecursos();
                 fecharModalHistorico();
-                alert("Semana carregada com sucesso!");
+                mostrarToast("Semana carregada com sucesso!");
             }
         }
 
@@ -1032,7 +1185,7 @@
             };
             localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
             await salvarNaNuvem();
-            alert("✅ Programação guardada no histórico!");
+            mostrarToast("✅ Programação guardada no histórico!");
             renderizarListaHistorico();
         }
 
@@ -1064,6 +1217,7 @@
                     carregarFrequentes();
                     document.getElementById('selectFrequentes').value = itemMaiusculo;
                     preencherPredefinido();
+                    mostrarToast("Item frequente adicionado!");
                 }
             }
         }
@@ -1099,7 +1253,7 @@
                 let chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
                 chaves.push(aplicarCorrecao(nova));
                 localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                alert("Palavra adicionada!");
+                mostrarToast("Palavra adicionada!");
             }
         }
 
@@ -1111,7 +1265,7 @@
                 if (index >= 0 && index < chaves.length) {
                     chaves.splice(index, 1);
                     localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    alert("Apagada!");
+                    mostrarToast("Palavra apagada!");
                 }
             }
         }
@@ -1133,6 +1287,7 @@
                 restaurarDiaNormal(checkbox);
             }
             atualizarIndicadorProgresso();
+            atualizarPainelDeRecursos();
             guardarEstadoDOM();
         }
 
@@ -1205,7 +1360,7 @@
 
         function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
         function permitirDrop(e) { e.preventDefault(); }
-        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
+        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); atualizarPainelDeRecursos(); } }
 
         function reativarEventosDragDrop() {
             document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
@@ -1215,6 +1370,21 @@
             document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
                 cont.setAttribute('ondragover', 'permitirDrop(event)');
                 cont.setAttribute('ondrop', 'soltarItem(event)');
+            });
+
+            // Ativa o SortableJS para suporte nativo em celular (Touch) e Desktop
+            document.querySelectorAll('.tasks-container, .day-resources').forEach(el => {
+                if (el._sortableInstance) el._sortableInstance.destroy();
+                el._sortableInstance = new Sortable(el, {
+                    group: el.classList.contains('day-resources') ? 'recursos-grupo' : 'tarefas-grupo',
+                    animation: 150,
+                    handle: '.drag-handle',
+                    ghostClass: 'sortable-ghost',
+                    onEnd: async () => {
+                        await guardarEstadoDOM();
+                        atualizarPainelDeRecursos();
+                    }
+                });
             });
         }
 
@@ -1300,7 +1470,6 @@
                 document.getElementById('weekGridContainer').innerHTML = htmlNuvemCorrigido;
             }
 
-            // Garante ao vivo que todos os cards em tela tenham a barra ✔️ Dia
             forcarCaixinhasDiaNoDOM();
 
             const datas = getDateRangeOfWeek(semana, ano);
@@ -1315,6 +1484,7 @@
             forcarRecursosFixos();
             reativarEventosDragDrop();
             atualizarIndicadorProgresso();
+            atualizarPainelDeRecursos();
         }
 
         function forcarRecursosFixos() {
@@ -1379,7 +1549,9 @@
                 document.getElementById('inputDesc').value = "";
                 await salvarNaNuvem();
                 atualizarIndicadorProgresso();
-                alert("✅ Adicionado com sucesso!");
+                reativarEventosDragDrop();
+                atualizarPainelDeRecursos();
+                mostrarToast("✅ Adicionado com sucesso!");
             }
         }
 
@@ -1391,6 +1563,8 @@
             if (novo !== null && novo.trim() !== "") {
                 if (span) span.innerText = aplicarCorrecao(novo);
                 await salvarNaNuvem();
+                atualizarPainelDeRecursos();
+                mostrarToast("Item atualizado!");
             }
         }
 
@@ -1400,6 +1574,8 @@
                 box.remove(); 
                 await salvarNaNuvem(); 
                 atualizarIndicadorProgresso();
+                atualizarPainelDeRecursos();
+                mostrarToast("Item removido.");
             }
         }
 
@@ -1410,6 +1586,7 @@
                 if (dadosGlobaisNuvem.semanas) delete dadosGlobaisNuvem.semanas[getWeekKey()];
                 await salvarNaNuvem();
                 atualizarDatasSemana();
+                mostrarToast("Semana resetada!");
             }
         }
 
@@ -1425,4 +1602,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
