@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Central - Gestão Integrada (v3.72)</title>
+    <title>Painel Central - Gestão Integrada (v3.80 Auto-Lock)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,6 +35,54 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col justify-between">
 
+    <!-- ========================================================================= -->
+    <!-- CAPA DE BLOQUEIO MOBILE: BLOQUEIO AUTOMÁTICO AO FECHAR OU BLOQUEAR A TELA -->
+    <!-- ========================================================================= -->
+    <div id="capaBloqueioMobile" class="fixed inset-0 z-[9999] bg-gray-950/95 backdrop-blur-md text-white flex flex-col items-center justify-center p-6 text-center md:hidden">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl w-full max-w-xs shadow-2xl space-y-4">
+            
+            <div class="w-16 h-16 bg-green-950/60 border border-green-700/60 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner animate-pulse">
+                🛡️
+            </div>
+            
+            <div>
+                <h2 class="text-base font-black uppercase text-green-400 tracking-wide">Acesso Protegido</h2>
+                <p class="text-[11px] text-gray-400 mt-0.5">Autentique sua biometria para acessar</p>
+            </div>
+
+            <!-- BOTÃO DE DISPARO DA BIOMETRIA (DIGITAL / FACE ID) -->
+            <button type="button" id="btnBiometria" onclick="autenticarBiometria()" 
+                class="w-full bg-green-600 hover:bg-green-700 active:scale-95 text-white py-3 rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                <span class="text-xl">👆</span>
+                <span>Desbloquear com Biometria</span>
+            </button>
+
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-700">
+                <hr class="w-full border-gray-800">
+                <span class="text-[9px] uppercase font-bold text-gray-500">ou PIN</span>
+                <hr class="w-full border-gray-800">
+            </div>
+
+            <!-- ENTRADA DE SENHA / PIN DE CONTINGÊNCIA -->
+            <div class="space-y-2">
+                <input type="password" id="inputPinAcesso" placeholder="Digite o PIN" maxlength="8"
+                    class="w-full text-center text-sm tracking-widest p-2.5 rounded-xl bg-gray-950 border border-gray-800 text-white outline-none focus:border-green-500 transition">
+                
+                <button type="button" onclick="validarPinManual()" 
+                    class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 py-2 rounded-xl text-xs font-bold transition border border-gray-700">
+                    Desbloquear com PIN
+                </button>
+            </div>
+
+            <p id="msgErroAcesso" class="text-[10px] text-red-400 font-bold hidden"></p>
+
+            <div class="pt-2 text-[9px] text-gray-500 border-t border-gray-800/80">
+                Bloqueio automático ao minimizar ou bloquear tela
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL DO PAINEL -->
     <div class="container space-y-8 my-auto py-10">
         <!-- CABEÇALHO DO PAINEL -->
         <div class="text-center space-y-2">
@@ -89,8 +137,126 @@
 
     <!-- RODAPÉ -->
     <footer class="text-center text-[10px] text-gray-400 dark:text-gray-500 py-4">
-        Painel Integrado v3.72 Nuvem • Todos os direitos reservados
+        Painel Integrado v3.80 Nuvem • Todos os direitos reservados
     </footer>
 
+    <script>
+        const PIN_MESTRE_PADRAO = "1234"; // Defina o seu PIN de contingência aqui
+
+        function liberarAcessoMobile() {
+            const capa = document.getElementById('capaBloqueioMobile');
+            if (capa) {
+                capa.classList.add('transition-opacity', 'duration-300', 'opacity-0');
+                setTimeout(() => {
+                    capa.style.display = 'none';
+                    capa.classList.remove('opacity-0');
+                }, 300);
+            }
+        }
+
+        function bloquearAcessoMobile() {
+            // Só executa o bloqueio se for dispositivo mobile
+            if (window.innerWidth >= 768) return;
+
+            const capa = document.getElementById('capaBloqueioMobile');
+            if (capa) {
+                document.getElementById('inputPinAcesso').value = '';
+                document.getElementById('msgErroAcesso').classList.add('hidden');
+                capa.style.display = 'flex';
+            }
+        }
+
+        // 1. MONITORAMENTO: Bloqueia na hora que a tela do celular apaga ou o app vai para segundo plano
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                bloquearAcessoMobile();
+            } else {
+                // Ao reabrir ou desbloquear a tela do celular, dispara a biometria na hora
+                setTimeout(autenticarBiometria, 300);
+            }
+        });
+
+        // 2. MONITORAMENTO: Bloqueia caso perca o foco (ex: puxar a barra de notificações)
+        window.addEventListener('blur', () => {
+            bloquearAcessoMobile();
+        });
+
+        // Validação por PIN manual
+        function validarPinManual() {
+            const pinDigitado = document.getElementById('inputPinAcesso').value.trim();
+            const msgErro = document.getElementById('msgErroAcesso');
+
+            if (pinDigitado === PIN_MESTRE_PADRAO) {
+                msgErro.classList.add('hidden');
+                liberarAcessoMobile();
+            } else {
+                msgErro.innerText = "PIN incorreto. Tente novamente.";
+                msgErro.classList.remove('hidden');
+            }
+        }
+
+        // Leitura da biometria nativa do aparelho (Touch ID / Face ID / Digital)
+        async function autenticarBiometria() {
+            const capa = document.getElementById('capaBloqueioMobile');
+            if (capa && capa.style.display === 'none') return;
+
+            const msgErro = document.getElementById('msgErroAcesso');
+            msgErro.classList.add('hidden');
+
+            if (!window.PublicKeyCredential) {
+                msgErro.innerText = "Biometria indisponível. Use o PIN.";
+                msgErro.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const suporte = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!suporte) {
+                    msgErro.innerText = "Biometria não ativa no aparelho. Use o PIN.";
+                    msgErro.classList.remove('hidden');
+                    return;
+                }
+
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+
+                const options = {
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "Painel Central" },
+                        user: {
+                            id: new Uint8Array([1, 2, 3, 4]),
+                            name: "operador",
+                            displayName: "Operador"
+                        },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: "platform",
+                            userVerification: "required"
+                        },
+                        timeout: 60000
+                    }
+                };
+
+                const cred = await navigator.credentials.create(options);
+                if (cred) {
+                    liberarAcessoMobile();
+                }
+            } catch (err) {
+                if (err.name !== "NotAllowedError") {
+                    msgErro.innerText = "Use o PIN de acesso.";
+                    msgErro.classList.remove('hidden');
+                }
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth < 768) {
+                bloquearAcessoMobile();
+                // Tenta chamar o leitor biométrico assim que a página é carregada
+                setTimeout(autenticarBiometria, 400);
+            }
+        });
+    </script>
 </body>
 </html>
