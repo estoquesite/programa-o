@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Treinamentos (v1.4 Nuvem)</title>
+    <title>Módulo de Treinamentos (v2.0 Nuvem Pro)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,19 +29,41 @@
             padding: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
         }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
 
-    <div class="container space-y-6">
-        <!-- CABEÇALHO COM BOTÃO DE VOLTAR AO ÍNDICE -->
-        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div class="container space-y-5">
+        <!-- CABEÇALHO -->
+        <div class="flex flex-wrap justify-between items-center gap-2 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <a href="index.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar ao Menu</a>
-            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">🎓 Gestão de Treinamentos</h2>
-            <button onclick="sincronizarTreinamentos()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Sincronizar</button>
+            <div class="text-center">
+                <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">🎓 Gestão de Treinamentos</h2>
+                <span class="text-[10px] font-bold text-gray-400">Controle e envio manual para a programação</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="alternarDarkMode()" class="px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-xs font-bold transition">🌙/☀️ Tema</button>
+                <button onclick="sincronizarTreinamentos()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Sincronizar</button>
+            </div>
+        </div>
+
+        <!-- RESUMO OPERACIONAL RÁPIDO -->
+        <div class="grid grid-cols-3 gap-3">
+            <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                <span class="text-[10px] font-bold uppercase text-gray-500">Total Registado</span>
+                <h3 id="contadorTotal" class="text-xl font-black text-green-700 dark:text-green-400">0</h3>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                <span class="text-[10px] font-bold uppercase text-blue-600">📅 Próximos / Ativos</span>
+                <h3 id="contadorProximos" class="text-xl font-black text-blue-600 dark:text-blue-400">0</h3>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                <span class="text-[10px] font-bold uppercase text-gray-400">Concluídos (Passados)</span>
+                <h3 id="contadorPassados" class="text-xl font-black text-gray-500">0</h3>
+            </div>
         </div>
 
         <!-- FORMULÁRIO DE CADASTRO / EDIÇÃO -->
@@ -64,11 +86,33 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome do Treinamento</label>
-                    <input type="text" id="treinamentoNome" placeholder="Ex: SEGURANÇA EM MÁQUINAS..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <input type="text" id="treinamentoNome" list="sugestoesCursos" placeholder="Ex: NR-10..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <datalist id="sugestoesCursos">
+                        <option value="NR-10 SEGURANÇA EM INSTALAÇÕES ELÉTRICAS">
+                        <option value="NR-12 SEGURANÇA NO TRABALHO EM MÁQUINAS">
+                        <option value="NR-33 ESPAÇO CONFINADO">
+                        <option value="NR-35 TRABALHO EM ALTURA">
+                        <option value="DIREÇÃO DEFENSIVA">
+                        <option value="OPERAÇÃO DE EMPILHADEIRA">
+                        <option value="BRIGADA DE INCÊNDIO">
+                        <option value="PRIMEIROS SOCORROS">
+                        <option value="RAC 01 - TRABALHO EM ALTURA">
+                        <option value="RAC 02 - VEÍCULOS AUTOMOTORES">
+                        <option value="RAC 03 - EQUIPAMENTOS MÓVEIS">
+                    </datalist>
                 </div>
                 <div>
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Local</label>
-                    <input type="text" id="treinamentoLocal" placeholder="Ex: SALA DE AUDIÊNCIAS..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <input type="text" id="treinamentoLocal" list="sugestoesLocais" placeholder="Ex: SALA DE TREINAMENTO..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <datalist id="sugestoesLocais">
+                        <option value="SALA DE TREINAMENTO">
+                        <option value="SALA DE AUDIÊNCIAS">
+                        <option value="ALMOXARIFADO CENTRAL">
+                        <option value="G4">
+                        <option value="OFICINA MECÂNICA">
+                        <option value="AUDITÓRIO">
+                        <option value="ONLINE / TEAMS">
+                    </datalist>
                 </div>
                 <div>
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome da Pessoa</label>
@@ -77,16 +121,34 @@
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">✓ Guardar Treinamento (OK)</button>
+                <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">💾 Guardar Treinamento</button>
                 <button onclick="limparFormulario()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-bold">Limpar</button>
             </div>
         </div>
 
-        <!-- BOTÃO DE IMPRESSÃO -->
-        <div class="flex justify-center">
-            <button onclick="imprimirTreinamentos()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
-                🖨️ Imprimir Relatório de Treinamentos (PDF Limpo)
-            </button>
+        <!-- BARRA DE BUSCA, FILTROS E EXPORTAÇÃO -->
+        <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <!-- BUSCA EM TEMPO REAL -->
+                <div class="flex-1 min-w-[220px]">
+                    <input type="text" id="inputBuscaTreino" oninput="filtrarTreinamentos()" placeholder="🔍 Buscar por pessoa, curso ou local..." class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl dark:text-white">
+                </div>
+                <!-- FILTRO DE PERÍODO -->
+                <div class="flex items-center gap-1 text-xs font-bold">
+                    <button type="button" onclick="mudarFiltroStatus('todos')" id="btnFiltroTodos" class="btn-filtro px-2.5 py-1.5 rounded-lg bg-green-700 text-white shadow-xs">Todos</button>
+                    <button type="button" onclick="mudarFiltroStatus('proximos')" id="btnFiltroProximos" class="btn-filtro px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">Próximos</button>
+                    <button type="button" onclick="mudarFiltroStatus('passados')" id="btnFiltroPassados" class="btn-filtro px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">Passados</button>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1 border-t dark:border-gray-700">
+                <button onclick="exportarTreinamentosCSV()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1">
+                    📊 Exportar CSV
+                </button>
+                <button onclick="imprimirTreinamentos()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1">
+                    🖨️ Imprimir PDF
+                </button>
+            </div>
         </div>
 
         <!-- LISTA DE TREINAMENTOS CADASTRADOS -->
@@ -104,8 +166,17 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const CHAVE_LOCAL_TREINOS = "modulo_treinamentos_dados_nuvem";
+        let filtroStatusAtual = 'todos';
+
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            if (localStorage.getItem('dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
             document.getElementById('treinamentoInicio').valueAsDate = new Date();
             document.getElementById('treinamentoFim').valueAsDate = new Date();
             await sincronizarTreinamentos();
@@ -185,7 +256,7 @@
 
             limparFormulario();
             renderizarListaTreinamentos();
-            alert("✅ Treinamento guardado e sincronizado com sucesso!");
+            alert("✅ Treinamento guardado na base de dados! Para colocá-lo na grade da semana, clique em '✅ OK (Enviar)' no card dele.");
         }
 
         function limparFormulario() {
@@ -197,7 +268,7 @@
             document.getElementById('editId').value = '';
         }
 
-        // Função para enviar o treinamento explicitamente para a programação semanal ao clicar em OK
+        // ENVIO MANUAL EXCLUSIVO AO CLICAR EM "OK" (INJETADO COM CHECKBOX E BOTÕES COMPLETOS)
         async function enviarParaProgramacao(id) {
             let treinamentos = obterTreinamentos();
             let t = treinamentos.find(item => item.id === id);
@@ -208,7 +279,6 @@
                 let conteudo = data ? (data.conteudo || {}) : {};
                 if (!conteudo.semanas) conteudo.semanas = {};
 
-                // Calcula o ano e a semana da data de início do treinamento
                 const dObj = new Date(t.inicio + 'T00:00:00');
                 const ano = dObj.getFullYear();
                 
@@ -220,19 +290,29 @@
 
                 const semanaKey = `prog_grid_${ano}_semana_${semanaNo}`;
 
-                // Se a semana ainda não tem HTML guardado na nuvem, criamos o esqueleto padrão dos 5 dias
+                // Se a semana ainda não tiver estrutura salva na nuvem, monta o esqueleto padrão completo
                 if (!conteudo.semanas[semanaKey]) {
-                    // Cria uma estrutura padrão limpa para injetar o treinamento
-                    conteudo.semanas[semanaKey] = `
-                        <div class="day-card" data-dia-idx="1" data-dia-nome="Segunda"><div class="day-content"><div class="day-title">Segunda</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
-                        <div class="day-card" data-dia-idx="2" data-dia-nome="Terça"><div class="day-content"><div class="day-title">Terça</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
-                        <div class="day-card" data-dia-idx="3" data-dia-nome="Quarta"><div class="day-content"><div class="day-title">Quarta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
-                        <div class="day-card" data-dia-idx="4" data-dia-nome="Quinta"><div class="day-content"><div class="day-title">Quinta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
-                        <div class="day-card" data-dia-idx="5" data-dia-nome="Sexta"><div class="day-content"><div class="day-title">Sexta</div><div class="tasks-container space-y-1"></div></div><div class="day-resources"><div class="resources-title">Recursos</div></div></div>
+                    const baseCard = (dia, idx) => `
+                        <div class="day-card" data-dia-idx="${idx}" data-dia-nome="${dia}">
+                            <div class="day-title">${dia}<br><small>--/---</small></div>
+                            <div class="day-content">
+                                <div class="flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0">
+                                    <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300">
+                                        <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
+                                    </label>
+                                    <div class="flex items-center gap-1.5">
+                                        <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" onchange="alternarBloqueioDia(this)"> Feriado</label>
+                                        <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" onchange="alternarBloqueioDia(this)"> Emenda</label>
+                                    </div>
+                                </div>
+                                <div class="tasks-container"></div>
+                            </div>
+                            <div class="day-resources"><div class="resources-title">Recursos</div></div>
+                        </div>
                     `;
+                    conteudo.semanas[semanaKey] = baseCard("Segunda", 1) + baseCard("Terça", 2) + baseCard("Quarta", 3) + baseCard("Quinta", 4) + baseCard("Sexta", 5);
                 }
 
-                // Cria um elemento temporário para manipular o HTML da semana na nuvem
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = conteudo.semanas[semanaKey];
 
@@ -247,12 +327,20 @@
                         const tasksCont = cardDia.querySelector('.tasks-container');
                         const identificadorUnico = `treino_id_${t.id}`;
 
-                        // Evita duplicados na mesma semana
                         if (!tasksCont.innerHTML.includes(identificadorUnico)) {
                             const divTreino = document.createElement('div');
                             divTreino.className = 'treinamento-box';
+                            divTreino.setAttribute('draggable', 'true');
+                            divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
                             divTreino.innerHTML = `
-                                <span class="${identificadorUnico}">🎓 <strong>${t.nome}</strong><br><small>📍 ${t.local} | 👤 ${t.pessoa}</small></span>
+                                <span class="${identificadorUnico} flex items-center gap-1.5">
+                                    <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
+                                    <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} | 👤 ${t.pessoa}</small>
+                                </span>
+                                <span class="item-controls flex gap-1">
+                                    <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                                    <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                                </span>
                             `;
                             tasksCont.appendChild(divTreino);
                             
@@ -262,13 +350,13 @@
                                 .from('app_dados_programacao')
                                 .upsert({ id: '1', conteudo: conteudo });
 
-                            alert(`✅ Treinamento enviado com sucesso para a Semana ${semanaNo} (${ano})!`);
+                            alert(`✅ Treinamento enviado com sucesso para a Semana ${semanaNo} (${ano})! Já com caixinha de marcar presença pronta.`);
                         } else {
                             alert("⚠️ Este treinamento já consta na programação desta semana.");
                         }
                     }
                 } else {
-                    alert("⚠️ A data de início deste treinamento cai num fim de semana (Sábado/Domingo), portanto não entra na grade de Segunda a Sexta.");
+                    alert("⚠️ A data de início deste treinamento cai num fim de semana (Sábado/Domingo).");
                 }
 
             } catch (err) {
@@ -277,30 +365,73 @@
             }
         }
 
+        function mudarFiltroStatus(tipo) {
+            filtroStatusAtual = tipo;
+            document.querySelectorAll('.btn-filtro').forEach(b => {
+                b.className = "btn-filtro px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200";
+            });
+            const btnAtivo = tipo === 'todos' ? 'btnFiltroTodos' : (tipo === 'proximos' ? 'btnFiltroProximos' : 'btnFiltroPassados');
+            document.getElementById(btnAtivo).className = "btn-filtro px-2.5 py-1.5 rounded-lg bg-green-700 text-white shadow-xs";
+            renderizarListaTreinamentos();
+        }
+
+        function filtrarTreinamentos() {
+            renderizarListaTreinamentos();
+        }
+
         function renderizarListaTreinamentos() {
             const container = document.getElementById('listaTreinamentos');
             container.innerHTML = '';
             let treinamentos = obterTreinamentos();
+            const termoBusca = (document.getElementById('inputBuscaTreino') ? document.getElementById('inputBuscaTreino').value : '').trim().toUpperCase();
 
-            if (treinamentos.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhum treinamento registado.</p>';
+            // Atualiza contadores
+            const hojeStr = new Date().toISOString().split('T')[0];
+            let qtdProximos = 0;
+            let qtdPassados = 0;
+
+            treinamentos.forEach(t => {
+                if (t.fim >= hojeStr) qtdProximos++;
+                else qtdPassados++;
+            });
+
+            document.getElementById('contadorTotal').innerText = treinamentos.length;
+            document.getElementById('contadorProximos').innerText = qtdProximos;
+            document.getElementById('contadorPassados').innerText = qtdPassados;
+
+            // Filtro por termo
+            let listaFiltrada = treinamentos.filter(t => {
+                const bateBusca = !termoBusca || t.nome.includes(termoBusca) || t.pessoa.includes(termoBusca) || t.local.includes(termoBusca);
+                if (!bateBusca) return false;
+
+                if (filtroStatusAtual === 'proximos') return t.fim >= hojeStr;
+                if (filtroStatusAtual === 'passados') return t.fim < hojeStr;
+                return true;
+            });
+
+            if (listaFiltrada.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhum treinamento encontrado com os filtros selecionados.</p>';
                 return;
             }
 
-            treinamentos.forEach((t) => {
+            listaFiltrada.forEach((t) => {
+                const ehFuturo = t.fim >= hojeStr;
                 const div = document.createElement('div');
-                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs gap-2';
+                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs gap-2 transition hover:border-green-400';
                 div.innerHTML = `
                     <div>
-                        <span class="font-bold text-green-800 dark:text-green-300 block text-sm">🎓 ${t.nome}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-green-800 dark:text-green-300 block text-sm">🎓 ${t.nome}</span>
+                            <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-full ${ehFuturo ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300' : 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400'}">${ehFuturo ? 'Em aberto' : 'Concluído'}</span>
+                        </div>
                         <span class="text-gray-600 dark:text-gray-300 font-semibold">📍 Local: ${t.local} | 👤 Participante: ${t.pessoa}</span>
                         <small class="text-gray-400 block mt-0.5">Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</small>
                     </div>
-                    <div class="flex gap-1.5 self-end sm:self-center">
-                        <button onclick="enviarParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2.5 py-1 rounded-lg font-bold shadow-sm" title="Enviar para a Programação Semanal">✅ OK (Enviar)</button>
-                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold" title="Duplicar">📋 Duplicar</button>
-                        <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
-                        <button onclick="apagarTreinamento('${t.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
+                    <div class="flex gap-1.5 self-end sm:self-center flex-wrap">
+                        <button onclick="enviarParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2.5 py-1 rounded-lg font-bold shadow-sm" title="Enviar manualmente para a grade da semana">✅ OK (Enviar)</button>
+                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold" title="Duplicar para outra pessoa">📋 Duplicar</button>
+                        <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-lg font-bold">Editar</button>
+                        <button onclick="apagarTreinamento('${t.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2 py-1 rounded-lg font-bold">Apagar</button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -334,7 +465,7 @@
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 document.getElementById('treinamentoPessoa').focus();
-                alert("📋 Dados duplicados! Altere o nome da pessoa ou as datas e clique em 'Guardar Treinamento'.");
+                alert("📋 Dados duplicados! Digite o nome do novo participante e clique em 'Guardar Treinamento'.");
             }
         }
 
@@ -346,6 +477,31 @@
                 await salvarNaNuvemGeral(treinamentos);
                 renderizarListaTreinamentos();
             }
+        }
+
+        function exportarTreinamentosCSV() {
+            let treinamentos = obterTreinamentos();
+            if (treinamentos.length === 0) {
+                alert("Nenhum treinamento para exportar.");
+                return;
+            }
+
+            let csv = "\uFEFFTREINAMENTO;PARTICIPANTE;LOCAL;DATA_INICIO;DATA_FIM;STATUS\n";
+            const hojeStr = new Date().toISOString().split('T')[0];
+
+            treinamentos.forEach(t => {
+                let status = t.fim >= hojeStr ? "EM ABERTO" : "CONCLUÍDO";
+                csv += `"${t.nome}";"${t.pessoa}";"${t.local}";"${t.inicio.split('-').reverse().join('/')}";"${t.fim.split('-').reverse().join('/')}";"${status}"\n`;
+            });
+
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `RELATORIO_TREINAMENTOS.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function imprimirTreinamentos() {
@@ -376,14 +532,13 @@
                     <title>Relatório de Treinamentos</title>
                     <style>
                         body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 30px; background: #fff; color: #333; }
-                        <h2>Relatório de Treinamentos</h2>
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
                         th { background-color: #1b5e20; color: white; padding: 10px; text-align: left; }
                         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     </style>
                 </head>
                 <body>
-                    <h2>Relatório de Treinamentos</h2>
+                    <h2 style="color: #1b5e20; text-transform: uppercase;">Relatório de Treinamentos</h2>
                     <table>
                         <thead>
                             <tr>
