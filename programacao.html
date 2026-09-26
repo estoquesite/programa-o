@@ -236,7 +236,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
-    <!-- TOASTS DE NOTIFICAÇÃO (NOVO) -->
+    <!-- TOASTS DE NOTIFICAÇÃO -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- CONTEÚDO PRINCIPAL -->
@@ -265,7 +265,7 @@
                     <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">🔄 Atual</button>
                 </div>
 
-                <!-- BUSCA EM TEMPO REAL (NOVO) -->
+                <!-- BUSCA EM TEMPO REAL -->
                 <div class="flex-1 min-w-[220px] relative">
                     <input type="text" id="inputBuscaGeral" oninput="filtrarItensEmTempoReal(this.value)" placeholder="🔍 Buscar tarefa, recurso, pessoa ou placa..." class="w-full text-xs p-2 pl-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600">
                     <button id="btnLimparBusca" onclick="limparBusca()" class="hidden absolute right-2.5 top-2 text-xs text-gray-400 hover:text-gray-600 font-bold">✕</button>
@@ -282,18 +282,7 @@
             </div>
         </div>
 
-        <!-- PAINEL DE OCUPAÇÃO DE RECURSOS DA SEMANA (NOVO) -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-4xl mx-auto mb-3">
-            <div class="flex justify-between items-center mb-1.5">
-                <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">🚙 Balanço de Alocação de Recursos (Semana Atual)</span>
-                <span class="text-[9px] text-gray-400">Totalizadores automáticos</span>
-            </div>
-            <div id="painelResumoRecursos" class="flex flex-wrap gap-1.5 text-xs">
-                <!-- Preenchido automaticamente via JS -->
-            </div>
-        </div>
-
-        <!-- ABAS DIÁRIAS PARA CELULAR / MOBILE (NOVO) -->
+        <!-- ABAS DIÁRIAS PARA CELULAR / MOBILE -->
         <div class="print-hidden flex md:hidden items-center justify-between gap-1 mb-3 bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl">
             <button onclick="mudarAbaDiaMobile('todos')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-green-800 dark:text-green-300">Todos</button>
             <button onclick="mudarAbaDiaMobile('Segunda')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Seg</button>
@@ -522,32 +511,6 @@
             filtrarItensEmTempoReal('');
         }
 
-        // PAINEL DE OCUPAÇÃO DE RECURSOS DA SEMANA
-        function atualizarPainelDeRecursos() {
-            const painel = document.getElementById('painelResumoRecursos');
-            if (!painel) return;
-
-            const tags = document.querySelectorAll('#weekGridContainer .resource-tag .item-text');
-            const contagem = {};
-
-            tags.forEach(t => {
-                const nome = limparSimbolosTexto(t.innerText);
-                if (nome) contagem[nome] = (contagem[nome] || 0) + 1;
-            });
-
-            if (Object.keys(contagem).length === 0) {
-                painel.innerHTML = '<span class="text-gray-400 italic text-[11px]">Nenhum recurso alocado nesta semana.</span>';
-                return;
-            }
-
-            painel.innerHTML = Object.entries(contagem).map(([recurso, qtd]) => `
-                <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold">
-                    <span>${recurso}</span>
-                    <span class="bg-emerald-700 text-white text-[9.5px] px-1.5 py-0.2 rounded-full">${qtd}x</span>
-                </span>
-            `).join('');
-        }
-
         // NAVEGAÇÃO POR ABAS NO CELULAR
         function mudarAbaDiaMobile(diaNome) {
             document.querySelectorAll('.btn-tab-mobile').forEach(b => {
@@ -728,7 +691,7 @@
             mostrarToast("📊 Exportado para Excel (Padrão Vale)!");
         }
 
-        // Função universal que repara o HTML garantindo que TODO dia tenha a barra com ✔️ Dia, Feriado e Emenda
+        // Garante a barra de controle em cada dia
         function garantirCaixinhasEmHtmlSalvo(htmlString) {
             if (!htmlString) return htmlString;
             let parser = new DOMParser();
@@ -782,7 +745,6 @@
             return doc.body.innerHTML;
         }
 
-        // Inspeção ao vivo no DOM exibido: se faltar o botão Dia em qualquer card, força a criação imediata
         function forcarCaixinhasDiaNoDOM() {
             document.querySelectorAll('.day-card').forEach(card => {
                 let dayContent = card.querySelector('.day-content');
@@ -1015,7 +977,6 @@
                         tasksCont.appendChild(divTreino);
                         await salvarNaNuvem();
                         atualizarIndicadorProgresso();
-                        atualizarPainelDeRecursos();
                         fecharModalTreinamentos();
                         mostrarToast(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
                     } else { alert("⚠️ Este treinamento já consta nesta semana."); }
@@ -1093,7 +1054,6 @@
                     cardDia.querySelector('.day-resources').innerHTML = '';
                     await salvarNaNuvem();
                     atualizarIndicadorProgresso();
-                    atualizarPainelDeRecursos();
                     fecharModalFeriados();
                     mostrarToast(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
                 }
@@ -1124,7 +1084,6 @@
             `;
             guardarEstadoDOM();
             reativarEventosDragDrop();
-            atualizarPainelDeRecursos();
         }
 
         function alternarConclusaoTarefa(checkbox) {
@@ -1168,7 +1127,6 @@
                 await guardarEstadoDOM();
                 reativarEventosDragDrop();
                 atualizarIndicadorProgresso();
-                atualizarPainelDeRecursos();
                 fecharModalHistorico();
                 mostrarToast("Semana carregada com sucesso!");
             }
@@ -1287,7 +1245,6 @@
                 restaurarDiaNormal(checkbox);
             }
             atualizarIndicadorProgresso();
-            atualizarPainelDeRecursos();
             guardarEstadoDOM();
         }
 
@@ -1360,7 +1317,7 @@
 
         function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
         function permitirDrop(e) { e.preventDefault(); }
-        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); atualizarPainelDeRecursos(); } }
+        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
 
         function reativarEventosDragDrop() {
             document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
@@ -1382,7 +1339,6 @@
                     ghostClass: 'sortable-ghost',
                     onEnd: async () => {
                         await guardarEstadoDOM();
-                        atualizarPainelDeRecursos();
                     }
                 });
             });
@@ -1484,7 +1440,6 @@
             forcarRecursosFixos();
             reativarEventosDragDrop();
             atualizarIndicadorProgresso();
-            atualizarPainelDeRecursos();
         }
 
         function forcarRecursosFixos() {
@@ -1550,7 +1505,6 @@
                 await salvarNaNuvem();
                 atualizarIndicadorProgresso();
                 reativarEventosDragDrop();
-                atualizarPainelDeRecursos();
                 mostrarToast("✅ Adicionado com sucesso!");
             }
         }
@@ -1563,7 +1517,6 @@
             if (novo !== null && novo.trim() !== "") {
                 if (span) span.innerText = aplicarCorrecao(novo);
                 await salvarNaNuvem();
-                atualizarPainelDeRecursos();
                 mostrarToast("Item atualizado!");
             }
         }
@@ -1574,7 +1527,6 @@
                 box.remove(); 
                 await salvarNaNuvem(); 
                 atualizarIndicadorProgresso();
-                atualizarPainelDeRecursos();
                 mostrarToast("Item removido.");
             }
         }
@@ -1602,4 +1554,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
