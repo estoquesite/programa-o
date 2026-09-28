@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v6.2 Gestão Pro & Exportação)</title>
+    <title>Painel de Indicadores & Gráficos (v5.5 Cursos no Encerramento)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -67,13 +67,11 @@
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-60, .max-h-56, .max-h-48, .max-h-40 {
+            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56, .max-h-48, .max-h-40 {
                 max-height: none !important;
                 overflow: visible !important;
             }
-            #corpoBlocoRecursos, #corpoBlocoTreinos {
-                display: block !important;
-            }
+            /* DIVISÃO EXCLUSIVA DE FOLHAS */
             .folha-a4 {
                 page-break-after: always !important;
                 break-after: page !important;
@@ -102,27 +100,27 @@
 
     <div class="container space-y-5">
         
-        <!-- FOLHA 1 -->
+        <!-- ============================================================== -->
+        <!-- FOLHA 1 NA IMPRESSÃO: CABEÇALHO, CARDS GERAIS E GRÁFICOS SEMANAIS -->
+        <!-- ============================================================== -->
         <div class="folha-a4 space-y-4">
             
             <!-- CABEÇALHO -->
-            <div class="flex flex-wrap justify-between items-center gap-2 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 card-a4-impresso">
+            <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 card-a4-impresso">
                 <a href="programacao.html" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar à Programação</a>
                 <div class="flex items-center gap-1.5">
                     <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Desempenho Operacional</h2>
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
-                    <span class="print-hidden text-[10px] font-extrabold bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-2 py-0.5 rounded-full ml-1">v6.2 Pro</span>
                 </div>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button onclick="alternarDarkMode()" class="print-hidden px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-xs font-bold transition">🌙/☀️ Tema</button>
-                    <button onclick="exportarIndicadoresCSV()" class="print-hidden bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1">📊 Exportar CSV</button>
+                <div class="flex items-center gap-2">
                     <button onclick="window.print()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir em A4</button>
-                    <button id="btnAtualizarNuvem" onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
+                    <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
                 </div>
             </div>
 
-            <!-- PAINEL DE CONTROLE DE FILTROS -->
+            <!-- PAINEL DE CONTROLE DE FILTROS (OCULTADO NA IMPRESSÃO) -->
             <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+                <!-- LINHA 1: ESCOLHA DE ANO -->
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
@@ -135,26 +133,10 @@
                         </div>
                         <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Vigente</button>
                     </div>
-
-                    <div class="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 px-3 py-1.5 rounded-xl">
-                        <span class="text-xs font-black text-purple-900 dark:text-purple-300">🎯 Meta:</span>
-                        <input type="number" id="inputMetaOperacional" value="90" min="50" max="100" onchange="alterarMetaOperacional(this.value)" class="w-12 text-xs p-1 bg-white dark:bg-gray-900 border border-purple-300 dark:border-purple-700 rounded font-black text-center text-purple-700 dark:text-purple-300">
-                        <span class="text-xs font-bold text-purple-800 dark:text-purple-400">%</span>
-                    </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-1.5 pt-1">
-                    <span class="text-[10px] font-black uppercase text-gray-500 mr-1">⚡ Atalhos:</span>
-                    <button type="button" onclick="aplicarAtalhoFiltro('ultimas4')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">Últimas 4 Semanas</button>
-                    <button type="button" onclick="aplicarAtalhoFiltro('q1')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">1º Tri (Q1)</button>
-                    <button type="button" onclick="aplicarAtalhoFiltro('q2')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">2º Tri (Q2)</button>
-                    <button type="button" onclick="aplicarAtalhoFiltro('q3')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">3º Tri (Q3)</button>
-                    <button type="button" onclick="aplicarAtalhoFiltro('q4')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">4º Tri (Q4)</button>
-                    <button type="button" onclick="aplicarAtalhoFiltro('sem1')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">1º Semestre</button>
-                    <button type="button" onclick="aplicarAtalhoFiltro('sem2')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">2º Semestre</button>
-                </div>
-
-                <div class="space-y-1.5 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <!-- LINHA 2: GAVETA RETRÁTIL DOS 12 MESES -->
+                <div class="space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
                             <span id="lbl_filtro_meses" class="text-[10px] font-bold uppercase tracking-wider text-green-800 dark:text-green-400">📅 Filtrar Meses:</span>
@@ -171,6 +153,7 @@
                     </div>
                 </div>
 
+                <!-- LINHA 3: GAVETA RETRÁTIL DAS 53 SEMANAS DO ANO -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -189,6 +172,7 @@
                     </div>
                 </div>
 
+                <!-- LINHA 4: GAVETA DINÂMICA DE RECURSOS -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -206,6 +190,7 @@
                     </div>
                 </div>
 
+                <!-- LINHA 5: CANAIS DE TAREFA -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                         <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -232,20 +217,7 @@
                 </div>
             </div>
 
-            <!-- BARRA DE DESTAQUES -->
-            <div id="barraDestaquesPeriodo" class="bg-gradient-to-r from-blue-50 via-emerald-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 p-2.5 rounded-xl border border-blue-200/60 dark:border-slate-700 flex flex-wrap justify-between items-center gap-2 text-xs card-a4-impresso">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm">💡</span>
-                    <span class="font-extrabold text-slate-800 dark:text-slate-200">Destaques do Período:</span>
-                </div>
-                <div class="flex items-center gap-3 text-[11px] font-bold flex-wrap">
-                    <span id="insightMelhorSemana" class="text-green-700 dark:text-green-400">🏆 Melhor Semana: Calculando...</span>
-                    <span class="text-gray-300 dark:text-gray-600">|</span>
-                    <span id="insightPiorSemana" class="text-amber-700 dark:text-amber-400">⚠️ Ponto de Atenção: Calculando...</span>
-                </div>
-            </div>
-
-            <!-- CARDS DE RESUMO -->
+            <!-- CARDS DE RESUMO OPERACIONAL -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
                     <div class="flex items-center justify-center gap-1">
@@ -283,17 +255,17 @@
                     <p id="cardSubTaxaExtras" class="text-[9px] text-amber-600 font-bold">0% do volume</p>
                 </div>
 
-                <div id="cardBoxAproveitamento" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1 card-a4-impresso transition-all duration-300">
+                <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 col-span-2 md:col-span-1 card-a4-impresso">
                     <div class="flex items-center justify-center gap-1">
                         <span id="lbl_card_aproveitamento" class="text-[10px] font-bold uppercase text-purple-600 tracking-wider">Aproveitamento</span>
                         <button type="button" onclick="editarTexto('lbl_card_aproveitamento')" class="btn-edit-title">✏️</button>
                     </div>
                     <h3 id="cardTaxaExecucao" class="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">0%</h3>
-                    <p class="text-[9px] font-bold" id="cardSubLabelAno">Meta: 90%</p>
+                    <p class="text-[9px] text-gray-500 font-semibold" id="cardSubLabelAno">Ano 2026</p>
                 </div>
             </div>
 
-            <!-- GRÁFICOS -->
+            <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
                     <div class="flex items-center gap-1 mb-1">
@@ -317,9 +289,12 @@
             </div>
         </div>
 
-        <!-- FOLHA 2 -->
+        <!-- ========================================================================= -->
+        <!-- FOLHA 2 NA IMPRESSÃO: RECURSOS / FROTA & TABELA DETALHADA DAS SEMANAS     -->
+        <!-- ========================================================================= -->
         <div class="folha-a4 space-y-4">
             
+            <!-- BLOCO DE RECURSOS & EQUIPAMENTOS -->
             <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-3 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
@@ -328,61 +303,57 @@
                         </h3>
                         <button type="button" onclick="editarTexto('lbl_titulo_bloco_recursos')" class="btn-edit-title">✏️</button>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2 py-0.5 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
-                        <button type="button" id="btnToggleBlocoRecursos" onclick="alternarSecao('corpoBlocoRecursos', 'btnToggleBlocoRecursos')" class="print-hidden text-xs text-emerald-700 dark:text-emerald-400 font-bold underline">Recolher ▴</button>
+                    <span class="text-[10px] font-bold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2 py-0.5 rounded-full" id="tagTotalAlocacoes">0 Utilizados</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_rec_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Total de Recursos Utilizados</span>
+                            <button type="button" onclick="editarTexto('lbl_card_rec_total')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardRecursoTotal" class="text-xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
+                        <p id="cardRecursoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_rec_mais" class="text-[9px] font-bold uppercase text-green-700 tracking-wider">Recurso Mais Utilizado</span>
+                            <button type="button" onclick="editarTexto('lbl_card_rec_mais')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardRecursoMaisNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardRecursoMaisQtd" class="text-[9px] text-green-700 font-bold">0 utilizações (0%)</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_rec_menos" class="text-[9px] font-bold uppercase text-amber-700 tracking-wider">Recurso Menos Utilizado</span>
+                            <button type="button" onclick="editarTexto('lbl_card_rec_menos')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardRecursoMenosNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardRecursoMenosQtd" class="text-[9px] text-amber-700 font-bold">0 utilizações</p>
                     </div>
                 </div>
 
-                <div id="corpoBlocoRecursos" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                        <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <span id="lbl_card_rec_total" class="text-[9px] font-bold uppercase text-gray-500 tracking-wider">Total de Recursos Utilizados</span>
-                                <button type="button" onclick="editarTexto('lbl_card_rec_total')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <h4 id="cardRecursoTotal" class="text-xl font-black text-emerald-700 dark:text-emerald-400">0</h4>
-                            <p id="cardRecursoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                        <div class="flex items-center gap-1 mb-1">
+                            <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Gráfico de Recursos</h4>
+                            <button type="button" onclick="editarTexto('lbl_grafico_rec')" class="btn-edit-title">✏️</button>
                         </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <span id="lbl_card_rec_mais" class="text-[9px] font-bold uppercase text-green-700 tracking-wider">Recurso Mais Utilizado</span>
-                                <button type="button" onclick="editarTexto('lbl_card_rec_mais')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <h4 id="cardRecursoMaisNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                            <p id="cardRecursoMaisQtd" class="text-[9px] text-green-700 font-bold">0 utilizações (0%)</p>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-2.5 rounded-xl shadow-sm border border-emerald-100 dark:border-gray-700 space-y-0.5 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <span id="lbl_card_rec_menos" class="text-[9px] font-bold uppercase text-amber-700 tracking-wider">Recurso Menos Utilizado</span>
-                                <button type="button" onclick="editarTexto('lbl_card_rec_menos')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <h4 id="cardRecursoMenosNome" class="text-base font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                            <p id="cardRecursoMenosQtd" class="text-[9px] text-amber-700 font-bold">0 utilizações</p>
+                        <div class="relative chart-wrapper h-48 w-full flex items-center justify-center">
+                            <canvas id="graficoRecursosCanvas"></canvas>
+                            <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado nas semanas selecionadas.</p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
-                        <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
-                            <div class="flex items-center gap-1 mb-1">
-                                <h4 id="lbl_grafico_rec" class="text-xs font-bold uppercase text-emerald-800 dark:text-emerald-300">📊 Gráfico de Recursos</h4>
-                                <button type="button" onclick="editarTexto('lbl_grafico_rec')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <div class="relative chart-wrapper h-48 w-full flex items-center justify-center">
-                                <canvas id="graficoRecursosCanvas"></canvas>
-                                <p id="msgSemDadosGrafico" class="hidden text-xs text-gray-400 italic">Nenhum recurso marcado nas semanas selecionadas.</p>
-                            </div>
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-1.5 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela de Recursos</h4>
+                            <button type="button" onclick="editarTexto('lbl_tabela_rec')" class="btn-edit-title">✏️</button>
                         </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-1.5 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <h4 id="lbl_tabela_rec" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Tabela de Recursos</h4>
-                                <button type="button" onclick="editarTexto('lbl_tabela_rec')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <div class="overflow-x-auto max-h-48 overflow-y-auto">
-                                <table class="w-full text-left text-xs">
+                        <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                            <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
                                         <th class="py-1.5 px-2">Recurso / Equipamento</th>
@@ -397,8 +368,8 @@
                     </div>
                 </div>
             </div>
-            </div>
 
+            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS -->
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-1">
@@ -428,7 +399,9 @@
             </div>
         </div>
 
-        <!-- FOLHA 3 -->
+        <!-- ========================================================================= -->
+        <!-- FOLHA 3 NA IMPRESSÃO: CURSOS & CAPACITAÇÃO ANUAL (FECHAMENTO DO RELATÓRIO) -->
+        <!-- ========================================================================= -->
         <div class="space-y-4">
             <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-4 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
@@ -438,71 +411,66 @@
                         </h3>
                         <button type="button" onclick="editarTexto('lbl_titulo_bloco_treinos')" class="btn-edit-title">✏️</button>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold bg-purple-200/60 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-full" id="tagTotalTreinamentos">0 Cursos Concluídos</span>
-                        <button type="button" id="btnToggleBlocoTreinos" onclick="alternarSecao('corpoBlocoTreinos', 'btnToggleBlocoTreinos')" class="print-hidden text-xs text-purple-700 dark:text-purple-400 font-bold underline">Recolher ▴</button>
+                    <span class="text-[10px] font-bold bg-purple-200/60 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-full" id="tagTotalTreinamentos">0 Cursos Concluídos</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-1 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_treino_total" class="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Cursos Validados no Ano</span>
+                            <button type="button" onclick="editarTexto('lbl_card_treino_total')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardTreinoTotal" class="text-2xl font-black text-purple-700 dark:text-purple-400">0</h4>
+                        <p id="cardTreinoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas na programação</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-1 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_treino_mais" class="text-[10px] font-bold uppercase text-purple-700 tracking-wider">Curso Mais Realizado</span>
+                            <button type="button" onclick="editarTexto('lbl_card_treino_mais')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardTreinoMaisNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardTreinoMaisQtd" class="text-[9px] text-purple-700 font-bold">0 turmas (0%)</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-1 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <span id="lbl_card_treino_mes" class="text-[10px] font-bold uppercase text-purple-700 tracking-wider">Mês com Maior Carga</span>
+                            <button type="button" onclick="editarTexto('lbl_card_treino_mes')" class="btn-edit-title">✏️</button>
+                        </div>
+                        <h4 id="cardTreinoMesPico" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
+                        <p id="cardTreinoMesPicoQtd" class="text-[9px] text-purple-700 font-bold">Pico de capacitação</p>
                     </div>
                 </div>
 
-                <div id="corpoBlocoTreinos" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-1 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <span id="lbl_card_treino_total" class="text-[10px] font-bold uppercase text-gray-500 tracking-wider">Cursos Validados no Ano</span>
-                                <button type="button" onclick="editarTexto('lbl_card_treino_total')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <h4 id="cardTreinoTotal" class="text-2xl font-black text-purple-700 dark:text-purple-400">0</h4>
-                            <p id="cardTreinoTotalSub" class="text-[9px] text-gray-500 font-semibold">Caixinhas marcadas na programação</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
+                    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
+                        <div class="flex items-center gap-1 mb-2">
+                            <h4 id="lbl_grafico_treinos_mensal" class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">📈 Curva Mensal de Cursos Ministrados</h4>
+                            <button type="button" onclick="editarTexto('lbl_grafico_treinos_mensal')" class="btn-edit-title">✏️</button>
                         </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-1 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <span id="lbl_card_treino_mais" class="text-[10px] font-bold uppercase text-purple-700 tracking-wider">Curso Mais Realizado</span>
-                                <button type="button" onclick="editarTexto('lbl_card_treino_mais')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <h4 id="cardTreinoMaisNome" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                            <p id="cardTreinoMaisQtd" class="text-[9px] text-purple-700 font-bold">0 turmas (0%)</p>
-                        </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 space-y-1 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <span id="lbl_card_treino_mes" class="text-[10px] font-bold uppercase text-purple-700 tracking-wider">Mês com Maior Carga</span>
-                                <button type="button" onclick="editarTexto('lbl_card_treino_mes')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <h4 id="cardTreinoMesPico" class="text-lg font-black text-gray-800 dark:text-gray-100 truncate">Nenhum</h4>
-                            <p id="cardTreinoMesPicoQtd" class="text-[9px] text-purple-700 font-bold">Pico de capacitação</p>
+                        <div class="relative chart-wrapper h-60 w-full flex items-center justify-center">
+                            <canvas id="graficoTreinosMensalCanvas"></canvas>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
-                        <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
-                            <div class="flex items-center gap-1 mb-2">
-                                <h4 id="lbl_grafico_treinos_mensal" class="text-xs font-bold uppercase text-purple-800 dark:text-purple-300">📈 Curva Mensal de Cursos Ministrados</h4>
-                                <button type="button" onclick="editarTexto('lbl_grafico_treinos_mensal')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <div class="relative chart-wrapper h-60 w-full flex items-center justify-center">
-                                <canvas id="graficoTreinosMensalCanvas"></canvas>
-                            </div>
+                    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
+                        <div class="flex items-center gap-1">
+                            <h4 id="lbl_tabela_treinos" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Ranking de Treinamentos</h4>
+                            <button type="button" onclick="editarTexto('lbl_tabela_treinos')" class="btn-edit-title">✏️</button>
                         </div>
-
-                        <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
-                            <div class="flex items-center gap-1">
-                                <h4 id="lbl_tabela_treinos" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Ranking de Treinamentos</h4>
-                                <button type="button" onclick="editarTexto('lbl_tabela_treinos')" class="btn-edit-title">✏️</button>
-                            </div>
-                            <div class="overflow-x-auto max-h-60 overflow-y-auto">
-                                <table class="w-full text-left text-xs">
-                                    <thead>
-                                        <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
-                                            <th class="py-2 px-2.5">Curso / Treinamento</th>
-                                            <th class="py-2 px-2.5 text-center">Feitos</th>
-                                            <th class="py-2 px-2.5 text-right">% do Ano</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tabelaTreinamentosCorpo">
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
+                                        <th class="py-2 px-2.5">Curso / Treinamento</th>
+                                        <th class="py-2 px-2.5 text-center">Feitos</th>
+                                        <th class="py-2 px-2.5 text-right">% do Ano</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaTreinamentosCorpo">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -524,110 +492,9 @@
         let graficoTreinosMensalInstance = null;
         let cacheDadosProcessados = null;
 
-        let mesesSelecionados = new Set();
+        let mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
         let semanasSelecionadasSet = new Set();
         let recursosDesmarcados = new Set();
-        let metaOperacionalConfig = parseInt(localStorage.getItem('meta_operacional_config')) || 90;
-
-        function alternarDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
-        }
-
-        function alternarSecao(conteudoId, btnId) {
-            const el = document.getElementById(conteudoId);
-            const btn = document.getElementById(btnId);
-            if (!el || !btn) return;
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                btn.innerText = "Recolher ▴";
-            } else {
-                el.classList.add('hidden');
-                btn.innerText = "Expandir ▾";
-            }
-        }
-
-        function alterarMetaOperacional(val) {
-            let m = parseInt(val);
-            if (isNaN(m) || m < 1) m = 90;
-            metaOperacionalConfig = m;
-            localStorage.setItem('meta_operacional_config', m);
-            carregarIndicadores();
-        }
-
-        function aplicarAtalhoFiltro(tipo) {
-            const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
-            const semAtual = calcularNumeroSemanaAtual();
-            const anoRealHoje = new Date().getFullYear();
-
-            if (tipo === 'ultimas4') {
-                mesesSelecionados = new Set();
-                semanasSelecionadasSet.clear();
-                let ref = (anoSelecionado === anoRealHoje) ? semAtual : 52;
-                for (let s = Math.max(1, ref - 3); s <= ref; s++) semanasSelecionadasSet.add(s);
-            } else if (tipo === 'q1') {
-                mesesSelecionados = new Set();
-                semanasSelecionadasSet.clear();
-                for (let s = 1; s <= 13; s++) semanasSelecionadasSet.add(s);
-            } else if (tipo === 'q2') {
-                mesesSelecionados = new Set([3, 4, 5]);
-                semanasSelecionadasSet.clear();
-                for (let s = 14; s <= 26; s++) semanasSelecionadasSet.add(s);
-            } else if (tipo === 'q3') {
-                mesesSelecionados = new Set([6, 7, 8]);
-                semanasSelecionadasSet.clear();
-                for (let s = 27; s <= 39; s++) semanasSelecionadasSet.add(s);
-            } else if (tipo === 'q4') {
-                mesesSelecionados = new Set([9, 10, 11]);
-                semanasSelecionadasSet.clear();
-                for (let s = 40; s <= 53; s++) semanasSelecionadasSet.add(s);
-            } else if (tipo === 'sem1') {
-                mesesSelecionados = new Set();
-                semanasSelecionadasSet.clear();
-                for (let s = 1; s <= 26; s++) semanasSelecionadasSet.add(s);
-            } else if (tipo === 'sem2') {
-                mesesSelecionados = new Set([6, 7, 8, 9, 10, 11]);
-                semanasSelecionadasSet.clear();
-                for (let s = 27; s <= 53; s++) semanasSelecionadasSet.add(s);
-            }
-
-            salvarSemanasNaMemoria();
-            renderizarCheckboxesMeses();
-            renderizarGridUniversalSemanas();
-            carregarIndicadores();
-        }
-
-        function exportarIndicadoresCSV() {
-            if (!cacheDadosProcessados) {
-                alert("Aguarde os dados serem carregados.");
-                return;
-            }
-            const ano = cacheDadosProcessados.anoSelecionado;
-            let csv = "\uFEFFRELATÓRIO DE DESEMPENHO OPERACIONAL - ANO " + ano + "\n\n";
-            csv += "RESUMO CONSOLIDADO\n";
-            csv += "Total Planeado;" + document.getElementById('cardTotalPlaneadas').innerText + "\n";
-            csv += "Total Concluído;" + document.getElementById('cardTotalConcluidas').innerText + "\n";
-            csv += "Total Não Realizado;" + document.getElementById('cardTotalNaoRealizadas').innerText + "\n";
-            csv += "Demandas Extras;" + document.getElementById('cardTotalExtras').innerText + "\n";
-            csv += "Aproveitamento Geral;" + document.getElementById('cardTaxaExecucao').innerText + "\n";
-            csv += "Meta Operacional;" + metaOperacionalConfig + "%\n\n";
-
-            csv += "DETALHAMENTO SEMANAL\n";
-            csv += "Semana;Planeadas;Concluídas;Não Realizadas;Extras Feitas;Total Extras;Recursos Utilizados;Cursos Realizados;% Concluído\n";
-            cacheDadosProcessados.semanasLista.forEach(s => {
-                let perc = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
-                csv += `Semana ${s.numSemana};${s.planeadas};${s.executadas};${s.naoRealizadas};${s.extrasConcluidas};${s.extrasCount};${s.recursosCount};${s.cursosCount};${perc}%\n`;
-            });
-
-            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = `INDICADORES_DESEMPENHO_${ano}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
 
         function obterChaveStorageSemanas(ano) {
             return `indicadores_semanas_selecionadas_${ano}`;
@@ -707,7 +574,7 @@
             if (!texto) return "";
             return texto
                 .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2300}-\u{23FF}]/gu, '')
-                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🚙⚡🚗🚚🚜🏍️🏗️🚤]/g, '')
+                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡🚗🚚🚜🏍️🏗️🚤]/g, '')
                 .replace(/\[.*?\]/g, '')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -752,7 +619,7 @@
         }
 
         function marcarTodosMeses(marcar) {
-            if (marcar) mesesSelecionados = new Set();
+            if (marcar) mesesSelecionados = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
             else mesesSelecionados.clear();
             renderizarCheckboxesMeses();
             carregarIndicadores();
@@ -832,7 +699,7 @@
             
             Object.keys(semanas).forEach(k => {
                 let m = k.match(/prog_grid_(\d{4})_/);
-                if (m) anosDetectados.add(parseInt(m[1]));
+                if (m && m[1]) anosDetectados.add(parseInt(m[1]));
             });
 
             anosDetectados.add(2025);
@@ -861,7 +728,7 @@
             if (!ano || isNaN(ano)) ano = 2026;
             document.getElementById('inputAnoIndicador').value = ano;
             popularSelectAnos(ano);
-            document.getElementById('cardSubLabelAno').innerText = `Meta: ${metaOperacionalConfig}%`;
+            document.getElementById('cardSubLabelAno').innerText = `Ano ${ano}`;
             recursosDesmarcados.clear();
             carregarSemanasDaMemoria();
             renderizarGridUniversalSemanas();
@@ -921,10 +788,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            if (localStorage.getItem('dark_mode') === 'true') {
-                document.documentElement.classList.add('dark');
-            }
-            document.getElementById('inputMetaOperacional').value = metaOperacionalConfig;
             carregarTextosCustomizados();
             renderizarCheckboxesMeses();
             carregarSemanasDaMemoria();
@@ -933,9 +796,6 @@
         });
 
         async function carregarIndicadoresDaNuvem() {
-            const btn = document.getElementById('btnAtualizarNuvem');
-            if (btn) btn.innerText = "⏳ Atualizando...";
-
             try {
                 let { data } = await supabaseClient
                     .from('app_dados_programacao')
@@ -949,10 +809,16 @@
             } catch (e) {
                 console.error("Erro ao buscar dados:", e);
             }
-
-            if (btn) btn.innerText = "🔄 Atualizar";
             popularSelectAnos(document.getElementById('inputAnoIndicador').value);
             carregarIndicadores();
+        }
+
+        function alternarTodosCanais(marcar) {
+            document.getElementById('checkCanalTotal').checked = marcar;
+            document.getElementById('checkCanalConcluidas').checked = marcar;
+            document.getElementById('checkCanalNaoRealizadas').checked = marcar;
+            document.getElementById('checkCanalExtras').checked = marcar;
+            atualizarVisualizacao();
         }
 
         function carregarIndicadores() {
@@ -988,9 +854,6 @@
 
             let semanasOrdenadas = Array.from(semanasSelecionadasSet).sort((a,b) => a - b);
 
-            let melhorSemanaObj = null;
-            let piorSemanaObj = null;
-
             semanasOrdenadas.forEach(numSemana => {
                 let key = `prog_grid_${anoSelecionado}_semana_${numSemana}`;
                 let htmlCard = semanasSalvas[key];
@@ -1005,30 +868,20 @@
                     const parser = new DOMParser();
                     let doc = parser.parseFromString(htmlCard, 'text/html');
 
-                    let tarefasNormais = doc.querySelectorAll('.task-box');
+                    let tarefasNormais = doc.querySelectorAll('.task-box, .treinamento-box');
                     let tarefasExtras = doc.querySelectorAll('.tarefa-extra-box');
-                    let boxesTreinos = doc.querySelectorAll('.treinamento-box');
-                    let tagsRecursos = doc.querySelectorAll('.resource-tag');
-
-                    // LEITURA BLINDADA COMPLETA
-                    let concluidas = Array.from(tarefasNormais).filter(el => {
-                        let chk = el.querySelector('input[type="checkbox"]');
-                        let style = el.getAttribute('style') || '';
-                        return (chk && chk.hasAttribute('checked')) || (chk && chk.checked) || el.classList.contains('task-done') || el.classList.contains('task_done') || style.includes('line-through');
-                    });
+                    let concluidas = doc.querySelectorAll('.task-done');
 
                     tarefasExtras.forEach(ext => {
                         let check = ext.querySelector('input[type="checkbox"]');
-                        let style = ext.getAttribute('style') || '';
-                        if ((check && check.hasAttribute('checked')) || (check && check.checked) || ext.classList.contains('task-done') || ext.classList.contains('task_done') || style.includes('line-through')) {
-                            extrasConcluidas++;
-                        }
+                        if (ext.classList.contains('task-done') || (check && check.checked)) extrasConcluidas++;
                     });
 
+                    // IDENTIFICAÇÃO DE CURSOS CONCLUÍDOS DIRETO NA GRADE
+                    let boxesTreinos = doc.querySelectorAll('.treinamento-box');
                     boxesTreinos.forEach(tBox => {
                         let check = tBox.querySelector('input[type="checkbox"]');
-                        let style = tBox.getAttribute('style') || '';
-                        let estaFeito = (check && check.hasAttribute('checked')) || (check && check.checked) || tBox.classList.contains('task-done') || tBox.classList.contains('task_done') || style.includes('line-through');
+                        let estaFeito = tBox.classList.contains('task-done') || (check && check.checked);
                         let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
                         let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
 
@@ -1040,6 +893,8 @@
                         }
                     });
 
+                    // IDENTIFICAÇÃO DE RECURSOS CONCLUÍDOS
+                    let tagsRecursos = doc.querySelectorAll('.resource-tag');
                     tagsRecursos.forEach(tag => {
                         let descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
                         let nomeBruto = descEl ? descEl.innerText.trim() : tag.innerText.trim();
@@ -1049,8 +904,7 @@
                             todosRecursosNomes.add(nomeRecurso);
 
                             let check = tag.querySelector('input[type="checkbox"]');
-                            let style = tag.getAttribute('style') || '';
-                            let estaConcluido = (check && check.hasAttribute('checked')) || (check && check.checked) || tag.classList.contains('task-done') || tag.classList.contains('task_done') || style.includes('line-through');
+                            let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
                             
                             if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
@@ -1077,8 +931,7 @@
                 mesesDados[mesIdx].naoRealizadas += naoRealizadas;
                 mesesDados[mesIdx].extras += extrasCount;
 
-                let taxaSemana = planeadas > 0 ? Math.round((executadas / planeadas) * 100) : 0;
-                let itemSemana = {
+                semanasLista.push({
                     numSemana,
                     planeadas,
                     executadas,
@@ -1087,30 +940,10 @@
                     extrasConcluidas,
                     recursosCount: recursosNestaSemanaFeitos,
                     cursosCount: cursosNestaSemanaFeitos,
-                    taxaSemana,
                     temDadosSalvos: !!htmlCard,
                     ehFuturoReal
-                };
-
-                if (planeadas > 0 && !ehFuturoReal) {
-                    if (!melhorSemanaObj || taxaSemana > melhorSemanaObj.taxaSemana) melhorSemanaObj = itemSemana;
-                    if (!piorSemanaObj || taxaSemana < piorSemanaObj.taxaSemana) piorSemanaObj = itemSemana;
-                }
-
-                semanasLista.push(itemSemana);
+                });
             });
-
-            if (melhorSemanaObj) {
-                document.getElementById('insightMelhorSemana').innerText = `🏆 Melhor Semana: S${melhorSemanaObj.numSemana} (${melhorSemanaObj.taxaSemana}%)`;
-            } else {
-                document.getElementById('insightMelhorSemana').innerText = `🏆 Melhor Semana: Sem dados`;
-            }
-
-            if (piorSemanaObj) {
-                document.getElementById('insightPiorSemana').innerText = `⚠️ Ponto de Atenção: S${piorSemanaObj.numSemana} (${piorSemanaObj.taxaSemana}%)`;
-            } else {
-                document.getElementById('insightPiorSemana').innerText = `⚠️ Ponto de Atenção: Sem dados`;
-            }
 
             document.getElementById('cardSubInfoEscopo').innerText = `${semanasLista.length} Semanas no Período`;
             document.getElementById('labelContadorSemanas').innerText = `${semanasSelecionadasSet.size} de 53 Marcadas`;
@@ -1128,19 +961,7 @@
             document.getElementById('cardSubTaxaConcluidas').innerText = `${taxaGeralConcluida}% de taxa`;
             document.getElementById('cardSubTaxaNaoRealizadas').innerText = `${taxaGeralNaoRealizada}% pendente`;
             document.getElementById('cardSubTaxaExtras').innerText = `${taxaGeralExtras}% do volume (${totalExtrasConcluidasAno} feitas)`;
-            
-            const cardTaxa = document.getElementById('cardTaxaExecucao');
-            const cardBoxAprov = document.getElementById('cardBoxAproveitamento');
-            cardTaxa.innerText = `${taxaGeralConcluida}%`;
-            document.getElementById('cardSubLabelAno').innerText = `Meta: ${metaOperacionalConfig}% (${taxaGeralConcluida >= metaOperacionalConfig ? 'Atingida' : 'Abaixo'})`;
-
-            if (taxaGeralConcluida >= metaOperacionalConfig) {
-                cardTaxa.className = "text-xl sm:text-2xl font-black text-green-600 dark:text-green-400";
-                cardBoxAprov.style.borderColor = "#86efac";
-            } else {
-                cardTaxa.className = "text-xl sm:text-2xl font-black text-red-600 dark:text-red-400";
-                cardBoxAprov.style.borderColor = "#fca5a5";
-            }
+            document.getElementById('cardTaxaExecucao').innerText = `${taxaGeralConcluida}%`;
 
             renderizarFiltroDeRecursos(todosRecursosNomes);
             processarIndicadoresDeRecursos(mapaRecursosUtilizados, totalRecursosUtilizadosGeral);
@@ -1161,6 +982,7 @@
             atualizarVisualizacao();
         }
 
+        // PROCESSAMENTO DE CURSOS E TREINAMENTOS
         function processarIndicadoresDeTreinamentos(mapaCursos, mesesCursos, totalCursos) {
             document.getElementById('cardTreinoTotal').innerText = totalCursos;
             document.getElementById('cardTreinoTotalSub').innerText = totalCursos > 0 ? "Participações validadas" : "Nenhum curso marcado";
@@ -1467,11 +1289,11 @@
 
             if (mostrarTotal) {
                 datasetsAnual.push({
-                    label: `Meta Operacional (${metaOperacionalConfig}%)`,
-                    data: Array(12).fill(metaOperacionalConfig),
-                    borderColor: '#8b5cf6',
-                    borderWidth: 1.5,
-                    borderDash: [6, 4],
+                    label: 'Meta Planeada (100%)',
+                    data: Array(12).fill(100),
+                    borderColor: '#3b82f6',
+                    borderWidth: 1.2,
+                    borderDash: [6, 6],
                     fill: false,
                     pointRadius: 0
                 });
