@@ -71,11 +71,9 @@
                 max-height: none !important;
                 overflow: visible !important;
             }
-            /* FORÇA OS BLOCOS COLAPSÁVEIS A FICAREM VISÍVEIS NO PAPEL */
             #corpoBlocoRecursos, #corpoBlocoTreinos {
                 display: block !important;
             }
-            /* DIVISÃO EXCLUSIVA DE FOLHAS */
             .folha-a4 {
                 page-break-after: always !important;
                 break-after: page !important;
@@ -104,9 +102,7 @@
 
     <div class="container space-y-5">
         
-        <!-- ============================================================== -->
-        <!-- FOLHA 1 NA IMPRESSÃO: CABEÇALHO, CARDS GERAIS E GRÁFICOS SEMANAIS -->
-        <!-- ============================================================== -->
+        <!-- FOLHA 1 -->
         <div class="folha-a4 space-y-4">
             
             <!-- CABEÇALHO -->
@@ -125,9 +121,8 @@
                 </div>
             </div>
 
-            <!-- PAINEL DE CONTROLE DE FILTROS (OCULTADO NA IMPRESSÃO) -->
+            <!-- PAINEL DE CONTROLE DE FILTROS -->
             <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-                <!-- LINHA 1: ESCOLHA DE ANO + ATALHOS RÁPIDOS + DEFINIÇÃO DE META -->
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
@@ -141,7 +136,6 @@
                         <button type="button" onclick="mudarAno(new Date().getFullYear())" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition">Ano Vigente</button>
                     </div>
 
-                    <!-- META OPERACIONAL CONFIGURÁVEL -->
                     <div class="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 px-3 py-1.5 rounded-xl">
                         <span class="text-xs font-black text-purple-900 dark:text-purple-300">🎯 Meta:</span>
                         <input type="number" id="inputMetaOperacional" value="90" min="50" max="100" onchange="alterarMetaOperacional(this.value)" class="w-12 text-xs p-1 bg-white dark:bg-gray-900 border border-purple-300 dark:border-purple-700 rounded font-black text-center text-purple-700 dark:text-purple-300">
@@ -149,7 +143,6 @@
                     </div>
                 </div>
 
-                <!-- ATALHOS RÁPIDOS (TRIMESTRES, SEMESTRES E ÚLTIMAS 4 SEMANAS) -->
                 <div class="flex flex-wrap items-center gap-1.5 pt-1">
                     <span class="text-[10px] font-black uppercase text-gray-500 mr-1">⚡ Atalhos:</span>
                     <button type="button" onclick="aplicarAtalhoFiltro('ultimas4')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">Últimas 4 Semanas</button>
@@ -161,7 +154,6 @@
                     <button type="button" onclick="aplicarAtalhoFiltro('sem2')" class="bg-gray-100 hover:bg-blue-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition">2º Semestre</button>
                 </div>
 
-                <!-- LINHA 2: GAVETA RETRÁTIL DOS 12 MESES -->
                 <div class="space-y-1.5 pt-2 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -179,7 +171,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 3: GAVETA RETRÁTIL DAS 53 SEMANAS DO ANO -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -198,7 +189,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 4: GAVETA DINÂMICA DE RECURSOS -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -216,7 +206,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 5: CANAIS DE TAREFA -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                         <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -243,7 +232,7 @@
                 </div>
             </div>
 
-            <!-- BARRA DE DESTAQUES E INSIGHTS OPERACIONAIS (NOVO) -->
+            <!-- BARRA DE DESTAQUES -->
             <div id="barraDestaquesPeriodo" class="bg-gradient-to-r from-blue-50 via-emerald-50 to-purple-50 dark:from-slate-800 dark:to-slate-900 p-2.5 rounded-xl border border-blue-200/60 dark:border-slate-700 flex flex-wrap justify-between items-center gap-2 text-xs card-a4-impresso">
                 <div class="flex items-center gap-2">
                     <span class="text-sm">💡</span>
@@ -256,7 +245,7 @@
                 </div>
             </div>
 
-            <!-- CARDS DE RESUMO OPERACIONAL -->
+            <!-- CARDS DE RESUMO -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
                     <div class="flex items-center justify-center gap-1">
@@ -304,7 +293,7 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
+            <!-- GRÁFICOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
                     <div class="flex items-center gap-1 mb-1">
@@ -328,12 +317,9 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- FOLHA 2 NA IMPRESSÃO: RECURSOS / FROTA & TABELA DETALHADA DAS SEMANAS     -->
-        <!-- ========================================================================= -->
+        <!-- FOLHA 2 -->
         <div class="folha-a4 space-y-4">
             
-            <!-- BLOCO DE RECURSOS & EQUIPAMENTOS (COLAPSÁVEL NO CELULAR) -->
             <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-3 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
@@ -413,7 +399,6 @@
             </div>
             </div>
 
-            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS -->
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-1">
@@ -443,9 +428,7 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- FOLHA 3 NA IMPRESSÃO: CURSOS & CAPACITAÇÃO ANUAL (FECHAMENTO DO RELATÓRIO) -->
-        <!-- ========================================================================= -->
+        <!-- FOLHA 3 -->
         <div class="space-y-4">
             <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-4 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
@@ -572,7 +555,6 @@
             carregarIndicadores();
         }
 
-        // ATALHOS RÁPIDOS DE FILTRO
         function aplicarAtalhoFiltro(tipo) {
             const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             const semAtual = calcularNumeroSemanaAtual();
@@ -615,7 +597,6 @@
             carregarIndicadores();
         }
 
-        // EXPORTAÇÃO CSV COMPLETA
         function exportarIndicadoresCSV() {
             if (!cacheDadosProcessados) {
                 alert("Aguarde os dados serem carregados.");
@@ -636,24 +617,6 @@
             cacheDadosProcessados.semanasLista.forEach(s => {
                 let perc = s.planeadas > 0 ? Math.round((s.executadas / s.planeadas) * 100) : 0;
                 csv += `Semana ${s.numSemana};${s.planeadas};${s.executadas};${s.naoRealizadas};${s.extrasConcluidas};${s.extrasCount};${s.recursosCount};${s.cursosCount};${perc}%\n`;
-            });
-
-            csv += "\nRANKING DE RECURSOS UTILIZADOS\n";
-            csv += "Recurso;Vezes Utilizado;% do Total\n";
-            let totRec = cacheDadosProcessados.totalRecursosUtilizadosGeral;
-            Object.keys(cacheDadosProcessados.mapaRecursosUtilizados).forEach(r => {
-                let qtd = cacheDadosProcessados.mapaRecursosUtilizados[r];
-                let perc = totRec > 0 ? Math.round((qtd / totRec) * 100) : 0;
-                csv += `"${r}";${qtd};${perc}%\n`;
-            });
-
-            csv += "\nRANKING DE TREINAMENTOS E CURSOS\n";
-            csv += "Curso;Realizados;% do Ano\n";
-            let totCur = cacheDadosProcessados.totalCursosConcluidosGeral;
-            Object.keys(cacheDadosProcessados.mapaCursosConcluidos).forEach(c => {
-                let qtd = cacheDadosProcessados.mapaCursosConcluidos[c];
-                let perc = totCur > 0 ? Math.round((qtd / totCur) * 100) : 0;
-                csv += `"${c}";${qtd};${perc}%\n`;
             });
 
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -869,7 +832,7 @@
             
             Object.keys(semanas).forEach(k => {
                 let m = k.match(/prog_grid_(\d{4})_/);
-                if (m && m) anosDetectados.add(parseInt(m));
+                if (m) anosDetectados.add(parseInt(m[1]));
             });
 
             anosDetectados.add(2025);
@@ -992,14 +955,6 @@
             carregarIndicadores();
         }
 
-        function alternarTodosCanais(marcar) {
-            document.getElementById('checkCanalTotal').checked = marcar;
-            document.getElementById('checkCanalConcluidas').checked = marcar;
-            document.getElementById('checkCanalNaoRealizadas').checked = marcar;
-            document.getElementById('checkCanalExtras').checked = marcar;
-            atualizarVisualizacao();
-        }
-
         function carregarIndicadores() {
             const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             const semanasSalvas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
@@ -1052,17 +1007,24 @@
 
                     let tarefasNormais = doc.querySelectorAll('.task-box, .treinamento-box');
                     let tarefasExtras = doc.querySelectorAll('.tarefa-extra-box');
-                    let concluidas = doc.querySelectorAll('.task-done');
+                    
+                    // CORREÇÃO ROBUSTA DE RECONHECIMENTO DE CONCLUSÃO
+                    let concluidas = Array.from(tarefasNormais).filter(el => {
+                        let chk = el.querySelector('input[type="checkbox"]');
+                        return el.classList.contains('task-done') || el.classList.contains('task_done') || (chk && chk.checked);
+                    });
 
                     tarefasExtras.forEach(ext => {
                         let check = ext.querySelector('input[type="checkbox"]');
-                        if (ext.classList.contains('task-done') || (check && check.checked)) extrasConcluidas++;
+                        if (ext.classList.contains('task-done') || ext.classList.contains('task_done') || (check && check.checked)) {
+                            extrasConcluidas++;
+                        }
                     });
 
                     let boxesTreinos = doc.querySelectorAll('.treinamento-box');
                     boxesTreinos.forEach(tBox => {
                         let check = tBox.querySelector('input[type="checkbox"]');
-                        let estaFeito = tBox.classList.contains('task-done') || (check && check.checked);
+                        let estaFeito = tBox.classList.contains('task-done') || tBox.classList.contains('task_done') || (check && check.checked);
                         let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
                         let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
 
@@ -1084,7 +1046,7 @@
                             todosRecursosNomes.add(nomeRecurso);
 
                             let check = tag.querySelector('input[type="checkbox"]');
-                            let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
+                            let estaConcluido = tag.classList.contains('task-done') || tag.classList.contains('task_done') || (check && check.checked);
                             
                             if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
@@ -1134,7 +1096,6 @@
                 semanasLista.push(itemSemana);
             });
 
-            // ATUALIZA BARRA DE INSIGHTS
             if (melhorSemanaObj) {
                 document.getElementById('insightMelhorSemana').innerText = `🏆 Melhor Semana: S${melhorSemanaObj.numSemana} (${melhorSemanaObj.taxaSemana}%)`;
             } else {
@@ -1169,7 +1130,6 @@
             cardTaxa.innerText = `${taxaGeralConcluida}%`;
             document.getElementById('cardSubLabelAno').innerText = `Meta: ${metaOperacionalConfig}% (${taxaGeralConcluida >= metaOperacionalConfig ? 'Atingida' : 'Abaixo'})`;
 
-            // Dinamismo da meta
             if (taxaGeralConcluida >= metaOperacionalConfig) {
                 cardTaxa.className = "text-xl sm:text-2xl font-black text-green-600 dark:text-green-400";
                 cardBoxAprov.style.borderColor = "#86efac";
@@ -1197,7 +1157,6 @@
             atualizarVisualizacao();
         }
 
-        // PROCESSAMENTO DE CURSOS E TREINAMENTOS
         function processarIndicadoresDeTreinamentos(mapaCursos, mesesCursos, totalCursos) {
             document.getElementById('cardTreinoTotal').innerText = totalCursos;
             document.getElementById('cardTreinoTotalSub').innerText = totalCursos > 0 ? "Participações validadas" : "Nenhum curso marcado";
