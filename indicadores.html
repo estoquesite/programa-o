@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v6.1 Gestão Pro & Exportação)</title>
+    <title>Painel de Indicadores & Gráficos (v6.2 Gestão Pro & Exportação)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -111,7 +111,7 @@
                 <div class="flex items-center gap-1.5">
                     <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Desempenho Operacional</h2>
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
-                    <span class="print-hidden text-[10px] font-extrabold bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-2 py-0.5 rounded-full ml-1">v6.1 Pro</span>
+                    <span class="print-hidden text-[10px] font-extrabold bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-2 py-0.5 rounded-full ml-1">v6.2 Pro</span>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
                     <button onclick="alternarDarkMode()" class="print-hidden px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-xs font-bold transition">🌙/☀️ Tema</button>
@@ -1010,22 +1010,25 @@
                     let boxesTreinos = doc.querySelectorAll('.treinamento-box');
                     let tagsRecursos = doc.querySelectorAll('.resource-tag');
 
-                    // VERIFICAÇÃO DIRETA DO CHECKBOX (CORREÇÃO DEFINITIVA)
+                    // LEITURA BLINDADA COMPLETA
                     let concluidas = Array.from(tarefasNormais).filter(el => {
                         let chk = el.querySelector('input[type="checkbox"]');
-                        return (chk && chk.checked) || el.classList.contains('task-done');
+                        let style = el.getAttribute('style') || '';
+                        return (chk && chk.hasAttribute('checked')) || (chk && chk.checked) || el.classList.contains('task-done') || el.classList.contains('task_done') || style.includes('line-through');
                     });
 
                     tarefasExtras.forEach(ext => {
                         let check = ext.querySelector('input[type="checkbox"]');
-                        if ((check && check.checked) || ext.classList.contains('task-done')) {
+                        let style = ext.getAttribute('style') || '';
+                        if ((check && check.hasAttribute('checked')) || (check && check.checked) || ext.classList.contains('task-done') || ext.classList.contains('task_done') || style.includes('line-through')) {
                             extrasConcluidas++;
                         }
                     });
 
                     boxesTreinos.forEach(tBox => {
                         let check = tBox.querySelector('input[type="checkbox"]');
-                        let estaFeito = (check && check.checked) || tBox.classList.contains('task-done');
+                        let style = tBox.getAttribute('style') || '';
+                        let estaFeito = (check && check.hasAttribute('checked')) || (check && check.checked) || tBox.classList.contains('task-done') || tBox.classList.contains('task_done') || style.includes('line-through');
                         let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
                         let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
 
@@ -1046,7 +1049,8 @@
                             todosRecursosNomes.add(nomeRecurso);
 
                             let check = tag.querySelector('input[type="checkbox"]');
-                            let estaConcluido = (check && check.checked) || tag.classList.contains('task-done');
+                            let style = tag.getAttribute('style') || '';
+                            let estaConcluido = (check && check.hasAttribute('checked')) || (check && check.checked) || tag.classList.contains('task-done') || tag.classList.contains('task_done') || style.includes('line-through');
                             
                             if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
