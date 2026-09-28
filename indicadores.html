@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v6.0 Gestão Pro & Exportação)</title>
+    <title>Painel de Indicadores & Gráficos (v6.1 Gestão Pro & Exportação)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -111,7 +111,7 @@
                 <div class="flex items-center gap-1.5">
                     <h2 id="lbl_titulo_pagina" class="text-sm sm:text-lg font-black uppercase text-green-800 dark:text-green-400">📊 Relatório de Desempenho Operacional</h2>
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
-                    <span class="print-hidden text-[10px] font-extrabold bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-2 py-0.5 rounded-full ml-1">v6.0 Pro</span>
+                    <span class="print-hidden text-[10px] font-extrabold bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-2 py-0.5 rounded-full ml-1">v6.1 Pro</span>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
                     <button onclick="alternarDarkMode()" class="print-hidden px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-xs font-bold transition">🌙/☀️ Tema</button>
@@ -707,7 +707,7 @@
             if (!texto) return "";
             return texto
                 .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2300}-\u{23FF}]/gu, '')
-                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡🚗🚚🚜🏍️🏗️🚤]/g, '')
+                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🚙⚡🚗🚚🚜🏍️🏗️🚤]/g, '')
                 .replace(/\[.*?\]/g, '')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -1005,26 +1005,27 @@
                     const parser = new DOMParser();
                     let doc = parser.parseFromString(htmlCard, 'text/html');
 
-                    let tarefasNormais = doc.querySelectorAll('.task-box, .treinamento-box');
+                    let tarefasNormais = doc.querySelectorAll('.task-box');
                     let tarefasExtras = doc.querySelectorAll('.tarefa-extra-box');
-                    
-                    // CORREÇÃO ROBUSTA DE RECONHECIMENTO DE CONCLUSÃO
+                    let boxesTreinos = doc.querySelectorAll('.treinamento-box');
+                    let tagsRecursos = doc.querySelectorAll('.resource-tag');
+
+                    // VERIFICAÇÃO DIRETA DO CHECKBOX (CORREÇÃO DEFINITIVA)
                     let concluidas = Array.from(tarefasNormais).filter(el => {
                         let chk = el.querySelector('input[type="checkbox"]');
-                        return el.classList.contains('task-done') || el.classList.contains('task_done') || (chk && chk.checked);
+                        return (chk && chk.checked) || el.classList.contains('task-done');
                     });
 
                     tarefasExtras.forEach(ext => {
                         let check = ext.querySelector('input[type="checkbox"]');
-                        if (ext.classList.contains('task-done') || ext.classList.contains('task_done') || (check && check.checked)) {
+                        if ((check && check.checked) || ext.classList.contains('task-done')) {
                             extrasConcluidas++;
                         }
                     });
 
-                    let boxesTreinos = doc.querySelectorAll('.treinamento-box');
                     boxesTreinos.forEach(tBox => {
                         let check = tBox.querySelector('input[type="checkbox"]');
-                        let estaFeito = tBox.classList.contains('task-done') || tBox.classList.contains('task_done') || (check && check.checked);
+                        let estaFeito = (check && check.checked) || tBox.classList.contains('task-done');
                         let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
                         let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
 
@@ -1036,7 +1037,6 @@
                         }
                     });
 
-                    let tagsRecursos = doc.querySelectorAll('.resource-tag');
                     tagsRecursos.forEach(tag => {
                         let descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
                         let nomeBruto = descEl ? descEl.innerText.trim() : tag.innerText.trim();
@@ -1046,7 +1046,7 @@
                             todosRecursosNomes.add(nomeRecurso);
 
                             let check = tag.querySelector('input[type="checkbox"]');
-                            let estaConcluido = tag.classList.contains('task-done') || tag.classList.contains('task_done') || (check && check.checked);
+                            let estaConcluido = (check && check.checked) || tag.classList.contains('task-done');
                             
                             if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
                                 mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
