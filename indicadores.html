@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.5 Cursos no Encerramento)</title>
+    <title>Painel de Indicadores & Gráficos (v5.6)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -30,6 +30,7 @@
             margin: 0;
             padding: 20px;
         }
+        .dark body { background-color: #111827; color: #f3f4f6; }
         .container {
             max-width: 1150px;
             margin: 0 auto;
@@ -113,6 +114,7 @@
                     <button type="button" onclick="editarTexto('lbl_titulo_pagina')" class="btn-edit-title print-hidden" title="Editar nome">✏️</button>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button onclick="alternarDarkMode()" class="print-hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2.5 py-1.5 rounded-xl text-xs font-bold transition" title="Tema claro/escuro">🌙/☀️</button>
                     <button onclick="window.print()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir em A4</button>
                     <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
                 </div>
@@ -496,6 +498,28 @@
         let semanasSelecionadasSet = new Set();
         let recursosDesmarcados = new Set();
 
+        function escHtml(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
+        }
+
+        // MESMA REGRA DA PROGRAMAÇÃO: devolve as 5 datas (Seg a Sex) da semana ISO
+        function getDateRangeOfWeek(weekNo, y) {
+            let d = new Date(y, 0, 1), dayNum = d.getDay();
+            let requiredDay = (weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum);
+            d.setDate(1 + requiredDay);
+            let dias = [];
+            for (let i = 0; i < 5; i++) {
+                let temp = new Date(d); temp.setDate(d.getDate() + i);
+                dias.push(temp);
+            }
+            return dias;
+        }
+
         function obterChaveStorageSemanas(ano) {
             return `indicadores_semanas_selecionadas_${ano}`;
         }
@@ -588,11 +612,6 @@
             d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
             return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        }
-
-        function obterMesPelaSemana(ano, numSemana) {
-            let d = new Date(ano, 0, 1 + (numSemana - 1) * 7);
-            return d.getMonth();
         }
 
         function renderizarCheckboxesMeses() {
@@ -777,9 +796,9 @@
                         : 'bg-white border-gray-200 text-gray-400 dark:bg-gray-800 dark:border-gray-700'
                 }`;
                 label.innerHTML = `
-                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="alternarRecursoFiltro('${nome.replace(/'/g, "\\'")}', this.checked)" class="w-3.5 h-3.5 accent-emerald-600 cursor-pointer">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} data-nome="${escHtml(nome)}" onchange="alternarRecursoFiltro(this.dataset.nome, this.checked)" class="w-3.5 h-3.5 accent-emerald-600 cursor-pointer">
                     <span class="text-base">${icone}</span>
-                    <span class="text-xs font-extrabold uppercase">${nome}</span>
+                    <span class="text-xs font-extrabold uppercase">${escHtml(nome)}</span>
                 `;
                 cont.appendChild(label);
             });
@@ -788,6 +807,9 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
+            if (localStorage.getItem('dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
             carregarTextosCustomizados();
             renderizarCheckboxesMeses();
             carregarSemanasDaMemoria();
@@ -821,17 +843,19 @@
             atualizarVisualizacao();
         }
 
+        // ===== LEITURA DA PROGRAMAÇÃO: AGORA DIA A DIA, COM AS DATAS REAIS =====
         function carregarIndicadores() {
             const anoSelecionado = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             const semanasSalvas = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.semanas) ? window.dadosGlobaisNuvem.semanas : {};
-            const anoRealHoje = new Date().getFullYear();
-            const semanaAtualReal = calcularNumeroSemanaAtual();
+            const hoje0 = new Date(); hoje0.setHours(0, 0, 0, 0);
+            const diasNomes = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
 
             let totalPlaneadasAno = 0;
             let totalConcluidasAno = 0;
             let totalNaoRealizadasAno = 0;
             let totalExtrasAno = 0;
             let totalExtrasConcluidasAno = 0;
+            let totalFeriadosAno = 0;
 
             let mapaRecursosUtilizados = {}; 
             let totalRecursosUtilizadosGeral = 0;
@@ -854,98 +878,114 @@
 
             let semanasOrdenadas = Array.from(semanasSelecionadasSet).sort((a,b) => a - b);
 
+            // Um item está feito se tem a classe de riscado OU a caixinha marcada
+            const estaFeito = (el) => {
+                if (el.classList.contains('task-done')) return true;
+                const c = el.querySelector('input[type="checkbox"]');
+                return !!(c && c.checked);
+            };
+
             semanasOrdenadas.forEach(numSemana => {
                 let key = `prog_grid_${anoSelecionado}_semana_${numSemana}`;
                 let htmlCard = semanasSalvas[key];
-                let mesIdx = obterMesPelaSemana(anoSelecionado, numSemana);
-                let ehFuturoReal = (anoSelecionado > anoRealHoje) || (anoSelecionado === anoRealHoje && numSemana > semanaAtualReal);
+                const datas = getDateRangeOfWeek(numSemana, anoSelecionado);
 
-                if (!mesesSelecionados.has(mesIdx)) return;
+                // A semana entra se pelo menos um dos seus dias cai num mês marcado
+                if (!datas.some(dt => mesesSelecionados.has(dt.getMonth()))) return;
 
-                let planeadas = 0, executadas = 0, naoRealizadas = 0, extrasCount = 0, extrasConcluidas = 0, recursosNestaSemanaFeitos = 0, cursosNestaSemanaFeitos = 0;
+                const doc = htmlCard ? new DOMParser().parseFromString(htmlCard, 'text/html') : null;
+                const w = { planeadas: 0, executadas: 0, naoRealizadas: 0, extrasCount: 0, extrasConcluidas: 0, recursos: 0, cursos: 0, feriados: 0 };
 
-                if (htmlCard) {
-                    const parser = new DOMParser();
-                    let doc = parser.parseFromString(htmlCard, 'text/html');
+                datas.forEach((dt, i) => {
+                    const mesIdx = dt.getMonth();
+                    if (!mesesSelecionados.has(mesIdx) || !doc) return;
 
-                    let tarefasNormais = doc.querySelectorAll('.task-box, .treinamento-box');
-                    let tarefasExtras = doc.querySelectorAll('.tarefa-extra-box');
-                    let concluidas = doc.querySelectorAll('.task-done');
+                    const card = doc.querySelector(`.day-card[data-dia-nome="${diasNomes[i]}"]`);
+                    if (!card) return;
 
-                    tarefasExtras.forEach(ext => {
-                        let check = ext.querySelector('input[type="checkbox"]');
-                        if (ext.classList.contains('task-done') || (check && check.checked)) extrasConcluidas++;
+                    const diaJaPassou = dt < hoje0;      // pendente só vira "não realizada" depois que o dia passou
+                    const diaAteHoje = dt <= hoje0;      // cursos e recursos só contam até hoje
+
+                    // Dia bloqueado por Feriado / Emenda
+                    const blocoTarefas = card.querySelector('.tasks-container');
+                    const textoBloco = blocoTarefas ? blocoTarefas.textContent : '';
+                    const normais = card.querySelectorAll('.task-box, .treinamento-box');
+                    const extras = card.querySelectorAll('.tarefa-extra-box');
+                    const ehFeriadoDia = card.hasAttribute('data-backup-tarefas') ||
+                        (/🍃 FERIADO|📌 EMENDA/.test(textoBloco) && normais.length === 0 && extras.length === 0);
+                    if (ehFeriadoDia) { w.feriados++; totalFeriadosAno++; }
+
+                    // Tarefas do dia (normais + treinamentos + extras). Recursos NÃO entram nesta conta.
+                    let feitasNormais = 0, feitasExtras = 0;
+                    normais.forEach(el => { if (estaFeito(el)) feitasNormais++; });
+                    extras.forEach(el => { if (estaFeito(el)) feitasExtras++; });
+
+                    const planeadasDia = normais.length + extras.length;
+                    const feitasDia = feitasNormais + feitasExtras;
+                    const naoFeitasDia = diaJaPassou ? Math.max(0, planeadasDia - feitasDia) : 0;
+
+                    w.planeadas += planeadasDia;
+                    w.executadas += feitasDia;
+                    w.naoRealizadas += naoFeitasDia;
+                    w.extrasCount += extras.length;
+                    w.extrasConcluidas += feitasExtras;
+
+                    mesesDados[mesIdx].planeadas += planeadasDia;
+                    mesesDados[mesIdx].concluidas += feitasDia;
+                    mesesDados[mesIdx].naoRealizadas += naoFeitasDia;
+                    mesesDados[mesIdx].extras += extras.length;
+
+                    // Cursos concluídos
+                    card.querySelectorAll('.treinamento-box').forEach(tBox => {
+                        if (!estaFeito(tBox) || !diaAteHoje) return;
+                        const descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
+                        const nomeTreino = descEl ? limparSimbolosTexto(descEl.textContent).toUpperCase() : "TREINAMENTO OPERACIONAL";
+                        mapaCursosConcluidos[nomeTreino] = (mapaCursosConcluidos[nomeTreino] || 0) + 1;
+                        mesesCursosConcluidos[mesIdx]++;
+                        totalCursosConcluidosGeral++;
+                        w.cursos++;
                     });
 
-                    // IDENTIFICAÇÃO DE CURSOS CONCLUÍDOS DIRETO NA GRADE
-                    let boxesTreinos = doc.querySelectorAll('.treinamento-box');
-                    boxesTreinos.forEach(tBox => {
-                        let check = tBox.querySelector('input[type="checkbox"]');
-                        let estaFeito = tBox.classList.contains('task-done') || (check && check.checked);
-                        let descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
-                        let nomeTreino = descEl ? limparSimbolosTexto(descEl.innerText).toUpperCase() : "TREINAMENTO OPERACIONAL";
+                    // Recursos utilizados
+                    card.querySelectorAll('.resource-tag').forEach(tag => {
+                        const descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
+                        const nomeBruto = descEl ? descEl.textContent.trim() : tag.textContent.trim();
+                        const nomeRecurso = limparSimbolosTexto(nomeBruto).toUpperCase();
+                        if (!nomeRecurso || nomeRecurso.length <= 1) return;
 
-                        if (estaFeito && !ehFuturoReal) {
-                            mapaCursosConcluidos[nomeTreino] = (mapaCursosConcluidos[nomeTreino] || 0) + 1;
-                            mesesCursosConcluidos[mesIdx]++;
-                            totalCursosConcluidosGeral++;
-                            cursosNestaSemanaFeitos++;
+                        todosRecursosNomes.add(nomeRecurso);
+                        if (estaFeito(tag) && diaAteHoje && !recursosDesmarcados.has(nomeRecurso)) {
+                            mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
+                            totalRecursosUtilizadosGeral++;
+                            w.recursos++;
                         }
                     });
+                });
 
-                    // IDENTIFICAÇÃO DE RECURSOS CONCLUÍDOS
-                    let tagsRecursos = doc.querySelectorAll('.resource-tag');
-                    tagsRecursos.forEach(tag => {
-                        let descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
-                        let nomeBruto = descEl ? descEl.innerText.trim() : tag.innerText.trim();
-                        let nomeRecurso = limparSimbolosTexto(nomeBruto).toUpperCase();
-                        
-                        if (nomeRecurso && nomeRecurso.length > 1) {
-                            todosRecursosNomes.add(nomeRecurso);
-
-                            let check = tag.querySelector('input[type="checkbox"]');
-                            let estaConcluido = tag.classList.contains('task-done') || (check && check.checked);
-                            
-                            if (estaConcluido && !recursosDesmarcados.has(nomeRecurso)) {
-                                mapaRecursosUtilizados[nomeRecurso] = (mapaRecursosUtilizados[nomeRecurso] || 0) + 1;
-                                totalRecursosUtilizadosGeral++;
-                                recursosNestaSemanaFeitos++;
-                            }
-                        }
-                    });
-
-                    planeadas = tarefasNormais.length + tarefasExtras.length;
-                    executadas = concluidas.length;
-                    naoRealizadas = ehFuturoReal ? 0 : Math.max(0, planeadas - executadas);
-                    extrasCount = tarefasExtras.length;
-                }
-
-                totalPlaneadasAno += planeadas;
-                totalConcluidasAno += executadas;
-                totalNaoRealizadasAno += naoRealizadas;
-                totalExtrasAno += extrasCount;
-                totalExtrasConcluidasAno += extrasConcluidas;
-
-                mesesDados[mesIdx].planeadas += planeadas;
-                mesesDados[mesIdx].concluidas += executadas;
-                mesesDados[mesIdx].naoRealizadas += naoRealizadas;
-                mesesDados[mesIdx].extras += extrasCount;
+                totalPlaneadasAno += w.planeadas;
+                totalConcluidasAno += w.executadas;
+                totalNaoRealizadasAno += w.naoRealizadas;
+                totalExtrasAno += w.extrasCount;
+                totalExtrasConcluidasAno += w.extrasConcluidas;
 
                 semanasLista.push({
                     numSemana,
-                    planeadas,
-                    executadas,
-                    naoRealizadas,
-                    extrasCount,
-                    extrasConcluidas,
-                    recursosCount: recursosNestaSemanaFeitos,
-                    cursosCount: cursosNestaSemanaFeitos,
+                    planeadas: w.planeadas,
+                    executadas: w.executadas,
+                    naoRealizadas: w.naoRealizadas,
+                    extrasCount: w.extrasCount,
+                    extrasConcluidas: w.extrasConcluidas,
+                    recursosCount: w.recursos,
+                    cursosCount: w.cursos,
+                    feriadosCount: w.feriados,
                     temDadosSalvos: !!htmlCard,
-                    ehFuturoReal
+                    semanaFutura: datas[0] > hoje0,
+                    semanaEmAndamento: datas[0] <= hoje0 && datas[4] >= hoje0
                 });
             });
 
-            document.getElementById('cardSubInfoEscopo').innerText = `${semanasLista.length} Semanas no Período`;
+            document.getElementById('cardSubInfoEscopo').innerText =
+                `${semanasLista.length} Semanas no Período` + (totalFeriadosAno > 0 ? ` · 🍃 ${totalFeriadosAno} feriado(s)/emenda(s)` : '');
             document.getElementById('labelContadorSemanas').innerText = `${semanasSelecionadasSet.size} de 53 Marcadas`;
 
             document.getElementById('cardTotalPlaneadas').innerText = totalPlaneadasAno;
@@ -954,7 +994,7 @@
             document.getElementById('cardTotalExtras').innerText = totalExtrasAno;
 
             let baseCalculoAproveitamento = (totalConcluidasAno + totalNaoRealizadasAno);
-            let taxaGeralConcluida = baseCalculoAproveitamento > 0 ? Math.round((totalConcluidasAno / baseCalculoAproveitamento) * 100) : (totalPlaneadasAno > 0 && totalConcluidasAno > 0 ? 100 : 0);
+            let taxaGeralConcluida = baseCalculoAproveitamento > 0 ? Math.round((totalConcluidasAno / baseCalculoAproveitamento) * 100) : 0;
             let taxaGeralNaoRealizada = baseCalculoAproveitamento > 0 ? Math.round((totalNaoRealizadasAno / baseCalculoAproveitamento) * 100) : 0;
             let taxaGeralExtras = totalPlaneadasAno > 0 ? Math.round((totalExtrasAno / totalPlaneadasAno) * 100) : 0;
 
@@ -1034,7 +1074,7 @@
                         <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
                             <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
                             <span class="text-sm">🎓</span>
-                            <span>${c.nome}</span>
+                            <span>${escHtml(c.nome)}</span>
                         </td>
                         <td class="py-1.5 px-2 text-center font-extrabold text-purple-700 dark:text-purple-400">${c.qtd}</td>
                         <td class="py-1.5 px-2 text-right">
@@ -1091,12 +1131,12 @@
             if (recursosOrdenados.length > 0 && totalUtilizados > 0) {
                 let mais = recursosOrdenados[0];
                 let percMais = Math.round((mais.utilizados / totalUtilizados) * 100);
-                document.getElementById('cardRecursoMaisNome').innerHTML = `<span class="mr-1">${obterIconeRecurso(mais.nome)}</span> ${mais.nome}`;
+                document.getElementById('cardRecursoMaisNome').innerHTML = `<span class="mr-1">${obterIconeRecurso(mais.nome)}</span> ${escHtml(mais.nome)}`;
                 document.getElementById('cardRecursoMaisQtd').innerText = `${mais.utilizados} vezes (${percMais}%)`;
 
                 let menos = recursosOrdenados[recursosOrdenados.length - 1];
                 let percMenos = Math.round((menos.utilizados / totalUtilizados) * 100);
-                document.getElementById('cardRecursoMenosNome').innerHTML = `<span class="mr-1">${obterIconeRecurso(menos.nome)}</span> ${menos.nome}`;
+                document.getElementById('cardRecursoMenosNome').innerHTML = `<span class="mr-1">${obterIconeRecurso(menos.nome)}</span> ${escHtml(menos.nome)}`;
                 document.getElementById('cardRecursoMenosQtd').innerText = `${menos.utilizados} vezes (${percMenos}%)`;
 
                 msgGrafico.classList.add('hidden');
@@ -1127,7 +1167,7 @@
                         <td class="py-1.5 px-2 font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
                             <span class="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${idx === 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-200 text-gray-700'}">${idx + 1}</span>
                             <span class="text-sm">${icone}</span>
-                            <span>${r.nome}</span>
+                            <span>${escHtml(r.nome)}</span>
                         </td>
                         <td class="py-1.5 px-2 text-center font-extrabold text-emerald-700 dark:text-emerald-400">${r.utilizados}</td>
                         <td class="py-1.5 px-2 text-right">
@@ -1208,11 +1248,13 @@
                     tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-700/20';
                     tr.innerHTML = `
                         <td class="py-2 px-2.5 font-bold text-gray-800 dark:text-gray-200">
-                            <label class="flex items-center gap-1.5 cursor-pointer">
+                            <label class="flex items-center gap-1.5 cursor-pointer flex-wrap">
                                 <input type="checkbox" checked onchange="alternarSemanaManual(${s.numSemana}, false)" class="w-3.5 h-3.5 accent-blue-600 cursor-pointer print-hidden" title="Desmarcar esta semana">
                                 <span>Semana ${String(s.numSemana).padStart(2,'0')}</span>
                                 ${!s.temDadosSalvos ? '<span class="text-[9px] text-gray-400 font-normal">(Sem Registos)</span>' : ''}
-                                ${s.ehFuturoReal ? '<span class="text-[9px] text-blue-500 font-normal">(Programada)</span>' : ''}
+                                ${s.semanaFutura ? '<span class="text-[9px] text-blue-500 font-normal">(Programada)</span>' : ''}
+                                ${s.semanaEmAndamento ? '<span class="text-[9px] text-amber-600 font-normal">(Em andamento)</span>' : ''}
+                                ${s.feriadosCount > 0 ? `<span class="text-[9px] text-teal-600 font-normal">🍃 ${s.feriadosCount}</span>` : ''}
                             </label>
                         </td>
                         <td class="py-2 px-2.5 font-semibold text-blue-600 dark:text-blue-400 col-total" style="${mostrarTotal ? '' : 'display:none;'}">${s.planeadas}</td>
@@ -1223,9 +1265,9 @@
                         <td class="py-2 px-2.5 font-extrabold text-purple-700 dark:text-purple-400">🎓 ${s.cursosCount}</td>
                         <td class="py-2 px-2.5">
                             <div class="flex items-center gap-2">
-                                <div class="w-16 bg-red-200 dark:bg-red-950/60 rounded-full h-2 overflow-hidden flex">
+                                <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden flex">
                                     <div class="bg-green-600 h-2" style="width: ${percentualExec}%" title="${percentualExec}% Concluído"></div>
-                                    <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Pendente"></div>
+                                    <div class="bg-red-500 h-2" style="width: ${percentualNaoRealizado}%" title="${percentualNaoRealizado}% Não realizado"></div>
                                 </div>
                                 <span class="font-bold text-[10px] text-gray-600 dark:text-gray-300">${percentualExec}%</span>
                             </div>
