@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.01 Nuvem Pro)</title>
+    <title>Programação Semanal Interativa (v4.03 Nuvem Pro)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -458,6 +458,7 @@
             <div class="flex gap-2">
                 <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
             </div>
+            <button onclick="importarFeriadosNacionais()" class="w-full bg-teal-100 hover:bg-teal-200 dark:bg-teal-950 text-teal-800 dark:text-teal-300 font-bold py-2 rounded-xl text-xs transition">📅 Importar feriados nacionais do ano selecionado</button>
             <div id="popListaFeriados" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
             <div class="flex justify-end pt-2"><button onclick="fecharModalFeriados()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
@@ -468,7 +469,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.01 Nuvem Pro</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.03 Nuvem Pro</span>
         </div>
     </div>
 
@@ -530,6 +531,12 @@
         }
         function classePrazo(n) { return n === 0 ? 'aviso-hoje' : n <= 3 ? 'aviso-breve' : 'aviso-normal'; }
 
+        function alternarAvisos(ocultar) {
+            if (ocultar) sessionStorage.setItem('avisos_ocultos', '1');
+            else sessionStorage.removeItem('avisos_ocultos');
+            renderizarAvisos();
+        }
+
         function renderizarAvisos() {
             const painel = document.getElementById('painelAvisos');
             if (!painel) return;
@@ -553,11 +560,20 @@
                     sub: f.data.split('-').reverse().join('/') });
             });
 
-            if (itens.length === 0 || sessionStorage.getItem('avisos_fechados') === '1') {
+            if (itens.length === 0) {
                 painel.innerHTML = '';
                 return;
             }
             itens.sort((a, b) => a.n - b.n);
+
+            // Painel recolhido: fica uma barra piscante para reabrir (não some de vez)
+            if (sessionStorage.getItem('avisos_ocultos') === '1') {
+                painel.innerHTML = `
+                    <button onclick="alternarAvisos(false)" class="aviso-chip aviso-hoje w-full justify-center" style="margin-top:0" title="Mostrar avisos">
+                        <span><span class="aviso-sino">🔔</span> Mostrar avisos (${itens.length})</span>
+                    </button>`;
+                return;
+            }
 
             painel.innerHTML = `
                 <div class="aviso-painel shadow-md">
@@ -565,7 +581,7 @@
                         <span class="text-xs font-black uppercase text-orange-700 dark:text-orange-300">
                             <span class="aviso-sino">🔔</span> Atenção! Próximos treinamentos e feriados
                         </span>
-                        <button onclick="sessionStorage.setItem('avisos_fechados','1');renderizarAvisos()" class="text-gray-400 hover:text-gray-600 font-bold text-sm" title="Ocultar">✕</button>
+                        <button onclick="alternarAvisos(true)" class="text-gray-400 hover:text-gray-600 font-bold text-sm" title="Recolher">✕</button>
                     </div>
                     ${itens.map(i => `
                         <div class="aviso-chip ${classePrazo(i.n)} aviso-${i.tipo}" onclick="sincronizarSemanaPelaData('${i.data}')" title="Ir para a semana">
@@ -910,7 +926,8 @@
                 historico: historicoLocal,
                 treinamentos: treinosLocal,
                 feriados: feriadosLocal,
-                semanas: semanasNuvem
+                semanas: semanasNuvem,
+                dispensados: dadosGlobaisNuvem.dispensados || []
             };
 
             try {
@@ -1001,9 +1018,15 @@
             lista.forEach(t => {
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
+                const periodo = (t.fim && t.fim !== t.inicio)
+                    ? `${t.inicio.split('-').reverse().join('/')} a ${t.fim.split('-').reverse().join('/')}`
+                    : t.inicio.split('-').reverse().join('/');
                 div.innerHTML = `
-                    <div><span class="font-bold text-emerald-800 dark:text-emerald-300">🎓 ${t.nome} (${t.pessoa})</span><br><small class="text-gray-400">${t.inicio.split('-').reverse().join('/')}</small></div>
-                    <button onclick="enviarTreinamentoParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded font-bold">✅ OK (Enviar)</button>
+                    <div><span class="font-bold text-emerald-800 dark:text-emerald-300">🎓 ${escHtml(t.nome)} (${escHtml(t.pessoa)})</span><br><small class="text-gray-400">${periodo} · ${escHtml(t.local)}</small></div>
+                    <div class="flex gap-1">
+                        <button onclick="enviarTreinamentoParaProgramacao('${t.id}')" class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded font-bold" title="Enviar de novo para a programação">➕</button>
+                        <button onclick="excluirTreinamento('${t.id}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded font-bold" title="Excluir treinamento">🗑️</button>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -1024,6 +1047,7 @@
             await salvarNaNuvem();
             renderizarAvisos();
             renderizarPopTreinamentos();
+            atualizarDatasSemana(); // aplica automaticamente se cair na semana exibida
             mostrarToast("✅ Treinamento guardado!");
         }
 
@@ -1057,6 +1081,7 @@
                         divTreino.className = 'treinamento-box';
                         divTreino.setAttribute('draggable', 'true');
                         divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                        divTreino.dataset.eventoChave = `treino:${t.id}:${t.inicio}`;
                         divTreino.innerHTML = `
                             <span class="${identificadorUnico} flex items-center gap-1.5">
                                 <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
@@ -1080,7 +1105,7 @@
         function renderizarPopFeriados() {
             const container = document.getElementById('popListaFeriados');
             container.innerHTML = '';
-            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            let lista = (JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || []).slice().sort((a, b) => a.data.localeCompare(b.data));
             if (lista.length === 0) {
                 container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum feriado registado.</p>';
                 return;
@@ -1089,8 +1114,11 @@
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
                 div.innerHTML = `
-                    <div><span class="font-bold text-teal-800 dark:text-teal-300">🍃 ${f.desc}</span><br><small class="text-gray-400">${f.data.split('-').reverse().join('/')}</small></div>
-                    <button onclick="enviarFeriadoParaProgramacao('${f.id}')" class="bg-teal-700 hover:bg-teal-800 text-white px-2 py-1 rounded font-bold">✅ OK (Enviar)</button>
+                    <div><span class="font-bold text-teal-800 dark:text-teal-300">${f.tipo === 'emenda' ? '📌' : '🍃'} ${escHtml(f.desc)}</span><br><small class="text-gray-400">${f.data.split('-').reverse().join('/')}</small></div>
+                    <div class="flex gap-1">
+                        <button onclick="enviarFeriadoParaProgramacao('${f.id}')" class="bg-teal-700 hover:bg-teal-800 text-white px-2 py-1 rounded font-bold" title="Enviar de novo para a programação">➕</button>
+                        <button onclick="excluirFeriado('${f.id}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded font-bold" title="Excluir feriado">🗑️</button>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -1109,6 +1137,7 @@
             await salvarNaNuvem();
             renderizarAvisos();
             renderizarPopFeriados();
+            atualizarDatasSemana(); // aplica automaticamente se cair na semana exibida
             mostrarToast("✅ Feriado guardado!");
         }
 
@@ -1138,6 +1167,17 @@
                     const tasksCont = cardDia.querySelector('.tasks-container');
                     const tituloFeriado = f.tipo === 'feriado' ? '🍃 FERIADO' : '📌 EMENDA';
 
+                    // CORREÇÃO: guarda o conteúdo do dia antes de substituir
+                    guardarBackupDia(cardDia);
+
+                    cardDia.dataset.eventoChave = `feriado:${f.id || f.data}:${f.data}`;
+
+                    // Mantém as caixinhas do dia coerentes com o bloqueio
+                    const cf = cardDia.querySelector('.check-feriado');
+                    const ce = cardDia.querySelector('.check-emenda');
+                    if (cf) cf.checked = (f.tipo === 'feriado');
+                    if (ce) ce.checked = (f.tipo === 'emenda');
+
                     tasksCont.innerHTML = `
                         <div style="background-color: ${f.tipo === 'feriado' ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${f.tipo === 'feriado' ? '#2e7d32' : '#00897b'}; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm">
                             <span style="color: ${f.tipo === 'feriado' ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 12px;">${tituloFeriado}</span>
@@ -1154,12 +1194,190 @@
             } else { alert("⚠️ A data deste evento cai em fim de semana."); }
         }
 
+        // ===== EXCLUIR TREINAMENTO / FERIADO CADASTRADO =====
+        async function excluirTreinamento(id) {
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            const t = lista.find(x => x.id === id);
+            if (!t) return;
+            if (!confirm(`Excluir o treinamento "${t.nome}"?\nEle também será retirado da semana exibida.`)) return;
+            localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista.filter(x => x.id !== id)));
+            document.querySelectorAll('.treino_id_' + id).forEach(el => {
+                const box = el.closest('.treinamento-box');
+                if (box) box.remove();
+            });
+            await salvarNaNuvem();
+            renderizarAvisos();
+            renderizarPopTreinamentos();
+            atualizarIndicadorProgresso();
+            mostrarToast("🗑️ Treinamento excluído.", "info");
+        }
+
+        async function excluirFeriado(id) {
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            const f = lista.find(x => x.id === id);
+            if (!f) return;
+            if (!confirm(`Excluir "${f.desc}"?\nO dia volta ao normal na semana exibida.`)) return;
+            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista.filter(x => x.id !== id)));
+            document.querySelectorAll('.day-card').forEach(card => {
+                if ((card.dataset.eventoChave || '').startsWith(`feriado:${id}:`)) restaurarDiaNormal(card);
+            });
+            await salvarNaNuvem();
+            renderizarAvisos();
+            renderizarPopFeriados();
+            mostrarToast("🗑️ Feriado excluído.", "info");
+        }
+
+        // ===== IMPORTAR FERIADOS NACIONAIS (BRASIL) =====
+        function calcularPascoa(ano) {
+            const a = ano % 19, b = Math.floor(ano / 100), c = ano % 100;
+            const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const mes = Math.floor((h + l - 7 * m + 114) / 31);
+            const dia = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(ano, mes - 1, dia);
+        }
+
+        async function importarFeriadosNacionais() {
+            const ano = parseInt(document.getElementById('inputAno').value) || new Date().getFullYear();
+            if (!confirm(`Importar os feriados nacionais de ${ano}?\n(Feriados estaduais e municipais você cadastra manualmente.)`)) return;
+
+            const pascoa = calcularPascoa(ano);
+            const sextaSanta = new Date(pascoa); sextaSanta.setDate(pascoa.getDate() - 2);
+            const fixos = [
+                [`${ano}-01-01`, 'CONFRATERNIZAÇÃO UNIVERSAL'],
+                [dataISO(sextaSanta), 'SEXTA-FEIRA SANTA'],
+                [`${ano}-04-21`, 'TIRADENTES'],
+                [`${ano}-05-01`, 'DIA DO TRABALHO'],
+                [`${ano}-09-07`, 'INDEPENDÊNCIA DO BRASIL'],
+                [`${ano}-10-12`, 'NOSSA SENHORA APARECIDA'],
+                [`${ano}-11-02`, 'FINADOS'],
+                [`${ano}-11-15`, 'PROCLAMAÇÃO DA REPÚBLICA']
+            ];
+            if (ano >= 2024) fixos.push([`${ano}-11-20`, 'DIA DA CONSCIÊNCIA NEGRA']);
+            fixos.push([`${ano}-12-25`, 'NATAL']);
+
+            let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            let novos = 0;
+            fixos.forEach(([data, desc]) => {
+                if (lista.some(f => f.data === data)) return; // já existe um feriado nessa data
+                lista.push({ id: 'feriado_nac_' + data, data, tipo: 'feriado', desc });
+                novos++;
+            });
+            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
+            await salvarNaNuvem();
+            renderizarAvisos();
+            renderizarPopFeriados();
+            atualizarDatasSemana();
+            mostrarToast(novos ? `✅ ${novos} feriados nacionais importados!` : "ℹ️ Todos já estavam cadastrados.", novos ? 'sucesso' : 'info');
+        }
+
+        // ===== AUTOMÁTICO: TREINAMENTOS E FERIADOS CADASTRADOS ENTRAM SOZINHOS NA SEMANA =====
+        function dataISO(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+        function eventoDispensado(chave) {
+            return (dadosGlobaisNuvem.dispensados || []).includes(chave);
+        }
+        function dispensarEvento(chave) {
+            if (!chave) return;
+            if (!dadosGlobaisNuvem.dispensados) dadosGlobaisNuvem.dispensados = [];
+            if (!dadosGlobaisNuvem.dispensados.includes(chave)) dadosGlobaisNuvem.dispensados.push(chave);
+        }
+
+        function aplicarEventosAutomaticos(datas) {
+            const nomesDias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+            const treinos = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            const feriados = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            let mudou = false;
+
+            datas.forEach((dataObj, index) => {
+                const card = document.querySelector(`.day-card[data-dia-nome="${nomesDias[index]}"]`);
+                if (!card) return;
+                const iso = dataISO(dataObj);
+
+                // 1) Feriado / Emenda do dia
+                const f = feriados.find(x => x.data === iso && !eventoDispensado(`feriado:${x.id || x.data}:${iso}`));
+                if (f && !diaEstaBloqueado(card)) {
+                    guardarBackupDia(card);
+                    const ehFeriado = f.tipo !== 'emenda';
+                    const cf = card.querySelector('.check-feriado');
+                    const ce = card.querySelector('.check-emenda');
+                    if (cf) cf.checked = ehFeriado;
+                    if (ce) ce.checked = !ehFeriado;
+                    card.dataset.eventoChave = `feriado:${f.id || f.data}:${iso}`;
+                    card.querySelector('.tasks-container').innerHTML = `
+                        <div style="background-color: ${ehFeriado ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${ehFeriado ? '#2e7d32' : '#00897b'}; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm">
+                            <span style="color: ${ehFeriado ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 12px;">${ehFeriado ? '🍃 FERIADO' : '📌 EMENDA'}</span>
+                            <div style="color: ${ehFeriado ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${escHtml(f.desc)}</div>
+                            <button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button>
+                        </div>
+                    `;
+                    card.querySelector('.day-resources').innerHTML = '';
+                    mudou = true;
+                }
+
+                // 2) Treinamentos que cobrem este dia (do início ao fim)
+                if (diaEstaBloqueado(card)) return;
+                const tasksCont = card.querySelector('.tasks-container');
+                treinos.forEach(t => {
+                    const fim = t.fim || t.inicio;
+                    if (iso < t.inicio || iso > fim) return;
+                    const chave = `treino:${t.id}:${iso}`;
+                    if (eventoDispensado(chave)) return;
+                    const identificadorUnico = `treino_id_${t.id}`;
+                    if (tasksCont.innerHTML.includes(identificadorUnico)) return;
+
+                    const divTreino = document.createElement('div');
+                    divTreino.className = 'treinamento-box';
+                    divTreino.setAttribute('draggable', 'true');
+                    divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    divTreino.dataset.eventoChave = chave;
+                    divTreino.innerHTML = `
+                        <span class="${identificadorUnico} flex items-center gap-1.5">
+                            <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
+                            <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${escHtml(t.nome)}</strong><br><small class="pl-5">📍 ${escHtml(t.local)} | 👤 ${escHtml(t.pessoa)}</small>
+                        </span>
+                        <span class="item-controls">
+                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
+                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
+                        </span>
+                    `;
+                    tasksCont.appendChild(divTreino);
+                    mudou = true;
+                });
+            });
+
+            if (mudou) salvarNaNuvem();
+        }
+
+        // ===== CORREÇÃO: BACKUP / RESTAURO DO DIA ANTES DE FERIADO OU EMENDA =====
+        function diaEstaBloqueado(card) {
+            const cf = card.querySelector('.check-feriado');
+            const ce = card.querySelector('.check-emenda');
+            return !!((cf && cf.checked) || (ce && ce.checked) || card.dataset.backupTarefas !== undefined);
+        }
+
+        function guardarBackupDia(card) {
+            // Só guarda se ainda não houver backup (evita sobrescrever com o bloco de feriado)
+            if (card.dataset.backupTarefas !== undefined) return;
+            card.dataset.backupTarefas = card.querySelector('.tasks-container').innerHTML;
+            card.dataset.backupRecursos = card.querySelector('.day-resources').innerHTML;
+        }
+
         function restaurarDiaNormal(botao) {
             const card = botao.closest('.day-card');
             if (!card) return;
             const checkFeriado = card.querySelector('.check-feriado');
             const checkEmenda = card.querySelector('.check-emenda');
             const checkConcluir = card.querySelector('.check-concluir-dia');
+            if (card.dataset.eventoChave) {
+                dispensarEvento(card.dataset.eventoChave); // não reaplicar sozinho
+                delete card.dataset.eventoChave;
+            }
             if (checkFeriado) checkFeriado.checked = false;
             if (checkEmenda) checkEmenda.checked = false;
             if (checkConcluir) checkConcluir.checked = false;
@@ -1167,17 +1385,27 @@
             const tasksCont = card.querySelector('.tasks-container');
             const resCont = card.querySelector('.day-resources');
 
-            tasksCont.innerHTML = `
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-            `;
-            resCont.innerHTML = `
-                <div class="resources-title">Recursos</div>
-                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-            `;
+            if (card.dataset.backupTarefas !== undefined) {
+                // Devolve exatamente o que existia antes do feriado/emenda
+                tasksCont.innerHTML = card.dataset.backupTarefas;
+                resCont.innerHTML = card.dataset.backupRecursos || '';
+                delete card.dataset.backupTarefas;
+                delete card.dataset.backupRecursos;
+            } else {
+                // Sem backup (semanas gravadas antes da correção): volta ao padrão
+                tasksCont.innerHTML = `
+                    <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                `;
+                resCont.innerHTML = `
+                    <div class="resources-title">Recursos</div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
+                `;
+            }
             guardarEstadoDOM();
             reativarEventosDragDrop();
+            atualizarIndicadorProgresso();
         }
 
         function alternarConclusaoTarefa(checkbox) {
@@ -1324,19 +1552,33 @@
 
         function alternarBloqueioDia(checkbox) {
             const card = checkbox.closest('.day-card');
-            const isFeriado = card.querySelector('.check-feriado').checked;
-            const isEmenda = card.querySelector('.check-emenda').checked;
+            const cf = card.querySelector('.check-feriado');
+            const ce = card.querySelector('.check-emenda');
             const tasksCont = card.querySelector('.tasks-container');
             const resCont = card.querySelector('.day-resources');
 
-            if (isFeriado) {
-                tasksCont.innerHTML = `<div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #1b5e20; font-weight: 900; font-size: 12px;">🍃 FERIADO</span><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
-                resCont.innerHTML = ``;
-            } else if (isEmenda) {
-                tasksCont.innerHTML = `<div style="background-color: #e0f2f1; border: 1px solid #b2dfdb; border-left: 4px solid #00897b; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #004d40; font-weight: 900; font-size: 12px;">📌 EMENDA</span><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+            // Mantém só uma das duas marcadas
+            if (checkbox.checked) {
+                if (checkbox === cf) ce.checked = false;
+                else cf.checked = false;
+            }
+
+            const isFeriado = cf.checked;
+            const isEmenda = ce.checked;
+
+            if (isFeriado || isEmenda) {
+                // CORREÇÃO: guarda o conteúdo do dia antes de bloquear
+                guardarBackupDia(card);
+
+                if (isFeriado) {
+                    tasksCont.innerHTML = `<div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #1b5e20; font-weight: 900; font-size: 12px;">🍃 FERIADO</span><br><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+                } else {
+                    tasksCont.innerHTML = `<div style="background-color: #e0f2f1; border: 1px solid #b2dfdb; border-left: 4px solid #00897b; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #004d40; font-weight: 900; font-size: 12px;">📌 EMENDA</span><br><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
+                }
                 resCont.innerHTML = ``;
             } else {
                 restaurarDiaNormal(checkbox);
+                return; // restaurarDiaNormal já grava e atualiza
             }
             atualizarIndicadorProgresso();
             guardarEstadoDOM();
@@ -1349,7 +1591,7 @@
                 const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
                 if (!card) return;
                 const tasksCont = card.querySelector('.tasks-container');
-                if (!tasksCont || tasksCont.innerText.includes("bloqueado") || tasksCont.innerText.includes("FERIADO") || tasksCont.innerText.includes("EMENDA")) return;
+                if (!tasksCont || tasksCont.innerText.includes("bloqueado") || tasksCont.innerText.includes("FERIADO") || tasksCont.innerText.includes("EMENDA") || diaEstaBloqueado(card)) return;
 
                 if (diaNome === "Quarta" && !tasksCont.innerText.includes("APC")) {
                     const divAPC = document.createElement('div');
@@ -1530,6 +1772,7 @@
                 }
             });
 
+            aplicarEventosAutomaticos(datas);
             injetarRotinasFixas(datas);
             forcarRecursosFixos();
             reativarEventosDragDrop();
@@ -1539,7 +1782,8 @@
         function forcarRecursosFixos() {
             document.querySelectorAll('.day-card').forEach(card => {
                 const recursosCont = card.querySelector('.day-resources');
-                if (!recursosCont || card.querySelector('.tasks-container').innerText.includes("bloqueado")) return;
+                // CORREÇÃO: não recria CARRO/EMPILHADEIRA em dias de feriado/emenda
+                if (!recursosCont || card.querySelector('.tasks-container').innerText.includes("bloqueado") || diaEstaBloqueado(card)) return;
                 const textos = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
                 if (!textos.includes('CARRO')) adicionarTagRecurso(recursosCont, 'CARRO');
                 if (!textos.includes('EMPILHADEIRA G4')) adicionarTagRecurso(recursosCont, 'EMPILHADEIRA G4');
@@ -1618,6 +1862,7 @@
         async function removerElemento(botao) {
             const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
             if (box) { 
+                if (box.dataset.eventoChave) dispensarEvento(box.dataset.eventoChave); // não reaplicar sozinho
                 box.remove(); 
                 await salvarNaNuvem(); 
                 atualizarIndicadorProgresso();
