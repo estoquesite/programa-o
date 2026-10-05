@@ -17,6 +17,30 @@
     <link id="pwa-manifest" rel="manifest" href="">
     <style>
         :root {
+            @keyframes pulsar {
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.65); transform: scale(1); }
+  50%     { box-shadow: 0 0 0 9px rgba(239,68,68,0); transform: scale(1.03); }
+}
+@keyframes balancar {
+  0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); }
+}
+.aviso-painel {
+  background: linear-gradient(135deg,#fff7ed,#fef2f2);
+  border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px;
+}
+.dark .aviso-painel { background: linear-gradient(135deg,#431407,#450a0a); border-color:#ea580c; }
+.aviso-sino { display:inline-block; animation: balancar 1.2s ease-in-out infinite; }
+.aviso-chip {
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  padding:7px 10px; border-radius:10px; font-size:11px; font-weight:800;
+  cursor:pointer; color:#fff; margin-top:6px;
+}
+.aviso-hoje   { background:linear-gradient(135deg,#dc2626,#f97316); animation:pulsar 1.2s infinite; }
+.aviso-breve  { background:linear-gradient(135deg,#d97706,#f59e0b); }
+.aviso-normal { background:linear-gradient(135deg,#047857,#10b981); }
+.aviso-feriado.aviso-normal { background:linear-gradient(135deg,#0f766e,#14b8a6); }
+.aviso-chip small { font-weight:600; opacity:.9; display:block; }
+.aviso-prazo { background:rgba(0,0,0,.25); padding:2px 8px; border-radius:999px; white-space:nowrap; }
             --primary-color: #1b5e20;
             --secondary-color: #e8f5e9;
             --bg-color: #f9f9f9;
