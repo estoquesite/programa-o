@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.00 Nuvem Pro)</title>
+    <title>Programação Semanal Interativa (v4.01 Nuvem Pro)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -17,30 +17,6 @@
     <link id="pwa-manifest" rel="manifest" href="">
     <style>
         :root {
-            @keyframes pulsar {
-  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.65); transform: scale(1); }
-  50%     { box-shadow: 0 0 0 9px rgba(239,68,68,0); transform: scale(1.03); }
-}
-@keyframes balancar {
-  0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); }
-}
-.aviso-painel {
-  background: linear-gradient(135deg,#fff7ed,#fef2f2);
-  border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px;
-}
-.dark .aviso-painel { background: linear-gradient(135deg,#431407,#450a0a); border-color:#ea580c; }
-.aviso-sino { display:inline-block; animation: balancar 1.2s ease-in-out infinite; }
-.aviso-chip {
-  display:flex; justify-content:space-between; align-items:center; gap:8px;
-  padding:7px 10px; border-radius:10px; font-size:11px; font-weight:800;
-  cursor:pointer; color:#fff; margin-top:6px;
-}
-.aviso-hoje   { background:linear-gradient(135deg,#dc2626,#f97316); animation:pulsar 1.2s infinite; }
-.aviso-breve  { background:linear-gradient(135deg,#d97706,#f59e0b); }
-.aviso-normal { background:linear-gradient(135deg,#047857,#10b981); }
-.aviso-feriado.aviso-normal { background:linear-gradient(135deg,#0f766e,#14b8a6); }
-.aviso-chip small { font-weight:600; opacity:.9; display:block; }
-.aviso-prazo { background:rgba(0,0,0,.25); padding:2px 8px; border-radius:999px; white-space:nowrap; }
             --primary-color: #1b5e20;
             --secondary-color: #e8f5e9;
             --bg-color: #f9f9f9;
@@ -256,6 +232,32 @@
         .btn-delete-item:hover { background-color: rgba(198, 40, 40, 0.1); }
         .dragging { opacity: 0.4; }
         .sortable-ghost { opacity: 0.35; background-color: #c8e6c9 !important; }
+
+        /* ===== PAINEL DE AVISOS (TREINAMENTOS E FERIADOS) ===== */
+        @keyframes pulsar {
+            0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.65); transform: scale(1); }
+            50%     { box-shadow: 0 0 0 9px rgba(239,68,68,0); transform: scale(1.03); }
+        }
+        @keyframes balancar {
+            0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); }
+        }
+        .aviso-painel {
+            background: linear-gradient(135deg,#fff7ed,#fef2f2);
+            border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px;
+        }
+        .dark .aviso-painel { background: linear-gradient(135deg,#431407,#450a0a); border-color:#ea580c; }
+        .aviso-sino { display:inline-block; animation: balancar 1.2s ease-in-out infinite; }
+        .aviso-chip {
+            display:flex; justify-content:space-between; align-items:center; gap:8px;
+            padding:7px 10px; border-radius:10px; font-size:11px; font-weight:800;
+            cursor:pointer; color:#fff; margin-top:6px;
+        }
+        .aviso-hoje   { background:linear-gradient(135deg,#dc2626,#f97316); animation:pulsar 1.2s infinite; }
+        .aviso-breve  { background:linear-gradient(135deg,#d97706,#f59e0b); }
+        .aviso-normal { background:linear-gradient(135deg,#047857,#10b981); }
+        .aviso-feriado.aviso-normal { background:linear-gradient(135deg,#0f766e,#14b8a6); }
+        .aviso-chip small { font-weight:600; opacity:.9; display:block; }
+        .aviso-prazo { background:rgba(0,0,0,.25); padding:2px 8px; border-radius:999px; white-space:nowrap; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
@@ -305,6 +307,9 @@
                 <button onclick="resetTotalNuvem()" class="ml-auto bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm" title="Limpar Cache Total da Nuvem">🗑️ Limpar Nuvem</button>
             </div>
         </div>
+
+        <!-- PAINEL DE AVISOS: PRÓXIMOS TREINAMENTOS E FERIADOS -->
+        <div id="painelAvisos" class="print-hidden max-w-4xl mx-auto mb-4"></div>
 
         <!-- ABAS DIÁRIAS PARA CELULAR / MOBILE -->
         <div class="print-hidden flex md:hidden items-center justify-between gap-1 mb-3 bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl">
@@ -463,7 +468,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.00 Nuvem Pro</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.01 Nuvem Pro</span>
         </div>
     </div>
 
@@ -507,6 +512,67 @@
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
+        }
+
+        // ===== PAINEL DE AVISOS: TREINAMENTOS E FERIADOS =====
+        function diasAte(dataStr) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            return Math.round((new Date(dataStr + 'T00:00:00') - hoje) / 86400000);
+        }
+        function escHtml(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function rotuloPrazo(n, emCurso) {
+            if (emCurso) return '🔥 EM CURSO!';
+            if (n === 0) return '🔥 HOJE!';
+            if (n === 1) return '⚠️ AMANHÃ!';
+            return `⏳ em ${n} dias`;
+        }
+        function classePrazo(n) { return n === 0 ? 'aviso-hoje' : n <= 3 ? 'aviso-breve' : 'aviso-normal'; }
+
+        function renderizarAvisos() {
+            const painel = document.getElementById('painelAvisos');
+            if (!painel) return;
+            const JANELA = 30; // mostra os próximos 30 dias
+            const treinos = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
+            const feriados = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
+            const itens = [];
+
+            treinos.forEach(t => {
+                const n = diasAte(t.inicio), fimN = diasAte(t.fim || t.inicio);
+                if (fimN < 0 || n > JANELA) return;
+                const emCurso = n < 0;
+                itens.push({ n: Math.max(0, n), emCurso, data: t.inicio, tipo: 'treino',
+                    titulo: `🎓 ${escHtml(t.nome)}`, sub: `👤 ${escHtml(t.pessoa)} · 📍 ${escHtml(t.local)}` });
+            });
+            feriados.forEach(f => {
+                const n = diasAte(f.data);
+                if (n < 0 || n > JANELA) return;
+                itens.push({ n, emCurso: false, data: f.data, tipo: 'feriado',
+                    titulo: `${f.tipo === 'emenda' ? '📌' : '🍃'} ${escHtml(f.desc)}`,
+                    sub: f.data.split('-').reverse().join('/') });
+            });
+
+            if (itens.length === 0 || sessionStorage.getItem('avisos_fechados') === '1') {
+                painel.innerHTML = '';
+                return;
+            }
+            itens.sort((a, b) => a.n - b.n);
+
+            painel.innerHTML = `
+                <div class="aviso-painel shadow-md">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-black uppercase text-orange-700 dark:text-orange-300">
+                            <span class="aviso-sino">🔔</span> Atenção! Próximos treinamentos e feriados
+                        </span>
+                        <button onclick="sessionStorage.setItem('avisos_fechados','1');renderizarAvisos()" class="text-gray-400 hover:text-gray-600 font-bold text-sm" title="Ocultar">✕</button>
+                    </div>
+                    ${itens.map(i => `
+                        <div class="aviso-chip ${classePrazo(i.n)} aviso-${i.tipo}" onclick="sincronizarSemanaPelaData('${i.data}')" title="Ir para a semana">
+                            <span>${i.titulo}<small>${i.sub}</small></span>
+                            <span class="aviso-prazo">${rotuloPrazo(i.n, i.emCurso)}</span>
+                        </div>`).join('')}
+                </div>`;
         }
 
         // BUSCA RÁPIDA EM TEMPO REAL
@@ -879,6 +945,7 @@
 
         async function sincronizarComNuvemManual() {
             await sincronizarComNuvem();
+            renderizarAvisos();
             atualizarDatasSemana();
             mostrarToast("✅ Sincronizado com sucesso!");
         }
@@ -889,6 +956,7 @@
             document.getElementById('popFeriadoData').valueAsDate = new Date();
             
             await sincronizarComNuvem();
+            renderizarAvisos();
 
             const manifestObj = {
                 "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
@@ -954,6 +1022,7 @@
             lista.push({ id: 'treino_' + Date.now(), inicio, fim, nome, local, pessoa });
             localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista));
             await salvarNaNuvem();
+            renderizarAvisos();
             renderizarPopTreinamentos();
             mostrarToast("✅ Treinamento guardado!");
         }
@@ -991,7 +1060,7 @@
                         divTreino.innerHTML = `
                             <span class="${identificadorUnico} flex items-center gap-1.5">
                                 <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
-                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} \vert{} 👤 ${t.pessoa}</small>
+                                <span class="drag-handle">⠿</span> 🎓 <strong class="item-text">${t.nome}</strong><br><small class="pl-5">📍 ${t.local} | 👤 ${t.pessoa}</small>
                             </span>
                             <span class="item-controls">
                                 <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
@@ -1038,6 +1107,7 @@
             lista.push({ id: 'feriado_custom_' + Date.now(), data, tipo, desc });
             localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
             await salvarNaNuvem();
+            renderizarAvisos();
             renderizarPopFeriados();
             mostrarToast("✅ Feriado guardado!");
         }
@@ -1079,7 +1149,7 @@
                     await salvarNaNuvem();
                     atualizarIndicadorProgresso();
                     fecharModalFeriados();
-                    mostrarToast(`✅ ${f.desc} aplicado na Semana${semanaNo}!`);
+                    mostrarToast(`✅ ${f.desc} aplicado na Semana ${semanaNo}!`);
                 }
             } else { alert("⚠️ A data deste evento cai em fim de semana."); }
         }
