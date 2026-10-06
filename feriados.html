@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Feriados e Emendas (v2.0 Nuvem Pro)</title>
+    <title>Módulo de Feriados e Emendas (v2.1 Nuvem Pro)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -236,20 +236,34 @@
                 verificarEGarantirAno(salvas, anoAtual);
                 verificarEGarantirAno(salvas, anoAtual + 1);
 
-                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(salvas));
+                // CORREÇÃO: remove feriados repetidos (mesma data + nome + tipo) e grava a lista limpa na nuvem
+                const limpas = removerDuplicados(salvas);
+                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(limpas));
+                if (limpas.length !== salvas.length) await salvarNaNuvemGeral(limpas);
             } catch (e) {
                 console.error("Erro ao sincronizar feriados:", e);
                 let salvas = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || obterFeriadosFixosEMoveis(new Date().getFullYear());
-                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(salvas));
+                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(removerDuplicados(salvas)));
             }
             renderizarListaFeriados();
+        }
+
+        // Mantém um só registo por data + nome + tipo (prefere o nacional automático)
+        function removerDuplicados(lista) {
+            const vistos = new Map();
+            lista.forEach(f => {
+                const k = f.data + '|' + String(f.desc || '').trim().toUpperCase() + '|' + f.tipo;
+                const atual = vistos.get(k);
+                if (!atual || (String(f.id).startsWith('fn_') && !String(atual.id).startsWith('fn_'))) vistos.set(k, f);
+            });
+            return Array.from(vistos.values()).sort((a, b) => new Date(a.data) - new Date(b.data));
         }
 
         function verificarEGarantirAno(lista, ano) {
             let idsAno = lista.map(l => l.id);
             let gerados = obterFeriadosFixosEMoveis(ano);
             gerados.forEach(g => {
-                if (!idsAno.includes(g.id)) {
+                if (!idsAno.includes(g.id) && !lista.some(l => l.data === g.data && String(l.desc).trim().toUpperCase() === g.desc)) {
                     lista.push(g);
                 }
             });
@@ -261,8 +275,8 @@
 
             let feriados = obterFeriados();
             verificarEGarantirAno(feriados, ano);
-            
-            feriados.sort((a, b) => new Date(a.data) - new Date(b.data));
+            feriados = removerDuplicados(feriados);
+
             localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(feriados));
             await salvarNaNuvemGeral(feriados);
             renderizarListaFeriados();
