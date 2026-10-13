@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.7)</title>
+    <title>Painel de Indicadores & Gráficos (v5.8)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -92,8 +92,16 @@
             /* Alturas dos gráficos ajustadas à altura da folha em paisagem */
             .chart-wrapper { height: 200px !important; }
             .container > div:nth-child(2) .chart-wrapper { height: 140px !important; }
-            .container > div:nth-child(3) .chart-wrapper { height: 170px !important; }
             canvas { max-height: 100% !important; width: 100% !important; }
+
+            /* Folha 2 = Recursos + Cursos juntos: compactar para caber em 1 página */
+            .container > div:nth-child(2) .chart-wrapper { height: 105px !important; }
+            .container > div:nth-child(2) .card-a4-impresso { padding: 5px !important; }
+            .container > div:nth-child(2) h3 { font-size: 11px !important; }
+            .container > div:nth-child(2) h4 { font-size: 12px !important; }
+            .container > div:nth-child(2) .space-y-3 > * + *,
+            .container > div:nth-child(2) .space-y-4 > * + * { margin-top: 4px !important; }
+            .container > div:nth-child(2) p { font-size: 8px !important; }
 
             .card-a4-impresso {
                 border: 1px solid #d1d5db !important;
@@ -318,7 +326,7 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- FOLHA 2 NA IMPRESSÃO: RECURSOS / FROTA & TABELA DETALHADA DAS SEMANAS     -->
+        <!-- FOLHA 2 NA IMPRESSÃO: RECURSOS / FROTA + CURSOS & CAPACITAÇÃO (JUNTOS)   -->
         <!-- ========================================================================= -->
         <div class="folha-a4 space-y-4">
             
@@ -397,40 +405,7 @@
                 </div>
             </div>
 
-            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS -->
-            <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-1">
-                        <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento das Semanas Selecionadas</h3>
-                        <button type="button" onclick="editarTexto('lbl_tabela_semanas')" class="btn-edit-title">✏️</button>
-                    </div>
-                    <span class="text-[10px] text-gray-400 print-hidden">Exibindo apenas as semanas ativas marcadas no filtro superior.</span>
-                </div>
-                <div class="overflow-x-auto max-h-72 overflow-y-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
-                                <th class="py-2 px-2.5">Semana</th>
-                                <th class="py-2 px-2.5 col-total">Total</th>
-                                <th class="py-2 px-2.5 text-green-600 col-concluidas">Feitas</th>
-                                <th class="py-2 px-2.5 text-red-600 col-naorealizadas">Não Feitas</th>
-                                <th class="py-2 px-2.5 text-amber-600 col-extras">Extras</th>
-                                <th class="py-2 px-2.5 text-emerald-700">Recursos</th>
-                                <th class="py-2 px-2.5 text-purple-700">Cursos</th>
-                                <th class="py-2 px-2.5">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaIndicadoresCorpo">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================================================= -->
-        <!-- FOLHA 3 NA IMPRESSÃO: CURSOS & CAPACITAÇÃO ANUAL (FECHAMENTO DO RELATÓRIO) -->
-        <!-- ========================================================================= -->
-        <div class="space-y-4">
+            <!-- BLOCO DE CURSOS & CAPACITAÇÃO (agora na mesma folha dos Recursos) -->
             <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-4 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
@@ -501,6 +476,40 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div><!-- fecha a Folha 2 (Recursos + Cursos) -->
+
+        <!-- ========================================================================= -->
+        <!-- FOLHA 3 NA IMPRESSÃO: DETALHAMENTO DAS SEMANAS (FECHAMENTO DO RELATÓRIO)  -->
+        <!-- ========================================================================= -->
+        <div class="space-y-4">
+            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS -->
+            <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-1">
+                        <h3 id="lbl_tabela_semanas" class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Detalhamento das Semanas Selecionadas</h3>
+                        <button type="button" onclick="editarTexto('lbl_tabela_semanas')" class="btn-edit-title">✏️</button>
+                    </div>
+                    <span class="text-[10px] text-gray-400 print-hidden">Exibindo apenas as semanas ativas marcadas no filtro superior.</span>
+                </div>
+                <div class="overflow-x-auto max-h-72 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b dark:border-gray-700 text-gray-400 font-bold uppercase text-[9px]">
+                                <th class="py-2 px-2.5">Semana</th>
+                                <th class="py-2 px-2.5 col-total">Total</th>
+                                <th class="py-2 px-2.5 text-green-600 col-concluidas">Feitas</th>
+                                <th class="py-2 px-2.5 text-red-600 col-naorealizadas">Não Feitas</th>
+                                <th class="py-2 px-2.5 text-amber-600 col-extras">Extras</th>
+                                <th class="py-2 px-2.5 text-emerald-700">Recursos</th>
+                                <th class="py-2 px-2.5 text-purple-700">Cursos</th>
+                                <th class="py-2 px-2.5">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaIndicadoresCorpo">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
