@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.6)</title>
+    <title>Painel de Indicadores & Gráficos (v5.7)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -46,32 +46,41 @@
             opacity: 1;
         }
 
-        /* REGRAS RÍGIDAS DE ENQUADRAMENTO E IMPRESSÃO EM A4 */
+        /* REGRAS DE ENQUADRAMENTO E IMPRESSÃO EM A4 NA HORIZONTAL (PAISAGEM) */
         @media print {
             @page {
-                size: A4 portrait;
+                size: A4 landscape;
                 margin: 8mm 8mm 8mm 8mm;
             }
             .print-hidden, .btn-edit-title {
                 display: none !important;
             }
-            body {
+            html, body {
                 background-color: #ffffff !important;
                 color: #000000 !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 font-size: 10px !important;
             }
+            .dark body { background-color: #ffffff !important; color: #000000 !important; }
             .container {
                 max-width: 100% !important;
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-56, .max-h-48, .max-h-40 {
+            .space-y-4 > * + * { margin-top: 8px !important; }
+            .overflow-x-auto, .max-h-96, .max-h-72, .max-h-60, .max-h-56, .max-h-48, .max-h-40 {
                 max-height: none !important;
                 overflow: visible !important;
             }
+
+            /* Em paisagem a largura é fixa: força as colunas das grelhas */
+            .lg\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+            .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+            .grid { gap: 8px !important; }
+
             /* DIVISÃO EXCLUSIVA DE FOLHAS */
             .folha-a4 {
                 page-break-after: always !important;
@@ -79,17 +88,24 @@
                 margin-bottom: 0 !important;
                 padding-bottom: 0 !important;
             }
-            .chart-wrapper {
-                height: 190px !important;
-            }
-            canvas {
-                max-height: 190px !important;
-                width: 100% !important;
-            }
+
+            /* Alturas dos gráficos ajustadas à altura da folha em paisagem */
+            .chart-wrapper { height: 200px !important; }
+            .container > div:nth-child(2) .chart-wrapper { height: 140px !important; }
+            .container > div:nth-child(3) .chart-wrapper { height: 170px !important; }
+            canvas { max-height: 100% !important; width: 100% !important; }
+
             .card-a4-impresso {
                 border: 1px solid #d1d5db !important;
                 box-shadow: none !important;
+                break-inside: avoid;
             }
+
+            /* Tabelas compactas; podem continuar na página seguinte com cabeçalho repetido */
+            table th, table td { padding-top: 2px !important; padding-bottom: 2px !important; font-size: 9px !important; }
+            tr { break-inside: avoid; }
+            thead { display: table-header-group; }
+
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
