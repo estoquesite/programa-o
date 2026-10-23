@@ -3,19 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.06 Nuvem Pro)</title>
-    <!-- Tailwind CSS -->
+    <title>Programação Semanal Interativa (v4.07 Nuvem Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- SortableJS para suporte a Touch e Mobile no Drag & Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <!-- PDF.js para ler PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- Manifesto Dinâmico via JavaScript -->
     <link id="pwa-manifest" rel="manifest" href="">
     <style>
         :root {
@@ -34,208 +29,83 @@
             margin: 0;
             padding: 10px;
         }
-        .container {
-            max-width: 1250px;
-            margin: 0 auto;
-        }
-        .header {
-            position: relative;
-            text-align: center;
-            margin-bottom: 20px;
-            padding-top: 5px;
-        }
+        .container { max-width: 1250px; margin: 0 auto; }
+        .header { position: relative; text-align: center; margin-bottom: 20px; padding-top: 5px; }
         .header h2 {
-            color: var(--primary-color);
-            font-size: 26px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            color: var(--primary-color); font-size: 26px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 1px; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .week-badge {
-            position: absolute;
-            top: 0;
-            right: 5px;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-            text-transform: uppercase;
+            position: absolute; top: 0; right: 5px; background-color: var(--primary-color); color: white;
+            padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 13px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); text-transform: uppercase;
         }
         .week-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: stretch;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 10px; margin-bottom: 20px; align-items: stretch;
         }
         @media (max-width: 768px) {
             .week-grid.mobile-single-day > .day-card { display: none !important; }
             .week-grid.mobile-single-day > .day-card.active-day { display: flex !important; }
         }
         .day-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            background: var(--card-bg); border: 1px solid var(--border-color); border-top: 4px solid var(--primary-color);
+            border-radius: 8px; padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; position: relative;
         }
-        .day-content {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            margin-bottom: 8px;
-        }
-        .tasks-container {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex-grow: 1;
-            min-height: 40px;
-        }
+        .day-content { display: flex; flex-direction: column; flex-grow: 1; margin-bottom: 8px; }
+        .tasks-container { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-height: 40px; }
         .day-title {
-            font-size: 13px;
-            font-weight: 900;
-            color: #1b5e20;
-            text-align: center;
-            background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%);
-            border: 1px solid #a3e4d7;
-            border-radius: 6px;
-            padding: 4px;
-            margin-bottom: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            flex-shrink: 0;
+            font-size: 13px; font-weight: 900; color: #1b5e20; text-align: center;
+            background: linear-gradient(135deg, #ccff90 0%, #b9f6ca 100%); border: 1px solid #a3e4d7;
+            border-radius: 6px; padding: 4px; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0;
         }
-        .day-title small {
-            font-weight: 700;
-            color: #0e3b12;
-            font-size: 9px;
-        }
+        .day-title small { font-weight: 700; color: #0e3b12; font-size: 9px; }
         .task-box {
-            font-weight: 600;
-            color: #1b5e20;
-            background-color: #f1f8e9;
-            padding: 5px 7px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10px;
-            border-left: 3px solid #2e7d32;
-            cursor: grab;
+            font-weight: 600; color: #1b5e20; background-color: #f1f8e9; padding: 5px 7px; border-radius: 4px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 10px;
+            border-left: 3px solid #2e7d32; cursor: grab;
         }
         .task-box:active { cursor: grabbing; }
         .tarefa-extra-box {
-            font-weight: 600;
-            color: #9a3412;
-            background-color: #ffedd5;
-            padding: 5px 7px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10px;
-            border-left: 3px solid #c2410c;
-            cursor: grab;
+            font-weight: 600; color: #9a3412; background-color: #ffedd5; padding: 5px 7px; border-radius: 4px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 10px;
+            border-left: 3px solid #c2410c; cursor: grab;
         }
         .tarefa-extra-box:active { cursor: grabbing; }
         .treinamento-box {
-            font-weight: 600;
-            color: #1b5e20;
-            background-color: #e8f5e9;
-            padding: 5px 7px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10px;
-            border-left: 3px solid #2e7d32;
-            cursor: grab;
+            font-weight: 600; color: #1b5e20; background-color: #e8f5e9; padding: 5px 7px; border-radius: 4px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 10px;
+            border-left: 3px solid #2e7d32; cursor: grab;
         }
         .task-done {
-            opacity: 0.6;
-            text-decoration: line-through;
-            background-color: #e2e8f0 !important;
-            border-left-color: #94a3b8 !important;
-            color: #64748b !important;
+            opacity: 0.6; text-decoration: line-through; background-color: #e2e8f0 !important;
+            border-left-color: #94a3b8 !important; color: #64748b !important;
         }
         .day-resources {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            border-top: 2px dashed #c8e6c9;
-            padding-top: 6px;
-            margin-top: auto;
-            background: #ffffff;
-            flex-shrink: 0;
-            min-height: 35px;
+            display: flex; flex-direction: column; gap: 4px; border-top: 2px dashed #c8e6c9; padding-top: 6px;
+            margin-top: auto; background: #ffffff; flex-shrink: 0; min-height: 35px;
         }
-        .dark .day-resources {
-            background: #1f2937;
-            border-top-color: #065f46;
-        }
+        .dark .day-resources { background: #1f2937; border-top-color: #065f46; }
         .resources-title {
-            font-size: 8px;
-            font-weight: 800;
-            color: #2e7d32;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            font-size: 8px; font-weight: 800; color: #2e7d32; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
         }
         .resource-tag {
-            background: var(--secondary-color);
-            color: var(--primary-color);
-            padding: 5px 7px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: grab;
-            border-left: 3px solid #2e7d32;
+            background: var(--secondary-color); color: var(--primary-color); padding: 5px 7px; border-radius: 4px;
+            font-size: 10px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+            cursor: grab; border-left: 3px solid #2e7d32;
         }
         .resource-tag:active { cursor: grabbing; }
-        .item-controls {
-            display: flex;
-            gap: 3px;
-            align-items: center;
-        }
-        .drag-handle {
-            cursor: grab;
-            font-size: 12px;
-            color: #888;
-            padding: 0 2px;
-            user-select: none;
-        }
+        .item-controls { display: flex; gap: 3px; align-items: center; }
+        .drag-handle { cursor: grab; font-size: 12px; color: #888; padding: 0 2px; user-select: none; }
         .drag-handle:active { cursor: grabbing; }
-        .btn-action-item {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 10px;
-            padding: 1px 3px;
-            border-radius: 3px;
-        }
+        .btn-action-item { background: none; border: none; cursor: pointer; font-size: 10px; padding: 1px 3px; border-radius: 3px; }
         .btn-edit-item:hover { background-color: rgba(0, 0, 0, 0.1); }
-        .btn-delete-item {
-            color: #c62828;
-            font-weight: bold;
-            font-size: 11px;
-        }
+        .btn-delete-item { color: #c62828; font-weight: bold; font-size: 11px; }
         .btn-delete-item:hover { background-color: rgba(198, 40, 40, 0.1); }
         .dragging { opacity: 0.4; }
         .sortable-ghost { opacity: 0.35; background-color: #c8e6c9 !important; }
 
-        /* ===== v4.04: CORREÇÃO DOS BOTÕES FLUTUANTES + TEMA VISUAL ===== */
         .task-box > span:first-child,
         .tarefa-extra-box > span:first-child,
         .treinamento-box > span:first-child,
@@ -257,10 +127,8 @@
             box-shadow: 0 2px 6px rgba(21,128,61,.35);
         }
         .day-title small { color: #dcfce7; font-size: 10px; font-weight: 700; }
-
         .task-box, .tarefa-extra-box, .treinamento-box, .resource-tag {
-            border-radius: 10px; padding: 6px 8px; text-align: left; align-items: center;
-            box-shadow: 0 1px 3px rgba(15,23,42,.10);
+            border-radius: 10px; padding: 6px 8px; text-align: left; align-items: center; box-shadow: 0 1px 3px rgba(15,23,42,.10);
         }
         .task-box { background: #f0fdf4; color: #14532d; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; }
         .treinamento-box { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; border-left: 4px solid #6366f1; }
@@ -271,22 +139,17 @@
         .dark .tarefa-extra-box { background: #431407; color: #fed7aa; border-color: #9a3412; border-left-color: #fb923c; }
         .dark .resource-tag { background: #042f2e; color: #99f6e4; border-color: #115e59; border-left-color: #2dd4bf; }
 
-        /* ===== SIPAT: destaque magenta ===== */
         .task-box.sipat-box {
-            background: #fdf4ff; color: #86198f; font-weight: 800;
-            border: 1px solid #f0abfc; border-left: 4px solid #c026d3;
+            background: #fdf4ff; color: #86198f; font-weight: 800; border: 1px solid #f0abfc; border-left: 4px solid #c026d3;
             box-shadow: 0 0 0 2px rgba(192,38,211,.25), 0 1px 3px rgba(15,23,42,.10);
         }
         .dark .task-box.sipat-box {
-            background: #4a044e; color: #f5d0fe;
-            border-color: #a21caf; border-left-color: #e879f9;
+            background: #4a044e; color: #f5d0fe; border-color: #a21caf; border-left-color: #e879f9;
             box-shadow: 0 0 0 2px rgba(232,121,249,.30);
         }
-
         .day-resources { border-top: 2px dashed #99f6e4; }
         .dark .day-resources { border-top-color: #115e59; }
         .resources-title { color: #0f766e; }
-
         .btn-action-item {
             width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
             border-radius: 6px; font-size: 11px; background: rgba(255,255,255,.75); padding: 0;
@@ -296,7 +159,6 @@
         .btn-delete-item { color: #dc2626; }
         .btn-delete-item:hover { background: #fee2e2; }
 
-        /* ===== IMPRESSÃO: sai igual à tela (sem botões de edição) ===== */
         @page { size: A4 landscape; margin: 8mm; }
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -307,18 +169,14 @@
             .header { margin-bottom: 10px; }
             .header .flex { justify-content: center !important; }
             .week-grid, .week-grid.mobile-single-day {
-                display: grid !important;
-                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-                gap: 8px; margin-bottom: 0;
+                display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 8px; margin-bottom: 0;
             }
             .week-grid > .day-card, .week-grid.mobile-single-day > .day-card {
                 display: flex !important; break-inside: avoid; page-break-inside: avoid;
             }
-            .day-content > .justify-between,
-            .item-controls, .drag-handle, input[type="checkbox"] { display: none !important; }
+            .day-content > .justify-between, .item-controls, .drag-handle, input[type="checkbox"] { display: none !important; }
         }
 
-        /* ===== PAINEL DE AVISOS (TREINAMENTOS E FERIADOS) ===== */
         @keyframes pulsar {
             0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.65); transform: scale(1); }
             50%     { box-shadow: 0 0 0 9px rgba(239,68,68,0); transform: scale(1.03); }
@@ -326,16 +184,12 @@
         @keyframes balancar {
             0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); }
         }
-        .aviso-painel {
-            background: linear-gradient(135deg,#fff7ed,#fef2f2);
-            border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px;
-        }
+        .aviso-painel { background: linear-gradient(135deg,#fff7ed,#fef2f2); border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px; }
         .dark .aviso-painel { background: linear-gradient(135deg,#431407,#450a0a); border-color:#ea580c; }
         .aviso-sino { display:inline-block; animation: balancar 1.2s ease-in-out infinite; }
         .aviso-chip {
-            display:flex; justify-content:space-between; align-items:center; gap:8px;
-            padding:7px 10px; border-radius:10px; font-size:11px; font-weight:800;
-            cursor:pointer; color:#fff; margin-top:6px;
+            display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 10px; border-radius:10px;
+            font-size:11px; font-weight:800; cursor:pointer; color:#fff; margin-top:6px;
         }
         .aviso-hoje   { background:linear-gradient(135deg,#dc2626,#f97316); animation:pulsar 1.2s infinite; }
         .aviso-breve  { background:linear-gradient(135deg,#d97706,#f59e0b); }
@@ -347,10 +201,8 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
-    <!-- TOASTS DE NOTIFICAÇÃO -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="container">
         <div class="header">
             <div class="flex justify-between items-center mb-2 px-2">
@@ -361,7 +213,6 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO, SEMANA, BUSCA RÁPIDA E MÓDULOS -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-4xl mx-auto mb-4 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
@@ -375,15 +226,11 @@
                     </div>
                     <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">🔄 Atual</button>
                 </div>
-
-                <!-- BUSCA EM TEMPO REAL -->
                 <div class="flex-1 min-w-[220px] relative">
                     <input type="text" id="inputBuscaGeral" oninput="filtrarItensEmTempoReal(this.value)" placeholder="🔍 Buscar tarefa, recurso, pessoa ou placa..." class="w-full text-xs p-2 pl-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600">
                     <button id="btnLimparBusca" onclick="limparBusca()" class="hidden absolute right-2.5 top-2 text-xs text-gray-400 hover:text-gray-600 font-bold">✕</button>
                 </div>
             </div>
-
-            <!-- BOTÕES DE MÓDULOS -->
             <div class="flex gap-1.5 items-center flex-wrap pt-2 border-t dark:border-gray-700">
                 <button onclick="abrirModalIndicador()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📊 Indicador</button>
                 <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📁 Histórico</button>
@@ -393,32 +240,29 @@
             </div>
         </div>
 
-        <!-- PAINEL DE AVISOS: PRÓXIMOS TREINAMENTOS E FERIADOS -->
         <div id="painelAvisos" class="print-hidden max-w-4xl mx-auto mb-4"></div>
 
-        <!-- ABAS DIÁRIAS PARA CELULAR / MOBILE -->
         <div class="print-hidden flex md:hidden items-center justify-between gap-1 mb-3 bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl">
-            <button onclick="mudarAbaDiaMobile('todos')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-green-800 dark:text-green-300">Todos</button>
-            <button onclick="mudarAbaDiaMobile('Segunda')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Seg</button>
-            <button onclick="mudarAbaDiaMobile('Terça')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Ter</button>
-            <button onclick="mudarAbaDiaMobile('Quarta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qua</button>
-            <button onclick="mudarAbaDiaMobile('Quinta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qui</button>
-            <button onclick="mudarAbaDiaMobile('Sexta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Sex</button>
+            <button onclick="mudarAbaDiaMobile('todos', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-green-800 dark:text-green-300">Todos</button>
+            <button onclick="mudarAbaDiaMobile('Segunda', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Seg</button>
+            <button onclick="mudarAbaDiaMobile('Terça', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Ter</button>
+            <button onclick="mudarAbaDiaMobile('Quarta', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qua</button>
+            <button onclick="mudarAbaDiaMobile('Quinta', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qui</button>
+            <button onclick="mudarAbaDiaMobile('Sexta', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Sex</button>
         </div>
 
-        <!-- CALENDÁRIO SEMANAL -->
         <div class="week-grid" id="weekGridContainer"></div>
 
-        <!-- BARRA DE AÇÕES DA SEMANA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto mb-6 space-y-2">
             <div class="flex flex-wrap justify-center items-center gap-2">
-                <button onclick="salvarNoComputador()" class="bg-green-800 hover:bg-green-900 text-white px-3.5 py-2 rounded-lg text-xs font-extrabold shadow-md transition" title="Salva direto num arquivo do seu computador (grava sozinho a cada alteração)">💾 Salvar no Meu Computador</button>
-                <button onclick="abrirArquivoDoComputador()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3.5 py-2 rounded-lg text-xs font-extrabold shadow-md transition" title="Abre o arquivo salvo no computador e traz tudo de volta para dentro do programa">📥 Importar do Meu Computador</button>
+                <button onclick="salvarNesteComputador()" class="bg-green-800 hover:bg-green-900 text-white px-3.5 py-2 rounded-lg text-xs font-extrabold shadow-md transition" title="Salva direto num arquivo neste computador (grava sozinho a cada alteração)">💾 Salvar neste Computador</button>
+                <button onclick="abrirArquivoDoComputador()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3.5 py-2 rounded-lg text-xs font-extrabold shadow-md transition" title="Abre o arquivo salvo neste computador e traz tudo de volta para dentro do programa">📥 Importar deste Computador</button>
                 <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">☁️ Salvar na Nuvem</button>
             </div>
             <div id="statusArquivo" class="text-center text-[10px] font-bold text-gray-500 dark:text-gray-400"></div>
             <div class="flex flex-wrap justify-center items-center gap-2 pt-2 border-t dark:border-gray-700">
                 <button onclick="baixarBackupLocal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💽 Baixar Backup (.json)</button>
+                <button onclick="baixarBackupPDF()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Abre a versão para impressão de todas as semanas guardadas. Escolha 'Salvar como PDF' na impressora.">📄 Backup em PDF</button>
                 <button onclick="document.getElementById('inputRestaurarBackup').click()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📂 Restaurar Backup</button>
                 <input type="file" id="inputRestaurarBackup" accept=".json,application/json" class="hidden" onchange="restaurarBackupLocal(this)">
                 <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
@@ -427,7 +271,6 @@
             </div>
         </div>
 
-        <!-- ADICIONAR NOVO ITEM -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Adicionar Nova Tarefa ou Recurso por Data</h3>
             <div>
@@ -440,7 +283,6 @@
                     <button onclick="gerenciarFrequentes()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">⚙️ Gerir</button>
                 </div>
             </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Evento</label>
@@ -456,7 +298,6 @@
                     </select>
                 </div>
             </div>
-
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
                 <input type="text" id="inputDesc" placeholder="EX: CAMINHÃO PARTE DA MANHÃ..." class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
@@ -466,7 +307,6 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -488,7 +328,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE INDICADOR DETALHADO -->
     <div id="modalIndicador" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-md w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
@@ -502,7 +341,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE HISTÓRICO -->
     <div id="modalHistorico" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
@@ -519,7 +357,6 @@
         </div>
     </div>
 
-    <!-- MODAL POP-UP DE TREINAMENTOS -->
     <div id="modalTreinamentos" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xl w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
@@ -543,7 +380,6 @@
         </div>
     </div>
 
-    <!-- MODAL POP-UP DE FERIADOS -->
     <div id="modalFeriados" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xl w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
@@ -564,12 +400,11 @@
         </div>
     </div>
 
-    <!-- BARRA INFERIOR FIXA -->
     <div class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.06 Nuvem Pro</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.07 Nuvem Pro</span>
         </div>
     </div>
 
@@ -587,7 +422,6 @@
         let deferredPrompt = null;
         let dadosGlobaisNuvem = {};
 
-        // ===== v4.06: ARQUIVO NO COMPUTADOR + ESPELHO LOCAL =====
         let arquivoHandle = null;
         let arquivoPendente = false;
         let ultimaGravacaoArquivo = null;
@@ -628,9 +462,9 @@
                 return;
             }
             if (!arquivoHandle) {
-                el.innerHTML = '📁 Nenhum arquivo vinculado ainda. Clique em "Salvar no Meu Computador" para escolher onde guardar.';
+                el.innerHTML = '📁 Nenhum arquivo vinculado ainda. Clique em "Salvar neste Computador" para escolher onde guardar.';
             } else if (arquivoPendente) {
-                el.innerHTML = `⚠️ Arquivo <b>${escHtml(arquivoHandle.name)}</b> precisa de autorização. Clique em "Salvar no Meu Computador".`;
+                el.innerHTML = `⚠️ Arquivo <b>${escHtml(arquivoHandle.name)}</b> precisa de autorização. Clique em "Salvar neste Computador".`;
             } else {
                 const hora = ultimaGravacaoArquivo ? ultimaGravacaoArquivo.toLocaleTimeString('pt-BR') : '--';
                 el.innerHTML = `🟢 Gravando automaticamente em <b>${escHtml(arquivoHandle.name)}</b> (última gravação: ${hora})`;
@@ -642,7 +476,7 @@
             const grid = document.getElementById('weekGridContainer');
             if (grid && grid.innerHTML.trim()) semanas[getWeekKey()] = grid.innerHTML;
             return {
-                versao: 'v4.06',
+                versao: 'v4.07',
                 geradoEm: new Date().toISOString(),
                 semanas,
                 historico: JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {},
@@ -650,7 +484,8 @@
                 feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
                 dispensados: dadosGlobaisNuvem.dispensados || [],
                 frequentes: JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || null,
-                palavrasChave: JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || null
+                palavrasChave: JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || null,
+                scriptTexto: document.getElementById('inputScriptTexto').value || ''
             };
         }
 
@@ -659,7 +494,6 @@
             catch (e) { console.warn("Espelho local cheio:", e); }
         }
 
-        // Junta o que está na nuvem com o espelho local (nada some se a nuvem vier vazia)
         function mesclarComEspelhoLocal() {
             let local = null;
             try { local = JSON.parse(localStorage.getItem(CHAVE_ESPELHO_LOCAL)); } catch (e) {}
@@ -692,7 +526,6 @@
         }
 
         function gravarArquivoLocal() {
-            // Fila: evita duas gravações ao mesmo tempo no mesmo arquivo
             filaGravacao = filaGravacao.then(async () => {
                 if (!arquivoHandle) return false;
                 try {
@@ -715,7 +548,7 @@
             return filaGravacao;
         }
 
-        async function vincularArquivoNoComputador() {
+        async function salvarNesteComputador() {
             try {
                 const h = await window.showSaveFilePicker({
                     suggestedName: 'PROGRAMACAO_SEMANAL.json',
@@ -725,7 +558,7 @@
                 await idbSet('arquivo_handle', h);
                 arquivoPendente = false;
                 const ok = await gravarArquivoLocal();
-                if (ok) mostrarToast(`💾 Salvo no computador: ${h.name}`);
+                if (ok) mostrarToast(`💾 Salvo neste computador: ${h.name}`);
                 else mostrarToast("❌ Não consegui gravar no arquivo.", "erro");
             } catch (e) {
                 if (e && e.name === 'AbortError') return;
@@ -733,24 +566,6 @@
                 mostrarToast("❌ Erro ao escolher o arquivo.", "erro");
             }
         }
-
-        function montarBackup() {
-    const semanas = Object.assign({}, dadosGlobaisNuvem.semanas || {});
-    const grid = document.getElementById('weekGridContainer');
-    if (grid && grid.innerHTML.trim()) semanas[getWeekKey()] = grid.innerHTML;
-    return {
-        versao: 'v4.06',
-        geradoEm: new Date().toISOString(),
-        semanas,
-        historico: JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {},
-        treinamentos: JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [],
-        feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
-        dispensados: dadosGlobaisNuvem.dispensados || [],
-        frequentes: JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || null,
-        palavrasChave: JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || null,
-        scriptTexto: document.getElementById('inputScriptTexto').value || ''
-    };
-}
 
         async function abrirArquivoDoComputador() {
             if (!window.showOpenFilePicker) { document.getElementById('inputRestaurarBackup').click(); return; }
@@ -815,12 +630,11 @@
 
         let itensFrequentesPadrao = [
             "🕒 HORA CERTA", "📦 MOVIMENTAÇÃO G4", "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
-            "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO", 
+            "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO",
             "CAMINHÃO PARTE DA MANHÃ", "CAMINHÃO PARTE DA TARDE", "CARRO", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS"
         ];
         let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // SISTEMA DE NOTIFICAÇÃO TOAST VISUAL
         function mostrarToast(mensagem, tipo = 'sucesso') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -842,7 +656,6 @@
             }, 3000);
         }
 
-        // ===== PAINEL DE AVISOS: TREINAMENTOS E FERIADOS =====
         function diasAte(dataStr) {
             const hoje = new Date(); hoje.setHours(0,0,0,0);
             return Math.round((new Date(dataStr + 'T00:00:00') - hoje) / 86400000);
@@ -867,7 +680,7 @@
         function renderizarAvisos() {
             const painel = document.getElementById('painelAvisos');
             if (!painel) return;
-            const JANELA = 30; // mostra os próximos 30 dias
+            const JANELA = 30;
             const treinos = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
             const feriados = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
             const itens = [];
@@ -893,7 +706,6 @@
             }
             itens.sort((a, b) => a.n - b.n);
 
-            // Painel recolhido: fica uma barra piscante para reabrir (não some de vez)
             if (sessionStorage.getItem('avisos_ocultos') === '1') {
                 painel.innerHTML = `
                     <button onclick="alternarAvisos(false)" class="aviso-chip aviso-hoje w-full justify-center" style="margin-top:0" title="Mostrar avisos">
@@ -918,7 +730,6 @@
                 </div>`;
         }
 
-        // BUSCA RÁPIDA EM TEMPO REAL
         function filtrarItensEmTempoReal(termo) {
             termo = termo.trim().toLowerCase();
             const btnLimpar = document.getElementById('btnLimparBusca');
@@ -944,13 +755,12 @@
             filtrarItensEmTempoReal('');
         }
 
-        // NAVEGAÇÃO POR ABAS NO CELULAR
-        function mudarAbaDiaMobile(diaNome) {
+        function mudarAbaDiaMobile(diaNome, botao) {
             document.querySelectorAll('.btn-tab-mobile').forEach(b => {
                 b.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
                 b.classList.add('text-gray-600', 'dark:text-gray-300');
             });
-            event.target.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
+            if (botao) botao.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
 
             const container = document.getElementById('weekGridContainer');
             const cards = container.querySelectorAll('.day-card');
@@ -961,11 +771,8 @@
             } else {
                 container.classList.add('mobile-single-day');
                 cards.forEach(c => {
-                    if (c.getAttribute('data-dia-nome') === diaNome) {
-                        c.classList.add('active-day');
-                    } else {
-                        c.classList.remove('active-day');
-                    }
+                    if (c.getAttribute('data-dia-nome') === diaNome) c.classList.add('active-day');
+                    else c.classList.remove('active-day');
                 });
             }
         }
@@ -1008,19 +815,12 @@
 
         function atualizarIndicadorProgresso() {
             const checkboxes = document.querySelectorAll('#weekGridContainer input[type="checkbox"].task-check');
-            const total = checkboxes.length;
-            let concluidas = 0;
-            checkboxes.forEach(cb => {
-                if (cb.checked) concluidas++;
-            });
-
             document.querySelectorAll('.day-card').forEach(card => {
                 const masterCheck = card.querySelector('.check-concluir-dia');
                 if (!masterCheck) return;
                 const itemsCheck = card.querySelectorAll('input[type="checkbox"].task-check');
                 if (itemsCheck.length > 0) {
-                    const todosMarcados = [...itemsCheck].every(cb => cb.checked);
-                    masterCheck.checked = todosMarcados;
+                    masterCheck.checked = [...itemsCheck].every(cb => cb.checked);
                 } else {
                     masterCheck.checked = false;
                 }
@@ -1032,19 +832,14 @@
             if (!card) return;
             const marcar = masterCheckbox.checked;
             const checksDia = card.querySelectorAll('input[type="checkbox"].task-check');
-
             checksDia.forEach(cb => {
                 cb.checked = marcar;
                 const taskBox = cb.closest('.task-box') || cb.closest('.tarefa-extra-box') || cb.closest('.treinamento-box') || cb.closest('.resource-tag');
                 if (taskBox) {
-                    if (marcar) {
-                        taskBox.classList.add('task-done');
-                    } else {
-                        taskBox.classList.remove('task-done');
-                    }
+                    if (marcar) taskBox.classList.add('task-done');
+                    else taskBox.classList.remove('task-done');
                 }
             });
-
             atualizarIndicadorProgresso();
             guardarEstadoDOM();
         }
@@ -1082,11 +877,8 @@
         }
 
         function exportarParaExcelTabelaVale() {
-            let ano = document.getElementById('inputAno').value;
             let semana = document.getElementById('inputNumSemana').value;
-            
             let csvContent = "\uFEFFITEM;OS;Área Responsável;Atividade;Local de execução;Sala/Equipamento;Data de execução;Dia da Semana;Tem Bloqueio elétrico?;Tem Bloqueio mecânico?;Tem PTS?;Tem solicitação ao almoxarifado;Necessidade de Recurso (Equip. moveis)?\n";
-
             let diasMap = { "Segunda": "segunda-feira", "Terça": "terça-feira", "Quarta": "quarta-feira", "Quinta": "quinta-feira", "Sexta": "sexta-feira" };
 
             document.querySelectorAll('.day-card').forEach(card => {
@@ -1108,7 +900,6 @@
                         }
                     });
                     let necessidadeRecurso = recursosDia.join(', ');
-
                     csvContent += `1;;ALMOXARIFADO;"${atividade}";;;"${dataExec}";"${diaSemanaStr}";NÃO;NÃO;NÃO;NÃO;"${necessidadeRecurso}"\n`;
                 });
             });
@@ -1124,20 +915,32 @@
             mostrarToast("📊 Exportado para Excel (Padrão Vale)!");
         }
 
-        // Garante a barra de controle em cada dia
+        function montarBarraDia(fChecked, eChecked) {
+            const barra = document.createElement('div');
+            barra.className = 'flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0';
+            barra.innerHTML = `
+                <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
+                    <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
+                </label>
+                <div class="flex items-center gap-1.5">
+                    <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" ${fChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Feriado</label>
+                    <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" ${eChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Emenda</label>
+                </div>
+            `;
+            return barra;
+        }
+
         function garantirCaixinhasEmHtmlSalvo(htmlString) {
             if (!htmlString) return htmlString;
             let parser = new DOMParser();
             let doc = parser.parseFromString(htmlString, 'text/html');
 
-            let cards = doc.querySelectorAll('.day-card');
-            cards.forEach(card => {
+            doc.querySelectorAll('.day-card').forEach(card => {
                 let dayContent = card.querySelector('.day-content');
                 if (dayContent) {
                     let barraVelha = dayContent.querySelector('.flex.items-center.justify-between');
                     let fChecked = false;
                     let eChecked = false;
-
                     if (barraVelha) {
                         let cf = barraVelha.querySelector('.check-feriado');
                         let ce = barraVelha.querySelector('.check-emenda');
@@ -1145,23 +948,10 @@
                         if (ce && ce.checked) eChecked = true;
                         barraVelha.remove();
                     }
-
-                    let barraDiv = doc.createElement('div');
-                    barraDiv.className = 'flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0';
-                    barraDiv.innerHTML = `
-                        <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
-                            <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" ${fChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Feriado</label>
-                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" ${eChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Emenda</label>
-                        </div>
-                    `;
-                    dayContent.insertBefore(barraDiv, dayContent.firstChild);
+                    dayContent.insertBefore(montarBarraDia(fChecked, eChecked), dayContent.firstChild);
                 }
             });
-            
-            // Corrige treinamentos gravados com a estrutura antiga (X e lápis flutuando)
+
             doc.querySelectorAll('.treinamento-box').forEach(box => {
                 if (box.querySelector('.treino-info')) return;
                 const span = box.firstElementChild;
@@ -1180,8 +970,7 @@
                 span.appendChild(info);
             });
 
-            let caixas = doc.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
-            caixas.forEach(box => {
+            doc.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(box => {
                 if (!box.querySelector('input[type="checkbox"].task-check')) {
                     let innerSpan = box.querySelector('span');
                     if (innerSpan && !innerSpan.classList.contains('item-controls')) {
@@ -1211,18 +1000,7 @@
                         if (ce && ce.checked) eChecked = true;
                         barra.remove();
                     }
-                    const novaBarra = document.createElement('div');
-                    novaBarra.className = 'flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0';
-                    novaBarra.innerHTML = `
-                        <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
-                            <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" ${fChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Feriado</label>
-                            <label class="flex items-center gap-0.5 font-bold cursor-pointer text-teal-700 dark:text-teal-300"><input type="checkbox" class="check-emenda w-3 h-3" ${eChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Emenda</label>
-                        </div>
-                    `;
-                    dayContent.insertBefore(novaBarra, dayContent.firstChild);
+                    dayContent.insertBefore(montarBarraDia(fChecked, eChecked), dayContent.firstChild);
                 }
             });
         }
@@ -1242,22 +1020,15 @@
                             dadosGlobaisNuvem.semanas[k] = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[k]);
                         }
                     }
-                    if (dadosGlobaisNuvem.historico) {
-                        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
-                    }
-                    if (dadosGlobaisNuvem.treinamentos) {
-                        localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
-                    }
-                    if (dadosGlobaisNuvem.feriados) {
-                        localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dadosGlobaisNuvem.feriados));
-                    }
+                    if (dadosGlobaisNuvem.historico) localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
+                    if (dadosGlobaisNuvem.treinamentos) localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
+                    if (dadosGlobaisNuvem.feriados) localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dadosGlobaisNuvem.feriados));
                 } else {
                     dadosGlobaisNuvem = {};
                 }
             } catch(e) {
                 console.error("Erro ao buscar da nuvem:", e);
             }
-            // v4.06: nada some — completa com o espelho guardado neste computador
             mesclarComEspelhoLocal();
         }
 
@@ -1278,7 +1049,6 @@
                 dispensados: dadosGlobaisNuvem.dispensados || []
             };
 
-            // v4.06: primeiro garante a cópia neste computador (espelho + arquivo), depois a nuvem
             espelharLocal();
             gravarArquivoLocal();
 
@@ -1320,7 +1090,6 @@
             mostrarToast("✅ Sincronizado com sucesso!");
         }
 
-        // ===== BACKUP NO COMPUTADOR (DOWNLOAD) =====
         function baixarBackupLocal() {
             const backup = montarBackup();
             const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
@@ -1334,6 +1103,73 @@
             mostrarToast("💽 Backup baixado no computador!");
         }
 
+        // ===== BACKUP EM PDF: abre a versão de impressão de todas as semanas guardadas =====
+        function baixarBackupPDF() {
+            const semanas = Object.assign({}, dadosGlobaisNuvem.semanas || {});
+            const grid = document.getElementById('weekGridContainer');
+            if (grid && grid.innerHTML.trim()) semanas[getWeekKey()] = grid.innerHTML;
+
+            const chaves = Object.keys(semanas).filter(k => semanas[k]).sort((a, b) => {
+                const ma = a.match(/(\d{4})_semana_(\d+)/), mb = b.match(/(\d{4})_semana_(\d+)/);
+                if (!ma || !mb) return a.localeCompare(b);
+                return (ma[1] - mb[1]) || (ma[2] - mb[2]);
+            });
+
+            if (chaves.length === 0) {
+                mostrarToast("⚠️ Não há semanas para exportar.", "aviso");
+                return;
+            }
+
+            const estilo = [...document.querySelectorAll('style')].map(s => s.innerHTML).join('\n');
+            const blocos = chaves.map(k => {
+                const m = k.match(/(\d{4})_semana_(\d+)/);
+                const titulo = m ? `Semana ${m[2]} de ${m[1]}` : k;
+                return `
+                    <section class="pagina-semana">
+                        <h1 class="titulo-semana">${escHtml(titulo)}</h1>
+                        <div class="week-grid">${semanas[k]}</div>
+                    </section>`;
+            }).join('');
+
+            const html = `<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<title>Backup Programação Semanal ${new Date().toISOString().slice(0, 10)}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+${estilo}
+.dark, .dark * { color-scheme: light; }
+body { padding: 0 !important; background: #fff !important; }
+.titulo-semana { font-size: 16px; font-weight: 900; color: #1b5e20; margin: 0 0 8px; text-transform: uppercase; }
+.pagina-semana { break-after: page; page-break-after: always; }
+.pagina-semana:last-child { break-after: auto; page-break-after: auto; }
+.week-grid { display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 8px; }
+.item-controls, .drag-handle, input[type="checkbox"], .btn-action-item { display: none !important; }
+@page { size: A4 landscape; margin: 8mm; }
+</style>
+</head>
+<body class="bg-white">
+${blocos}
+<script>
+window.addEventListener('load', function () {
+    setTimeout(function () { window.print(); }, 400);
+});
+<\/script>
+</body>
+</html>`;
+
+            const janela = window.open('', '_blank');
+            if (!janela) {
+                mostrarToast("❌ O navegador bloqueou a janela. Permita pop-ups para este site.", "erro");
+                return;
+            }
+            janela.document.open();
+            janela.document.write(html);
+            janela.document.close();
+            mostrarToast("📄 Escolha 'Salvar como PDF' na janela de impressão.", "info");
+        }
+
         function restaurarBackupLocal(input) {
             const arquivo = input.files[0];
             if (!arquivo) return;
@@ -1345,7 +1181,6 @@
             leitor.readAsText(arquivo);
         }
 
-        // ===== IMPORTAR PDF PARA O ANALISADOR =====
         async function importarPDFParaScript(input) {
             const arquivo = input.files[0];
             if (!arquivo) return;
@@ -1376,7 +1211,7 @@
             document.getElementById('popTreinoInicio').valueAsDate = new Date();
             document.getElementById('popTreinoFim').valueAsDate = new Date();
             document.getElementById('popFeriadoData').valueAsDate = new Date();
-            
+
             await recuperarHandleSalvo();
             await sincronizarComNuvem();
             renderizarAvisos();
@@ -1395,6 +1230,13 @@
             carregarFrequentes();
             definirSemanaAtualComRegraSexta();
             document.getElementById('inputDataEvento').valueAsDate = new Date();
+        });
+
+        window.addEventListener('beforeunload', (e) => {
+            if (!arquivoHandle || arquivoPendente) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
         });
 
         function instalarApp() {
@@ -1453,8 +1295,16 @@
             await salvarNaNuvem();
             renderizarAvisos();
             renderizarPopTreinamentos();
-            atualizarDatasSemana(); // aplica automaticamente se cair na semana exibida
+            atualizarDatasSemana();
             mostrarToast("✅ Treinamento guardado!");
+        }
+
+        function semanaISO(dObj) {
+            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         }
 
         async function enviarTreinamentoParaProgramacao(id) {
@@ -1464,11 +1314,7 @@
 
             const dObj = new Date(t.inicio + 'T00:00:00');
             const ano = dObj.getFullYear();
-            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
-            const dayNum = d.getUTCDay() || 7; 
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            const semanaNo = semanaISO(dObj);
 
             document.getElementById('inputAno').value = ano;
             document.getElementById('inputNumSemana').value = semanaNo;
@@ -1543,7 +1389,7 @@
             await salvarNaNuvem();
             renderizarAvisos();
             renderizarPopFeriados();
-            atualizarDatasSemana(); // aplica automaticamente se cair na semana exibida
+            atualizarDatasSemana();
             mostrarToast("✅ Feriado guardado!");
         }
 
@@ -1554,11 +1400,7 @@
 
             const dObj = new Date(f.data + 'T00:00:00');
             const ano = dObj.getFullYear();
-            const d = new Date(Date.UTC(dObj.getFullYear(), dObj.getMonth(), dObj.getDate()));
-            const dayNum = d.getUTCDay() || 7; 
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const semanaNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            const semanaNo = semanaISO(dObj);
 
             document.getElementById('inputAno').value = ano;
             document.getElementById('inputNumSemana').value = semanaNo;
@@ -1571,23 +1413,19 @@
                 const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
                 if (cardDia) {
                     const tasksCont = cardDia.querySelector('.tasks-container');
-                    const tituloFeriado = f.tipo === 'feriado' ? '🍃 FERIADO' : '📌 EMENDA';
-
-                    // CORREÇÃO: guarda o conteúdo do dia antes de substituir
                     guardarBackupDia(cardDia);
-
                     cardDia.dataset.eventoChave = `feriado:${f.id || f.data}:${f.data}`;
 
-                    // Mantém as caixinhas do dia coerentes com o bloqueio
                     const cf = cardDia.querySelector('.check-feriado');
                     const ce = cardDia.querySelector('.check-emenda');
-                    if (cf) cf.checked = (f.tipo === 'feriado');
+                    if (cf) cf.checked = (f.tipo !== 'emenda');
                     if (ce) ce.checked = (f.tipo === 'emenda');
 
+                    const ehFeriado = f.tipo !== 'emenda';
                     tasksCont.innerHTML = `
-                        <div style="background-color: ${f.tipo === 'feriado' ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${f.tipo === 'feriado' ? '#2e7d32' : '#00897b'}; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm">
-                            <span style="color: ${f.tipo === 'feriado' ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 12px;">${tituloFeriado}</span>
-                            <div style="color: ${f.tipo === 'feriado' ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${f.desc}</div>
+                        <div style="background-color: ${ehFeriado ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${ehFeriado ? '#2e7d32' : '#00897b'}; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm">
+                            <span style="color: ${ehFeriado ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 12px;">${ehFeriado ? '🍃 FERIADO' : '📌 EMENDA'}</span>
+                            <div style="color: ${ehFeriado ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${escHtml(f.desc)}</div>
                             <button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button>
                         </div>
                     `;
@@ -1600,7 +1438,6 @@
             } else { alert("⚠️ A data deste evento cai em fim de semana."); }
         }
 
-        // ===== EXCLUIR TREINAMENTO / FERIADO CADASTRADO =====
         async function excluirTreinamento(id) {
             let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
             const t = lista.find(x => x.id === id);
@@ -1633,7 +1470,6 @@
             mostrarToast("🗑️ Feriado excluído.", "info");
         }
 
-        // ===== IMPORTAR FERIADOS NACIONAIS (BRASIL) =====
         function calcularPascoa(ano) {
             const a = ano % 19, b = Math.floor(ano / 100), c = ano % 100;
             const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
@@ -1669,7 +1505,7 @@
             let lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
             let novos = 0;
             fixos.forEach(([data, desc]) => {
-                if (lista.some(f => f.data === data)) return; // já existe um feriado nessa data
+                if (lista.some(f => f.data === data)) return;
                 lista.push({ id: 'feriado_nac_' + data, data, tipo: 'feriado', desc });
                 novos++;
             });
@@ -1681,7 +1517,6 @@
             mostrarToast(novos ? `✅ ${novos} feriados nacionais importados!` : "ℹ️ Todos já estavam cadastrados.", novos ? 'sucesso' : 'info');
         }
 
-        // ===== AUTOMÁTICO: TREINAMENTOS E FERIADOS CADASTRADOS ENTRAM SOZINHOS NA SEMANA =====
         function dataISO(d) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
@@ -1705,7 +1540,6 @@
                 if (!card) return;
                 const iso = dataISO(dataObj);
 
-                // 1) Feriado / Emenda do dia
                 const f = feriados.find(x => x.data === iso && !eventoDispensado(`feriado:${x.id || x.data}:${iso}`));
                 if (f && !diaEstaBloqueado(card)) {
                     guardarBackupDia(card);
@@ -1726,7 +1560,6 @@
                     mudou = true;
                 }
 
-                // 2) Treinamentos que cobrem este dia (do início ao fim)
                 if (diaEstaBloqueado(card)) return;
                 const tasksCont = card.querySelector('.tasks-container');
                 treinos.forEach(t => {
@@ -1760,7 +1593,6 @@
             if (mudou) salvarNaNuvem();
         }
 
-        // ===== CORREÇÃO: BACKUP / RESTAURO DO DIA ANTES DE FERIADO OU EMENDA =====
         function diaEstaBloqueado(card) {
             const cf = card.querySelector('.check-feriado');
             const ce = card.querySelector('.check-emenda');
@@ -1768,7 +1600,6 @@
         }
 
         function guardarBackupDia(card) {
-            // Só guarda se ainda não houver backup (evita sobrescrever com o bloco de feriado)
             if (card.dataset.backupTarefas !== undefined) return;
             card.dataset.backupTarefas = card.querySelector('.tasks-container').innerHTML;
             card.dataset.backupRecursos = card.querySelector('.day-resources').innerHTML;
@@ -1781,24 +1612,22 @@
             const checkEmenda = card.querySelector('.check-emenda');
             const checkConcluir = card.querySelector('.check-concluir-dia');
             if (card.dataset.eventoChave) {
-                dispensarEvento(card.dataset.eventoChave); // não reaplicar sozinho
+                dispensarEvento(card.dataset.eventoChave);
                 delete card.dataset.eventoChave;
             }
             if (checkFeriado) checkFeriado.checked = false;
             if (checkEmenda) checkEmenda.checked = false;
             if (checkConcluir) checkConcluir.checked = false;
-            
+
             const tasksCont = card.querySelector('.tasks-container');
             const resCont = card.querySelector('.day-resources');
 
             if (card.dataset.backupTarefas !== undefined) {
-                // Devolve exatamente o que existia antes do feriado/emenda
                 tasksCont.innerHTML = card.dataset.backupTarefas;
                 resCont.innerHTML = card.dataset.backupRecursos || '';
                 delete card.dataset.backupTarefas;
                 delete card.dataset.backupRecursos;
             } else {
-                // Sem backup (semanas gravadas antes da correção): volta ao padrão
                 tasksCont.innerHTML = `
                     <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
                     <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
@@ -1817,11 +1646,8 @@
         function alternarConclusaoTarefa(checkbox) {
             const taskBox = checkbox.closest('.task-box') || checkbox.closest('.tarefa-extra-box') || checkbox.closest('.treinamento-box') || checkbox.closest('.resource-tag');
             if (!taskBox) return;
-            if (checkbox.checked) {
-                taskBox.classList.add('task-done');
-            } else {
-                taskBox.classList.remove('task-done');
-            }
+            if (checkbox.checked) taskBox.classList.add('task-done');
+            else taskBox.classList.remove('task-done');
             atualizarIndicadorProgresso();
             guardarEstadoDOM();
         }
@@ -1889,7 +1715,7 @@
         function preencherPredefinido() {
             const select = document.getElementById('selectFrequentes');
             const inputDesc = document.getElementById('inputDesc');
-            if (select.value) { inputDesc.value = select.value; }
+            if (select.value) inputDesc.value = select.value;
         }
 
         async function adicionarNovoFrequente() {
@@ -1963,7 +1789,6 @@
             const tasksCont = card.querySelector('.tasks-container');
             const resCont = card.querySelector('.day-resources');
 
-            // Mantém só uma das duas marcadas
             if (checkbox.checked) {
                 if (checkbox === cf) ce.checked = false;
                 else cf.checked = false;
@@ -1973,9 +1798,7 @@
             const isEmenda = ce.checked;
 
             if (isFeriado || isEmenda) {
-                // CORREÇÃO: guarda o conteúdo do dia antes de bloquear
                 guardarBackupDia(card);
-
                 if (isFeriado) {
                     tasksCont.innerHTML = `<div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #1b5e20; font-weight: 900; font-size: 12px;">🍃 FERIADO</span><br><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
                 } else {
@@ -1984,7 +1807,7 @@
                 resCont.innerHTML = ``;
             } else {
                 restaurarDiaNormal(checkbox);
-                return; // restaurarDiaNormal já grava e atualiza
+                return;
             }
             atualizarIndicadorProgresso();
             guardarEstadoDOM();
@@ -2047,7 +1870,7 @@
                     jaAdicionadas.add(linhaUp);
                     const div = document.createElement('div');
                     div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border text-xs';
-                    div.innerHTML = `<span>💬 "${linhaUp}"</span><button onclick="usarSugestao(this)" data-texto="${linhaUp.replace(/"/g, '&quot;')}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
+                    div.innerHTML = `<span>💬 "${escHtml(linhaUp)}"</span><button onclick="usarSugestao(this)" data-texto="${escHtml(linhaUp)}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
                     containerSugestoes.appendChild(div);
                 }
             });
@@ -2070,8 +1893,6 @@
                 cont.setAttribute('ondragover', 'permitirDrop(event)');
                 cont.setAttribute('ondrop', 'soltarItem(event)');
             });
-
-            // Ativa o SortableJS para suporte nativo em celular (Touch) e Desktop
             document.querySelectorAll('.tasks-container, .day-resources').forEach(el => {
                 if (el._sortableInstance) el._sortableInstance.destroy();
                 el._sortableInstance = new Sortable(el, {
@@ -2079,24 +1900,19 @@
                     animation: 150,
                     handle: '.drag-handle',
                     ghostClass: 'sortable-ghost',
-                    onEnd: async () => {
-                        await guardarEstadoDOM();
-                    }
+                    onEnd: async () => { await guardarEstadoDOM(); }
                 });
             });
         }
 
         function definirSemanaAtualComRegraSexta() {
-            const hoje = new Date(); 
+            const hoje = new Date();
             document.getElementById('inputAno').value = hoje.getFullYear();
             let dataCalculo = new Date(hoje);
             if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) {
                 dataCalculo.setDate(hoje.getDate() + 3);
             }
-            const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            document.getElementById('inputNumSemana').value = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            document.getElementById('inputNumSemana').value = semanaISO(dataCalculo);
             atualizarDatasSemana();
         }
 
@@ -2104,10 +1920,7 @@
             if (!dataStr) return;
             const dataObj = new Date(dataStr + 'T00:00:00');
             document.getElementById('inputAno').value = dataObj.getFullYear();
-            const d = new Date(Date.UTC(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate()));
-            const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            document.getElementById('inputNumSemana').value = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            document.getElementById('inputNumSemana').value = semanaISO(dataObj);
             atualizarDatasSemana();
         }
 
@@ -2164,8 +1977,7 @@
 
             let semanaKey = getWeekKey();
             if (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey]) {
-                let htmlNuvemCorrigido = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[semanaKey]);
-                document.getElementById('weekGridContainer').innerHTML = htmlNuvemCorrigido;
+                document.getElementById('weekGridContainer').innerHTML = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[semanaKey]);
             }
 
             forcarCaixinhasDiaNoDOM();
@@ -2188,7 +2000,6 @@
         function forcarRecursosFixos() {
             document.querySelectorAll('.day-card').forEach(card => {
                 const recursosCont = card.querySelector('.day-resources');
-                // CORREÇÃO: não recria CARRO/EMPILHADEIRA em dias de feriado/emenda
                 if (!recursosCont || card.querySelector('.tasks-container').innerText.includes("bloqueado") || diaEstaBloqueado(card)) return;
                 const textos = [...recursosCont.querySelectorAll('.item-text')].map(el => el.innerText.trim());
                 if (!textos.includes('CARRO')) adicionarTagRecurso(recursosCont, 'CARRO');
@@ -2273,10 +2084,10 @@
 
         async function removerElemento(botao) {
             const box = botao.closest('.task-box') || botao.closest('.tarefa-extra-box') || botao.closest('.resource-tag') || botao.closest('.treinamento-box');
-            if (box) { 
-                if (box.dataset.eventoChave) dispensarEvento(box.dataset.eventoChave); // não reaplicar sozinho
-                box.remove(); 
-                await salvarNaNuvem(); 
+            if (box) {
+                if (box.dataset.eventoChave) dispensarEvento(box.dataset.eventoChave);
+                box.remove();
+                await salvarNaNuvem();
                 atualizarIndicadorProgresso();
                 mostrarToast("Item removido.");
             }
@@ -2299,7 +2110,6 @@
         }
 
         function imprimirProgramacao() {
-            // Imprime a própria página, com o mesmo visual da tela (sempre em tema claro)
             const eraEscuro = document.documentElement.classList.contains('dark');
             if (eraEscuro) document.documentElement.classList.remove('dark');
             limparBusca();
@@ -2312,10 +2122,4 @@
         }
     </script>
 </body>
-    window.addEventListener('beforeunload', (e) => {
-    if (!arquivoHandle || arquivoPendente) {
-        e.preventDefault();
-        e.returnValue = '';
-    }
-});
 </html>
