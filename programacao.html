@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.05 Nuvem Pro)</title>
+    <title>Programação Semanal Interativa (v4.06 Nuvem Pro)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -410,14 +410,21 @@
         <div class="week-grid" id="weekGridContainer"></div>
 
         <!-- BARRA DE AÇÕES DA SEMANA -->
-        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
-            <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar na Nuvem</button>
-            <button onclick="baixarBackupLocal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💽 Salvar no Computador</button>
-            <button onclick="document.getElementById('inputRestaurarBackup').click()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📂 Restaurar Backup</button>
-            <input type="file" id="inputRestaurarBackup" accept=".json,application/json" class="hidden" onchange="restaurarBackupLocal(this)">
-            <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
-            <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
-            <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
+        <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto mb-6 space-y-2">
+            <div class="flex flex-wrap justify-center items-center gap-2">
+                <button onclick="salvarNoComputador()" class="bg-green-800 hover:bg-green-900 text-white px-3.5 py-2 rounded-lg text-xs font-extrabold shadow-md transition" title="Salva direto num arquivo do seu computador (grava sozinho a cada alteração)">💾 Salvar no Meu Computador</button>
+                <button onclick="abrirArquivoDoComputador()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3.5 py-2 rounded-lg text-xs font-extrabold shadow-md transition" title="Abre o arquivo salvo no computador e traz tudo de volta para dentro do programa">📥 Importar do Meu Computador</button>
+                <button onclick="salvarProgramacaoManualNuvem()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">☁️ Salvar na Nuvem</button>
+            </div>
+            <div id="statusArquivo" class="text-center text-[10px] font-bold text-gray-500 dark:text-gray-400"></div>
+            <div class="flex flex-wrap justify-center items-center gap-2 pt-2 border-t dark:border-gray-700">
+                <button onclick="baixarBackupLocal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💽 Baixar Backup (.json)</button>
+                <button onclick="document.getElementById('inputRestaurarBackup').click()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📂 Restaurar Backup</button>
+                <input type="file" id="inputRestaurarBackup" accept=".json,application/json" class="hidden" onchange="restaurarBackupLocal(this)">
+                <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
+                <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
+                <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
+            </div>
         </div>
 
         <!-- ADICIONAR NOVO ITEM -->
@@ -562,7 +569,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.05 Nuvem Pro</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.06 Nuvem Pro</span>
         </div>
     </div>
 
@@ -574,10 +581,233 @@
         const CHAVE_HISTORICO = "programacao_historico_semanas_definitivo";
         const CHAVE_LOCAL_TREINOS = "modulo_treinamentos_dados_nuvem";
         const CHAVE_LOCAL_FERIADOS = "modulo_feriados_dados_nuvem";
+        const CHAVE_ESPELHO_LOCAL = "programacao_espelho_local_v406";
         const nomesMeses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
         let elementoArrastado = null;
         let deferredPrompt = null;
         let dadosGlobaisNuvem = {};
+
+        // ===== v4.06: ARQUIVO NO COMPUTADOR + ESPELHO LOCAL =====
+        let arquivoHandle = null;
+        let arquivoPendente = false;
+        let ultimaGravacaoArquivo = null;
+        let filaGravacao = Promise.resolve();
+
+        function idbAbrir() {
+            return new Promise((res, rej) => {
+                const r = indexedDB.open('prog_semanal_db', 1);
+                r.onupgradeneeded = () => r.result.createObjectStore('kv');
+                r.onsuccess = () => res(r.result);
+                r.onerror = () => rej(r.error);
+            });
+        }
+        async function idbSet(chave, valor) {
+            const db = await idbAbrir();
+            return new Promise((res, rej) => {
+                const tx = db.transaction('kv', 'readwrite');
+                tx.objectStore('kv').put(valor, chave);
+                tx.oncomplete = () => res();
+                tx.onerror = () => rej(tx.error);
+            });
+        }
+        async function idbGet(chave) {
+            const db = await idbAbrir();
+            return new Promise((res, rej) => {
+                const tx = db.transaction('kv', 'readonly');
+                const rq = tx.objectStore('kv').get(chave);
+                rq.onsuccess = () => res(rq.result);
+                rq.onerror = () => rej(rq.error);
+            });
+        }
+
+        function atualizarStatusArquivo() {
+            const el = document.getElementById('statusArquivo');
+            if (!el) return;
+            if (!window.showSaveFilePicker) {
+                el.innerHTML = '⚠️ Este navegador não grava direto em arquivo (use Chrome ou Edge). O botão vai baixar o arquivo.';
+                return;
+            }
+            if (!arquivoHandle) {
+                el.innerHTML = '📁 Nenhum arquivo vinculado ainda. Clique em "Salvar no Meu Computador" para escolher onde guardar.';
+            } else if (arquivoPendente) {
+                el.innerHTML = `⚠️ Arquivo <b>${escHtml(arquivoHandle.name)}</b> precisa de autorização. Clique em "Salvar no Meu Computador".`;
+            } else {
+                const hora = ultimaGravacaoArquivo ? ultimaGravacaoArquivo.toLocaleTimeString('pt-BR') : '--';
+                el.innerHTML = `🟢 Gravando automaticamente em <b>${escHtml(arquivoHandle.name)}</b> (última gravação: ${hora})`;
+            }
+        }
+
+        function montarBackup() {
+            const semanas = Object.assign({}, dadosGlobaisNuvem.semanas || {});
+            const grid = document.getElementById('weekGridContainer');
+            if (grid && grid.innerHTML.trim()) semanas[getWeekKey()] = grid.innerHTML;
+            return {
+                versao: 'v4.06',
+                geradoEm: new Date().toISOString(),
+                semanas,
+                historico: JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {},
+                treinamentos: JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [],
+                feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
+                dispensados: dadosGlobaisNuvem.dispensados || [],
+                frequentes: JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || null,
+                palavrasChave: JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || null
+            };
+        }
+
+        function espelharLocal() {
+            try { localStorage.setItem(CHAVE_ESPELHO_LOCAL, JSON.stringify(montarBackup())); }
+            catch (e) { console.warn("Espelho local cheio:", e); }
+        }
+
+        // Junta o que está na nuvem com o espelho local (nada some se a nuvem vier vazia)
+        function mesclarComEspelhoLocal() {
+            let local = null;
+            try { local = JSON.parse(localStorage.getItem(CHAVE_ESPELHO_LOCAL)); } catch (e) {}
+            if (!local) return false;
+            let mudou = false;
+            if (!dadosGlobaisNuvem.semanas) dadosGlobaisNuvem.semanas = {};
+            Object.keys(local.semanas || {}).forEach(k => {
+                if (!dadosGlobaisNuvem.semanas[k]) {
+                    dadosGlobaisNuvem.semanas[k] = garantirCaixinhasEmHtmlSalvo(local.semanas[k]);
+                    mudou = true;
+                }
+            });
+            const mesclarLista = (chaveLS, listaLocal) => {
+                const atual = JSON.parse(localStorage.getItem(chaveLS)) || [];
+                (listaLocal || []).forEach(it => {
+                    if (!atual.some(x => x.id === it.id)) { atual.push(it); mudou = true; }
+                });
+                localStorage.setItem(chaveLS, JSON.stringify(atual));
+            };
+            mesclarLista(CHAVE_LOCAL_TREINOS, local.treinamentos);
+            mesclarLista(CHAVE_LOCAL_FERIADOS, local.feriados);
+            const hist = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
+            Object.keys(local.historico || {}).forEach(k => {
+                if (!hist[k]) { hist[k] = local.historico[k]; mudou = true; }
+            });
+            localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(hist));
+            const disp = new Set([...(dadosGlobaisNuvem.dispensados || []), ...(local.dispensados || [])]);
+            dadosGlobaisNuvem.dispensados = [...disp];
+            return mudou;
+        }
+
+        function gravarArquivoLocal() {
+            // Fila: evita duas gravações ao mesmo tempo no mesmo arquivo
+            filaGravacao = filaGravacao.then(async () => {
+                if (!arquivoHandle) return false;
+                try {
+                    const perm = await arquivoHandle.queryPermission({ mode: 'readwrite' });
+                    if (perm !== 'granted') { arquivoPendente = true; atualizarStatusArquivo(); return false; }
+                    const w = await arquivoHandle.createWritable();
+                    await w.write(JSON.stringify(montarBackup()));
+                    await w.close();
+                    arquivoPendente = false;
+                    ultimaGravacaoArquivo = new Date();
+                    atualizarStatusArquivo();
+                    return true;
+                } catch (e) {
+                    console.error("Erro ao gravar arquivo local:", e);
+                    arquivoPendente = true;
+                    atualizarStatusArquivo();
+                    return false;
+                }
+            });
+            return filaGravacao;
+        }
+
+        async function vincularArquivoNoComputador() {
+            try {
+                const h = await window.showSaveFilePicker({
+                    suggestedName: 'PROGRAMACAO_SEMANAL.json',
+                    types: [{ description: 'Programação Semanal (JSON)', accept: { 'application/json': ['.json'] } }]
+                });
+                arquivoHandle = h;
+                await idbSet('arquivo_handle', h);
+                arquivoPendente = false;
+                const ok = await gravarArquivoLocal();
+                if (ok) mostrarToast(`💾 Salvo no computador: ${h.name}`);
+                else mostrarToast("❌ Não consegui gravar no arquivo.", "erro");
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
+                console.error(e);
+                mostrarToast("❌ Erro ao escolher o arquivo.", "erro");
+            }
+        }
+
+        async function salvarNoComputador() {
+            if (!window.showSaveFilePicker) { baixarBackupLocal(); return; }
+            if (!arquivoHandle) { await vincularArquivoNoComputador(); return; }
+            let ok = await gravarArquivoLocal();
+            if (!ok) {
+                try {
+                    const p = await arquivoHandle.requestPermission({ mode: 'readwrite' });
+                    if (p === 'granted') ok = await gravarArquivoLocal();
+                } catch (e) { console.error(e); }
+            }
+            if (ok) mostrarToast(`💾 Salvo no computador: ${arquivoHandle.name}`);
+            else mostrarToast("⚠️ Não foi possível gravar. Escolha o arquivo de novo.", "aviso");
+            if (!ok) { arquivoHandle = null; await vincularArquivoNoComputador(); }
+        }
+
+        async function abrirArquivoDoComputador() {
+            if (!window.showOpenFilePicker) { document.getElementById('inputRestaurarBackup').click(); return; }
+            try {
+                const [h] = await window.showOpenFilePicker({
+                    types: [{ description: 'Programação Semanal (JSON)', accept: { 'application/json': ['.json'] } }]
+                });
+                const arquivo = await h.getFile();
+                const texto = await arquivo.text();
+                const ok = await aplicarBackupTexto(texto);
+                if (ok) {
+                    arquivoHandle = h;
+                    await idbSet('arquivo_handle', h);
+                    try { await h.requestPermission({ mode: 'readwrite' }); } catch (e) {}
+                    arquivoPendente = false;
+                    await gravarArquivoLocal();
+                    atualizarStatusArquivo();
+                }
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
+                console.error(e);
+                mostrarToast("❌ Não consegui abrir o arquivo.", "erro");
+            }
+        }
+
+        async function recuperarHandleSalvo() {
+            try {
+                const h = await idbGet('arquivo_handle');
+                if (h) {
+                    arquivoHandle = h;
+                    const perm = await h.queryPermission({ mode: 'readwrite' });
+                    arquivoPendente = (perm !== 'granted');
+                }
+            } catch (e) { console.warn("Sem handle salvo:", e); }
+            atualizarStatusArquivo();
+        }
+
+        async function aplicarBackupTexto(texto) {
+            try {
+                const b = JSON.parse(texto);
+                if (!b.semanas) throw new Error('Arquivo inválido');
+                if (!confirm("Importar este arquivo? Isso substitui os dados atuais (e envia para a nuvem).")) return false;
+                dadosGlobaisNuvem = { semanas: b.semanas, historico: b.historico || {}, treinamentos: b.treinamentos || [], feriados: b.feriados || [], dispensados: b.dispensados || [] };
+                localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(b.historico || {}));
+                localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(b.treinamentos || []));
+                localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(b.feriados || []));
+                if (b.frequentes) localStorage.setItem('programacao_frequentes_custom', JSON.stringify(b.frequentes));
+                if (b.palavrasChave) localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(b.palavrasChave));
+                carregarFrequentes();
+                await salvarNaNuvem();
+                renderizarAvisos();
+                atualizarDatasSemana();
+                mostrarToast("✅ Arquivo importado com sucesso!");
+                return true;
+            } catch (e) {
+                console.error(e);
+                mostrarToast("❌ Arquivo inválido.", "erro");
+                return false;
+            }
+        }
 
         let itensFrequentesPadrao = [
             "🕒 HORA CERTA", "📦 MOVIMENTAÇÃO G4", "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
@@ -1023,6 +1253,8 @@
             } catch(e) {
                 console.error("Erro ao buscar da nuvem:", e);
             }
+            // v4.06: nada some — completa com o espelho guardado neste computador
+            mesclarComEspelhoLocal();
         }
 
         async function salvarNaNuvem() {
@@ -1042,6 +1274,10 @@
                 dispensados: dadosGlobaisNuvem.dispensados || []
             };
 
+            // v4.06: primeiro garante a cópia neste computador (espelho + arquivo), depois a nuvem
+            espelharLocal();
+            gravarArquivoLocal();
+
             try {
                 let { error } = await supabaseClient
                     .from('app_dados_programacao')
@@ -1059,13 +1295,13 @@
             if (sucesso) {
                 mostrarToast("✅ Programação salva com sucesso na nuvem!");
             } else {
-                mostrarToast("❌ Erro ao salvar na nuvem. Baixando backup no computador...", "erro");
-                baixarBackupLocal();
+                mostrarToast("❌ Erro ao salvar na nuvem. Cópia mantida neste computador.", "erro");
+                if (!arquivoHandle) baixarBackupLocal();
             }
         }
 
         async function resetTotalNuvem() {
-            if (confirm("⚠️ ATENÇÃO: Deseja apagar TODO o cache de semanas gravadas na nuvem e começar totalmente do zero?")) {
+            if (confirm("⚠️ ATENÇÃO: Deseja apagar TODO o cache de semanas gravadas na nuvem e começar totalmente do zero?\n\n(Dica: clique antes em 'Baixar Backup' para guardar uma cópia.)")) {
                 dadosGlobaisNuvem.semanas = {};
                 await salvarNaNuvem();
                 atualizarDatasSemana();
@@ -1080,21 +1316,9 @@
             mostrarToast("✅ Sincronizado com sucesso!");
         }
 
-        // ===== BACKUP NO COMPUTADOR =====
+        // ===== BACKUP NO COMPUTADOR (DOWNLOAD) =====
         function baixarBackupLocal() {
-            const semanas = Object.assign({}, dadosGlobaisNuvem.semanas || {});
-            semanas[getWeekKey()] = document.getElementById('weekGridContainer').innerHTML; // inclui o que está na tela
-            const backup = {
-                versao: 'v4.05',
-                geradoEm: new Date().toISOString(),
-                semanas,
-                historico: JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {},
-                treinamentos: JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [],
-                feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
-                dispensados: dadosGlobaisNuvem.dispensados || [],
-                frequentes: JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || null,
-                palavrasChave: JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || null
-            };
+            const backup = montarBackup();
             const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -1103,7 +1327,7 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            mostrarToast("💽 Backup salvo no computador!");
+            mostrarToast("💽 Backup baixado no computador!");
         }
 
         function restaurarBackupLocal(input) {
@@ -1111,25 +1335,7 @@
             if (!arquivo) return;
             const leitor = new FileReader();
             leitor.onload = async () => {
-                try {
-                    const b = JSON.parse(leitor.result);
-                    if (!b.semanas) throw new Error('Arquivo inválido');
-                    if (!confirm("Restaurar este backup? Isso substitui os dados atuais (e envia para a nuvem).")) { input.value = ''; return; }
-                    dadosGlobaisNuvem = { semanas: b.semanas, historico: b.historico || {}, treinamentos: b.treinamentos || [], feriados: b.feriados || [], dispensados: b.dispensados || [] };
-                    localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(b.historico || {}));
-                    localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(b.treinamentos || []));
-                    localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(b.feriados || []));
-                    if (b.frequentes) localStorage.setItem('programacao_frequentes_custom', JSON.stringify(b.frequentes));
-                    if (b.palavrasChave) localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(b.palavrasChave));
-                    carregarFrequentes();
-                    await salvarNaNuvem();
-                    renderizarAvisos();
-                    atualizarDatasSemana();
-                    mostrarToast("✅ Backup restaurado!");
-                } catch (e) {
-                    console.error(e);
-                    mostrarToast("❌ Arquivo de backup inválido.", "erro");
-                }
+                await aplicarBackupTexto(leitor.result);
                 input.value = '';
             };
             leitor.readAsText(arquivo);
@@ -1167,6 +1373,7 @@
             document.getElementById('popTreinoFim').valueAsDate = new Date();
             document.getElementById('popFeriadoData').valueAsDate = new Date();
             
+            await recuperarHandleSalvo();
             await sincronizarComNuvem();
             renderizarAvisos();
 
