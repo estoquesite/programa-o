@@ -496,7 +496,7 @@
 
         function mesclarComEspelhoLocal() {
             let local = null;
-            try { local = JSON.parse(localStorage.getItem(CHAVE_ESPELHO_LOCAL)); } catch (e) {}
+            try { local = JSON.parse(localStorage.getItem(CHAVE_ESPELHO_LOCAL)); } catch (e) { console.warn("Espelho corrompido, ignorado:", e); }
             if (!local) return false;
             let mudou = false;
             if (!dadosGlobaisNuvem.semanas) dadosGlobaisNuvem.semanas = {};
@@ -1006,6 +1006,7 @@
         }
 
         async function sincronizarComNuvem() {
+            if (!window.supabase || !supabaseClient) { mesclarComEspelhoLocal(); return; }
             try {
                 let { data, error } = await supabaseClient
                     .from('app_dados_programacao')
@@ -1208,28 +1209,36 @@ window.addEventListener('load', function () {
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('popTreinoInicio').valueAsDate = new Date();
-            document.getElementById('popTreinoFim').valueAsDate = new Date();
-            document.getElementById('popFeriadoData').valueAsDate = new Date();
+            // 1) Primeiro: desenhar a semana (independe da nuvem e de qualquer dado salvo)
+            try {
+                document.getElementById('popTreinoInicio').valueAsDate = new Date();
+                document.getElementById('popTreinoFim').valueAsDate = new Date();
+                document.getElementById('popFeriadoData').valueAsDate = new Date();
+                document.getElementById('inputDataEvento').valueAsDate = new Date();
+                carregarFrequentes();
+                definirSemanaAtualComRegraSexta();
+            } catch (e) { console.error("Falha ao desenhar a semana:", e); }
 
-            await recuperarHandleSalvo();
-            await sincronizarComNuvem();
-            renderizarAvisos();
+            // 2) Depois: recuperar o arquivo salvo e sincronizar (erros aqui não apagam a grade)
+            try { await recuperarHandleSalvo(); } catch (e) { console.error("Handle:", e); }
+            try { await sincronizarComNuvem(); } catch (e) { console.error("Nuvem:", e); }
+            try { renderizarAvisos(); } catch (e) { console.error("Avisos:", e); }
+            try { atualizarDatasSemana(); } catch (e) { console.error("Redesenho:", e); }
 
-            const manifestObj = {
-                "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
-                "display": "standalone", "background_color": "#f9f9f9", "theme_color": "#1b5e20",
-                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", "sizes": "512x512", "type": "image/png"}]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
-            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+            // 3) Manifesto (PWA)
+            try {
+                const manifestObj = {
+                    "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
+                    "display": "standalone", "background_color": "#f9f9f9", "theme_color": "#1b5e20",
+                    "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", "sizes": "512x512", "type": "image/png"}]
+                };
+                const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
+                document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+            } catch (e) { console.error("Manifesto:", e); }
 
             if (localStorage.getItem('dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
             }
-            carregarFrequentes();
-            definirSemanaAtualComRegraSexta();
-            document.getElementById('inputDataEvento').valueAsDate = new Date();
         });
 
         window.addEventListener('beforeunload', (e) => {
