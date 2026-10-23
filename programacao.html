@@ -269,6 +269,18 @@
         .dark .tarefa-extra-box { background: #431407; color: #fed7aa; border-color: #9a3412; border-left-color: #fb923c; }
         .dark .resource-tag { background: #042f2e; color: #99f6e4; border-color: #115e59; border-left-color: #2dd4bf; }
 
+        /* ===== SIPAT: destaque magenta ===== */
+        .task-box.sipat-box {
+            background: #fdf4ff; color: #86198f; font-weight: 800;
+            border: 1px solid #f0abfc; border-left: 4px solid #c026d3;
+            box-shadow: 0 0 0 2px rgba(192,38,211,.25), 0 1px 3px rgba(15,23,42,.10);
+        }
+        .dark .task-box.sipat-box {
+            background: #4a044e; color: #f5d0fe;
+            border-color: #a21caf; border-left-color: #e879f9;
+            box-shadow: 0 0 0 2px rgba(232,121,249,.30);
+        }
+
         .day-resources { border-top: 2px dashed #99f6e4; }
         .dark .day-resources { border-top-color: #115e59; }
         .resources-title { color: #0f766e; }
@@ -428,6 +440,7 @@
                         <option value="task">🟢 Tarefa (Caixa Verde)</option>
                         <option value="extra">⚡ Tarefa Extra / Fora de Rotina (Caixa Laranja)</option>
                         <option value="resource">🚙 Recurso / Equipamento (Caixa Verde Vale)</option>
+                        <option value="sipat">🟣 SIPAT (Destaque Magenta)</option>
                     </select>
                 </div>
             </div>
@@ -1920,6 +1933,12 @@
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', 'iniciarArrasto(event)');
                     div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
+                    card.querySelector('.tasks-container').appendChild(div);
+                } else if (tipo === 'sipat') {
+                    div.className = 'task-box sipat-box';
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} 🦺 <span class="item-text">${desc}</span></span>${controls}`;
                     card.querySelector('.tasks-container').appendChild(div);
                 } else {
                     div.className = 'resource-tag';
