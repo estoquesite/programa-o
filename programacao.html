@@ -734,20 +734,23 @@
             }
         }
 
-        async function salvarNoComputador() {
-            if (!window.showSaveFilePicker) { baixarBackupLocal(); return; }
-            if (!arquivoHandle) { await vincularArquivoNoComputador(); return; }
-            let ok = await gravarArquivoLocal();
-            if (!ok) {
-                try {
-                    const p = await arquivoHandle.requestPermission({ mode: 'readwrite' });
-                    if (p === 'granted') ok = await gravarArquivoLocal();
-                } catch (e) { console.error(e); }
-            }
-            if (ok) mostrarToast(`💾 Salvo no computador: ${arquivoHandle.name}`);
-            else mostrarToast("⚠️ Não foi possível gravar. Escolha o arquivo de novo.", "aviso");
-            if (!ok) { arquivoHandle = null; await vincularArquivoNoComputador(); }
-        }
+        function montarBackup() {
+    const semanas = Object.assign({}, dadosGlobaisNuvem.semanas || {});
+    const grid = document.getElementById('weekGridContainer');
+    if (grid && grid.innerHTML.trim()) semanas[getWeekKey()] = grid.innerHTML;
+    return {
+        versao: 'v4.06',
+        geradoEm: new Date().toISOString(),
+        semanas,
+        historico: JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {},
+        treinamentos: JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [],
+        feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
+        dispensados: dadosGlobaisNuvem.dispensados || [],
+        frequentes: JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || null,
+        palavrasChave: JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || null,
+        scriptTexto: document.getElementById('inputScriptTexto').value || ''
+    };
+}
 
         async function abrirArquivoDoComputador() {
             if (!window.showOpenFilePicker) { document.getElementById('inputRestaurarBackup').click(); return; }
@@ -797,6 +800,7 @@
                 if (b.frequentes) localStorage.setItem('programacao_frequentes_custom', JSON.stringify(b.frequentes));
                 if (b.palavrasChave) localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(b.palavrasChave));
                 carregarFrequentes();
+                if (b.scriptTexto) document.getElementById('inputScriptTexto').value = b.scriptTexto;
                 await salvarNaNuvem();
                 renderizarAvisos();
                 atualizarDatasSemana();
@@ -2308,4 +2312,10 @@
         }
     </script>
 </body>
+    window.addEventListener('beforeunload', (e) => {
+    if (!arquivoHandle || arquivoPendente) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
 </html>
