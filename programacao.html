@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.11 Local)</title>
+    <title>Programação Semanal Interativa (v4.12 Local)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
@@ -229,12 +229,15 @@
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
             <button id="btnSalvarBarra" onclick="salvarTudo()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar</button>
             <button onclick="salvarNoComputador()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Escolhe um arquivo no computador; depois, cada Salvar grava nele também">💻 Salvar no computador</button>
+            <button onclick="exportarBackupCompleto()" class="bg-teal-700 hover:bg-teal-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Baixa um arquivo com TODAS as semanas, para enviar a outra pessoa">📦 Exportar tudo (backup)</button>
             <button onclick="abrirArquivoDoComputador()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-1.5 rounded-lg text-xs font-bold transition">📂 Abrir arquivo</button>
             <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
             <button onclick="imprimirNitido()" class="bg-gray-900 hover:bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Página de impressão sem sombras, igual à tela">🖨️ Imprimir nítido</button>
             <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
         </div>
+        <!-- Seletor de arquivo para navegadores sem janela de abrir arquivo (Firefox, Safari) -->
+        <input type="file" id="inputArquivoAbrir" accept=".json,application/json" class="hidden" onchange="lerArquivoSelecionado(this)">
 
         <!-- ADICIONAR NOVO ITEM -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
@@ -410,7 +413,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.11 Local</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.12 Local</span>
             <button id="btnSalvarMov" onclick="salvarTudo()" class="px-3 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold shadow-sm">💾 Salvar</button>
         </div>
     </div>
@@ -561,6 +564,40 @@
             movimentosPendentes = false;
             atualizarBotaoSalvar();
             mostrarToast(noArquivo ? `💾 Salvo no navegador e em "${arquivoHandle.name}"!` : '💾 Programação salva no navegador!');
+        }
+
+        // ===== BACKUP COMPLETO (todas as semanas em um único arquivo) =====
+        function exportarBackupCompleto() {
+            snapshotSemanaExibida();
+            persistirLocal();
+            const conteudo = JSON.stringify(estado, null, 2);
+            const blob = new Blob([conteudo], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `programacao_semanal_backup_${dataISO(new Date())}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 3000);
+            mostrarToast("📦 Backup baixado! Envie esse arquivo; a outra pessoa abre com 📂 Abrir arquivo.", "info");
+        }
+
+        // Aplica os dados de um arquivo importado (todas as semanas)
+        function aplicarDadosImportados(dados) {
+            if (!dados || typeof dados !== 'object' || !dados.semanas) {
+                throw new Error('formato inválido');
+            }
+            carregarEstado(dados);
+            persistirLocal();
+            atualizarCampoEmoji();
+            carregarFrequentes();
+            carregarTipos();
+            renderizarAvisos();
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            movimentosPendentes = false;
+            atualizarBotaoSalvar();
+            mostrarToast("📂 Arquivo carregado! Todas as semanas foram importadas.");
         }
 
         // ===== EMOJI (fica salvo) =====
@@ -1489,7 +1526,7 @@
             const estilos = [...document.querySelectorAll('style')].map(s => s.innerHTML).join('\n');
 
             const html = `<!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <title>Programação Semanal ${semana} (${ano})</title>
@@ -1592,26 +1629,35 @@ body { background: #ffffff !important; padding: 0 !important; margin: 0; }
             }
         }
 
+        // Abre um arquivo de backup. Usa a janela nativa quando existe; senão, o seletor comum do navegador.
         async function abrirArquivoDoComputador() {
-            if (!window.showOpenFilePicker) { alert("Use Chrome ou Edge no computador para abrir arquivos."); return; }
+            if (!window.showOpenFilePicker) {
+                document.getElementById('inputArquivoAbrir').click();
+                return;
+            }
             try {
                 const [h] = await window.showOpenFilePicker({ types: [{ description: 'Programação Semanal', accept: { 'application/json': ['.json'] } }] });
                 const dados = JSON.parse(await (await h.getFile()).text());
                 if (!confirm("Substituir os dados atuais pelos deste arquivo?")) return;
                 arquivoHandle = h;
                 await idbSet(h);
-                carregarEstado(dados);
-                persistirLocal();
-                atualizarCampoEmoji();
-                carregarFrequentes();
-                carregarTipos();
-                renderizarAvisos();
-                renderSemana(semanaExibida.ano, semanaExibida.sem);
-                movimentosPendentes = false;
-                atualizarBotaoSalvar();
-                mostrarToast("📂 Arquivo carregado!");
+                aplicarDadosImportados(dados);
             } catch (e) {
                 if (e.name !== 'AbortError') alert("Arquivo inválido.");
+            }
+        }
+
+        async function lerArquivoSelecionado(input) {
+            const arq = input.files[0];
+            input.value = '';
+            if (!arq) return;
+            try {
+                const dados = JSON.parse(await arq.text());
+                if (!confirm("Substituir os dados atuais pelos deste arquivo?")) return;
+                arquivoHandle = null;
+                aplicarDadosImportados(dados);
+            } catch (e) {
+                alert("Arquivo inválido. Use um arquivo de backup (.json) exportado por este app.");
             }
         }
 
