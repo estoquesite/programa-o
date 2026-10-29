@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.12 Local)</title>
+    <title>Programação Semanal Interativa (v4.13 Local)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
@@ -413,7 +413,7 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.12 Local</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.13 Local</span>
             <button id="btnSalvarMov" onclick="salvarTudo()" class="px-3 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold shadow-sm">💾 Salvar</button>
         </div>
     </div>
@@ -477,6 +477,16 @@
                 .trim();
         }
 
+        // Remove resíduos visuais do arrastar (translúcido, sombra de ghost, filtro de busca)
+        function limparEstadoVisual(root) {
+            if (!root) return;
+            root.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag').forEach(el => {
+                el.classList.remove('dragging', 'sortable-ghost', 'sortable-chosen', 'sortable-drag', 'ring-2', 'ring-amber-400');
+                el.style.opacity = '';
+                el.style.display = '';
+            });
+        }
+
         // ===== SEMANAS (ISO) =====
         function dataParaSemana(d) {
             const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -525,9 +535,11 @@
             }
         }
 
+        // Copia a semana que está na tela para o estado, já limpa de resíduos visuais
         function snapshotSemanaExibida() {
             const cont = document.getElementById('weekGridContainer');
             if (!cont.querySelector('.day-card')) return;
+            limparEstadoVisual(cont);
             sincronizarChecks(cont);
             estado.semanas[chaveSemana(semanaExibida.ano, semanaExibida.sem)] = cont.innerHTML;
         }
@@ -552,7 +564,9 @@
             });
         }
 
+        // Salva a semana que está aberta e mantém a mesma semana na tela
         async function salvarTudo() {
+            const anoAtual = semanaExibida.ano, semAtual = semanaExibida.sem;
             snapshotSemanaExibida();
             const ok = persistirLocal();
             let noArquivo = false;
@@ -561,17 +575,17 @@
                 mostrarToast('❌ Não foi possível salvar.', 'erro');
                 return;
             }
+            renderSemana(anoAtual, semAtual);
             movimentosPendentes = false;
             atualizarBotaoSalvar();
-            mostrarToast(noArquivo ? `💾 Salvo no navegador e em "${arquivoHandle.name}"!` : '💾 Programação salva no navegador!');
+            mostrarToast(noArquivo ? `💾 Semana ${semAtual} salva no navegador e em "${arquivoHandle.name}"!` : `💾 Semana ${semAtual} salva no navegador!`);
         }
 
-        // ===== BACKUP COMPLETO (todas as semanas em um único arquivo) =====
+        // ===== BACKUP COMPLETO =====
         function exportarBackupCompleto() {
             snapshotSemanaExibida();
             persistirLocal();
-            const conteudo = JSON.stringify(estado, null, 2);
-            const blob = new Blob([conteudo], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -583,7 +597,6 @@
             mostrarToast("📦 Backup baixado! Envie esse arquivo; a outra pessoa abre com 📂 Abrir arquivo.", "info");
         }
 
-        // Aplica os dados de um arquivo importado (todas as semanas)
         function aplicarDadosImportados(dados) {
             if (!dados || typeof dados !== 'object' || !dados.semanas) {
                 throw new Error('formato inválido');
@@ -707,6 +720,7 @@
                 }
                 if (!dc.querySelector('.check-concluir-dia')) dc.insertAdjacentHTML('afterbegin', htmlBarraDia(f, e));
             });
+            limparEstadoVisual(doc.body);
             return doc.body.innerHTML;
         }
 
@@ -730,6 +744,13 @@
                 card.querySelector('.day-title').innerHTML = `${nome}<br><small>${pad2(d.getDate())}/${MESES[d.getMonth()]}</small>`;
                 aplicarEventosNoDia(card, iso);
             });
+
+            // A data do campo acompanha a semana aberta: hoje (se estiver nela) ou a segunda
+            const fimSem = new Date(seg); fimSem.setDate(seg.getDate() + 4);
+            const hojeISO = dataISO(new Date());
+            const dataPadrao = (hojeISO >= dataISO(seg) && hojeISO <= dataISO(fimSem)) ? hojeISO : dataISO(seg);
+            document.getElementById('inputDataEvento').value = dataPadrao;
+            document.getElementById('inputDataFim').value = '';
 
             reativarDragDrop();
             atualizarIndicador();
@@ -756,10 +777,12 @@
             irParaSemana(info.ano, info.sem);
         }
 
+        // Ao escolher uma data, vai para a semana dela e mantém a data escolhida no campo
         function irParaDataEvento(dataStr) {
             if (!dataStr) return;
             const info = dataParaSemana(parseISO(dataStr));
             irParaSemana(info.ano, info.sem);
+            document.getElementById('inputDataEvento').value = dataStr;
         }
 
         function aplicarEventosNoDia(card, iso) {
@@ -1357,8 +1380,10 @@
 
             if (adicionados === 0 && bloqueados === 0) { alert("Nenhum dia útil no período escolhido."); return; }
 
+            const dataMantida = ini;
             document.getElementById('inputDesc').value = "";
             renderSemana(semanaExibida.ano, semanaExibida.sem);
+            document.getElementById('inputDataEvento').value = dataMantida;
             alterou();
             const msg = bloqueados
                 ? `✅ Adicionado em ${adicionados} dia(s). ${bloqueados} dia(s) estavam bloqueados (feriado/emenda).`
@@ -1441,6 +1466,8 @@
 
         function aoSoltarItem(evt) {
             mostrarDock(false);
+            // Limpa a classe de arrasto já no momento de soltar, para o item nunca ficar translúcido
+            limparEstadoVisual(document.getElementById('weekGridContainer'));
             const item = evt.item;
             const pt = pontoDoEvento(evt);
             const chip = pt ? document.elementFromPoint(pt.x, pt.y)?.closest('.dock-semana') : null;
@@ -1459,10 +1486,12 @@
                 return;
             }
 
-            item.classList.remove('dragging', 'sortable-ghost', 'sortable-chosen', 'sortable-drag');
             sincronizarChecks(item);
+            const copia = item.cloneNode(true);
+            copia.classList.remove('dragging', 'sortable-ghost', 'sortable-chosen', 'sortable-drag');
+            copia.style.opacity = '';
             (ehRecurso ? card.querySelector('.day-resources') : card.querySelector('.tasks-container'))
-                .insertAdjacentHTML('beforeend', item.outerHTML);
+                .insertAdjacentHTML('beforeend', copia.outerHTML);
             estado.semanas[chaveSemana(ano, sem)] = doc.body.innerHTML;
 
             item.remove();
@@ -1629,7 +1658,6 @@ body { background: #ffffff !important; padding: 0 !important; margin: 0; }
             }
         }
 
-        // Abre um arquivo de backup. Usa a janela nativa quando existe; senão, o seletor comum do navegador.
         async function abrirArquivoDoComputador() {
             if (!window.showOpenFilePicker) {
                 document.getElementById('inputArquivoAbrir').click();
@@ -1683,7 +1711,6 @@ body { background: #ffffff !important; padding: 0 !important; margin: 0; }
             document.getElementById('popTreinoInicio').valueAsDate = new Date();
             document.getElementById('popTreinoFim').valueAsDate = new Date();
             document.getElementById('popFeriadoData').valueAsDate = new Date();
-            document.getElementById('inputDataEvento').valueAsDate = new Date();
 
             carregarEstado();
             persistirLocal();
