@@ -344,6 +344,22 @@
         .aviso-feriado.aviso-normal { background:linear-gradient(135deg,#0f766e,#14b8a6); }
         .aviso-chip small { font-weight:600; opacity:.9; display:block; }
         .aviso-prazo { background:rgba(0,0,0,.25); padding:2px 8px; border-radius:999px; white-space:nowrap; }
+
+        /* ===== v4.06: ARRASTAR ENTRE SEMANAS + BOTÃO SALVAR ===== */
+        .dock-semanas {
+            position: fixed; left: 0; right: 0; bottom: 60px; z-index: 45;
+            display: none; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 10px;
+            background: rgba(255,255,255,.97); border-top: 2px dashed #16a34a;
+        }
+        .dark .dock-semanas { background: rgba(17,24,39,.97); }
+        .dock-semanas.dock-ativo { display: flex; }
+        .dock-semana {
+            min-width: 96px; padding: 12px 10px; border-radius: 12px; text-align: center;
+            background: #dcfce7; color: #14532d; border: 2px dashed #16a34a;
+            font-size: 12px; font-weight: 800;
+        }
+        .dark .dock-semana { background: #052e16; color: #bbf7d0; }
+        .btn-pendente { background: #d97706 !important; animation: pulsar 1.2s infinite; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
@@ -463,6 +479,28 @@
                 <button onclick="gerirTiposCustom()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">⚙️ Gerir</button>
             </div>
 
+            <!-- EMOJI (OPCIONAL) -->
+            <div>
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Emoji (opcional)</label>
+                <div class="flex gap-2 items-center">
+                    <input type="text" id="inputEmoji" maxlength="8" placeholder="😀" class="w-14 text-center text-lg p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg">
+                    <div class="flex flex-wrap gap-1 flex-1">
+                        <button type="button" onclick="escolherEmoji('🚚')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🚚</button>
+                        <button type="button" onclick="escolherEmoji('🔧')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🔧</button>
+                        <button type="button" onclick="escolherEmoji('📦')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">📦</button>
+                        <button type="button" onclick="escolherEmoji('🧰')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🧰</button>
+                        <button type="button" onclick="escolherEmoji('👥')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">👥</button>
+                        <button type="button" onclick="escolherEmoji('🚗')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🚗</button>
+                        <button type="button" onclick="escolherEmoji('📋')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">📋</button>
+                        <button type="button" onclick="escolherEmoji('✅')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">✅</button>
+                        <button type="button" onclick="escolherEmoji('⚠️')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">⚠️</button>
+                        <button type="button" onclick="escolherEmoji('🎓')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🎓</button>
+                        <button type="button" onclick="escolherEmoji('🧹')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🧹</button>
+                        <button type="button" onclick="escolherEmoji('🕒')" class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-base">🕒</button>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
                 <input type="text" id="inputDesc" placeholder="EX: CAMINHÃO PARTE DA MANHÃ..." class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
@@ -566,12 +604,16 @@
         </div>
     </div>
 
+    <!-- FAIXA DE SEMANAS DE DESTINO (ARRASTAR ENTRE SEMANAS) -->
+    <div id="dockSemanas" class="dock-semanas"></div>
+
     <!-- BARRA INFERIOR FIXA -->
     <div class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.05 Nuvem Pro</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.06 Nuvem Pro</span>
+            <button id="btnSalvarMov" onclick="salvarMovimentos()" class="px-3 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold shadow-sm">💾 Salvar</button>
         </div>
     </div>
 
@@ -1796,7 +1838,6 @@
                 cont.setAttribute('ondrop', 'soltarItem(event)');
             });
 
-            // Ativa o SortableJS para suporte nativo em celular (Touch) e Desktop
             document.querySelectorAll('.tasks-container, .day-resources').forEach(el => {
                 if (el._sortableInstance) el._sortableInstance.destroy();
                 el._sortableInstance = new Sortable(el, {
@@ -1804,9 +1845,8 @@
                     animation: 150,
                     handle: '.drag-handle',
                     ghostClass: 'sortable-ghost',
-                    onEnd: async () => {
-                        await guardarEstadoDOM();
-                    }
+                    onStart: () => mostrarDock(true),
+                    onEnd: (evt) => aoSoltarItem(evt)
                 });
             });
         }
@@ -1936,6 +1976,10 @@
             let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
 
             if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
+
+            const emojiEscolhido = document.getElementById('inputEmoji').value.trim();
+            if (emojiEscolhido) desc = `${emojiEscolhido} ${desc}`;
+            document.getElementById('inputEmoji').value = "";
 
             const dObj = new Date(dataStr + 'T00:00:00');
             const diaNum = dObj.getDay();
@@ -2183,6 +2227,150 @@
             } catch (e) {
                 if (e.name !== 'AbortError') alert("Arquivo inválido.");
             }
+        }
+
+        // ===== v4.06: MOVER ITENS ENTRE SEMANAS =====
+        let movimentosPendentes = false;
+        const DIAS_SEMANA = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+
+        function semanaDeData(d) {
+            const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const dayNum = x.getUTCDay() || 7;
+            x.setUTCDate(x.getUTCDate() + 4 - dayNum);
+            const inicioAno = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+            return { ano: x.getUTCFullYear(), semana: Math.ceil((((x - inicioAno) / 86400000) + 1) / 7) };
+        }
+
+        function semanasVizinhas(antes = 3, depois = 3) {
+            const ano = parseInt(document.getElementById('inputAno').value);
+            const sem = parseInt(document.getElementById('inputNumSemana').value);
+            const segunda = getDateRangeOfWeek(sem, ano)[0];
+            const lista = [];
+            for (let k = -antes; k <= depois; k++) {
+                if (k === 0) continue;
+                const d = new Date(segunda);
+                d.setDate(segunda.getDate() + k * 7);
+                lista.push(semanaDeData(d));
+            }
+            return lista;
+        }
+
+        function mostrarDock(mostrar) {
+            const dock = document.getElementById('dockSemanas');
+            if (!dock) return;
+            if (mostrar) {
+                dock.innerHTML = `<span class="w-full text-center text-[11px] font-bold text-gray-500 dark:text-gray-300">⬇️ Solte o item na semana de destino</span>` +
+                    semanasVizinhas().map(s => `<div class="dock-semana" data-ano="${s.ano}" data-semana="${s.semana}">Semana ${s.semana}<br><small>${s.ano}</small></div>`).join('');
+                dock.classList.add('dock-ativo');
+            } else {
+                dock.classList.remove('dock-ativo');
+            }
+        }
+
+        function gerarGridBase() {
+            const linha = (cls, txt) => `<div class="${cls}" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">${txt}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>`;
+            const card = dia => `
+                <div class="day-card" data-dia-nome="${dia}">
+                    <div class="day-title">${dia}<br><small>--/---</small></div>
+                    <div class="day-content">
+                        <div class="tasks-container">
+                            ${linha('task-box', '🕒 HORA CERTA')}
+                            ${linha('task-box', '📦 MOVIMENTAÇÃO G4')}
+                        </div>
+                    </div>
+                    <div class="day-resources">
+                        <div class="resources-title">Recursos</div>
+                        ${linha('resource-tag', 'CARRO')}
+                        ${linha('resource-tag', 'EMPILHADEIRA G4')}
+                    </div>
+                </div>`;
+            return DIAS_SEMANA.map(card).join('');
+        }
+
+        function copiarItemParaSemana(item) {
+            const copia = item.cloneNode(true);
+            copia.classList.remove('dragging', 'sortable-ghost', 'sortable-chosen', 'sortable-drag');
+            const originais = item.querySelectorAll('input[type="checkbox"]');
+            const copias = copia.querySelectorAll('input[type="checkbox"]');
+            originais.forEach((cb, i) => {
+                if (!copias[i]) return;
+                copias[i].checked = cb.checked;
+                if (cb.checked) copias[i].setAttribute('checked', '');
+                else copias[i].removeAttribute('checked');
+            });
+            return copia;
+        }
+
+        function pontoDoEvento(evt) {
+            const e = evt.originalEvent || evt;
+            const p = e.changedTouches ? e.changedTouches[0] : e;
+            return p ? { x: p.clientX, y: p.clientY } : null;
+        }
+
+        async function aoSoltarItem(evt) {
+            mostrarDock(false);
+            const pt = pontoDoEvento(evt);
+            const alvoEl = pt ? document.elementFromPoint(pt.x, pt.y) : null;
+            const chip = alvoEl ? alvoEl.closest('.dock-semana') : null;
+
+            if (!chip) { await guardarEstadoDOM(); return; }
+
+            const alvoAno = parseInt(chip.dataset.ano);
+            const alvoSem = parseInt(chip.dataset.semana);
+            const item = evt.item;
+            const ehRecurso = item.parentElement.classList.contains('day-resources');
+            const dia = item.closest('.day-card').dataset.diaNome;
+            const chaveAtual = getWeekKey();
+            const chaveAlvo = `prog_grid_${alvoAno}_semana_${alvoSem}`;
+
+            // Monta a semana de destino (salva ou base)
+            const base = (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[chaveAlvo]) || gerarGridBase();
+            const doc = new DOMParser().parseFromString(garantirCaixinhasEmHtmlSalvo(base), 'text/html');
+            const card = doc.querySelector(`.day-card[data-dia-nome="${dia}"]`);
+            if (!card) return;
+
+            if (card.querySelector('.check-feriado')?.checked || card.querySelector('.check-emenda')?.checked) {
+                mostrarToast('⚠️ Esse dia está bloqueado (feriado/emenda) na semana de destino', 'aviso');
+                await guardarEstadoDOM();
+                return;
+            }
+
+            const destino = ehRecurso ? card.querySelector('.day-resources') : card.querySelector('.tasks-container');
+            destino.insertAdjacentHTML('beforeend', copiarItemParaSemana(item).outerHTML);
+
+            if (!dadosGlobaisNuvem.semanas) dadosGlobaisNuvem.semanas = {};
+            dadosGlobaisNuvem.semanas[chaveAlvo] = doc.body.innerHTML;
+
+            item.remove();
+            dadosGlobaisNuvem.semanas[chaveAtual] = document.getElementById('weekGridContainer').innerHTML;
+
+            movimentosPendentes = true;
+            atualizarBotaoSalvarMov();
+            atualizarIndicadorProgresso();
+            mostrarToast(`↪️ Movido para a Semana ${alvoSem}. Clique em Salvar.`, 'info');
+        }
+
+        function atualizarBotaoSalvarMov() {
+            const b = document.getElementById('btnSalvarMov');
+            if (!b) return;
+            b.classList.toggle('btn-pendente', movimentosPendentes);
+            b.textContent = movimentosPendentes ? '💾 Salvar alterações •' : '💾 Salvar';
+        }
+
+        async function salvarMovimentos() {
+            const ok = await salvarNaNuvem();
+            if (ok) {
+                movimentosPendentes = false;
+                atualizarBotaoSalvarMov();
+                mostrarToast('💾 Alterações salvas na nuvem!');
+            } else {
+                mostrarToast('❌ Erro ao salvar na nuvem.', 'erro');
+            }
+        }
+
+        // ===== EMOJI =====
+        function escolherEmoji(emoji) {
+            document.getElementById('inputEmoji').value = emoji;
         }
     </script>
 </body>
