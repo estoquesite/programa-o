@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programação Semanal Interativa (v4.08 Local)</title>
-    <!-- Tailwind CSS -->
+    <title>Programação Semanal Interativa (v4.09 Local)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- SortableJS para suporte a Touch e Mobile no Drag & Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <!-- Manifesto Dinâmico via JavaScript -->
     <link id="pwa-manifest" rel="manifest" href="">
     <style>
         :root {
             --primary-color: #1b5e20;
-            --secondary-color: #e8f5e9;
             --bg-color: #f9f9f9;
             --card-bg: #ffffff;
             --text-color: #333333;
-            --border-color: #d0d0d0;
         }
         * { box-sizing: border-box; }
         body {
@@ -30,131 +25,64 @@
             margin: 0;
             padding: 10px;
         }
-        .container {
-            max-width: 1250px;
-            margin: 0 auto;
-        }
-        .header {
-            position: relative;
-            text-align: center;
-            margin-bottom: 20px;
-            padding-top: 5px;
-        }
+        .container { max-width: 1250px; margin: 0 auto; }
+        .header { position: relative; text-align: center; margin-bottom: 20px; padding-top: 5px; }
         .header h2 {
-            color: var(--primary-color);
-            font-size: 26px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            color: var(--primary-color); font-size: 26px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px; margin: 0;
         }
         .week-badge {
-            position: absolute;
-            top: 0;
-            right: 5px;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 13px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-            text-transform: uppercase;
+            position: absolute; top: 0; right: 5px; background-color: var(--primary-color);
+            color: white; padding: 6px 14px; border-radius: 6px; font-weight: bold;
+            font-size: 13px; text-transform: uppercase;
         }
         .week-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: stretch;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 10px; margin-bottom: 20px; align-items: stretch;
         }
         @media (max-width: 768px) {
             .week-grid.mobile-single-day > .day-card { display: none !important; }
             .week-grid.mobile-single-day > .day-card.active-day { display: flex !important; }
         }
-        .day-content {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            margin-bottom: 8px;
-        }
-        .tasks-container {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex-grow: 1;
-            min-height: 40px;
-        }
-        .day-title small { font-size: 10px; font-weight: 700; color: #dcfce7; }
-        .task-done {
-            opacity: 0.6;
-            text-decoration: line-through;
-            background-color: #e2e8f0 !important;
-            border-left-color: #94a3b8 !important;
-            color: #64748b !important;
-        }
-        .day-resources {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            border-top: 2px dashed #99f6e4;
-            padding-top: 6px;
-            margin-top: auto;
-            background: #ffffff;
-            flex-shrink: 0;
-            min-height: 35px;
-        }
-        .dark .day-resources { background: #1f2937; border-top-color: #115e59; }
-        .resources-title {
-            font-size: 8px;
-            font-weight: 800;
-            color: #0f766e;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-        .drag-handle {
-            cursor: grab;
-            font-size: 12px;
-            color: #888;
-            padding: 0 2px;
-            user-select: none;
-            flex-shrink: 0;
-        }
-        .drag-handle:active { cursor: grabbing; }
-        .dragging { opacity: 0.4; }
-        .sortable-ghost { opacity: 0.35; background-color: #c8e6c9 !important; }
-
-        /* ===== CAIXAS DE ITENS ===== */
-        .task-box > span:first-child,
-        .tarefa-extra-box > span:first-child,
-        .treinamento-box > span:first-child,
-        .resource-tag > span:first-child { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
-        .treinamento-box > span:first-child { align-items: flex-start; }
-        .item-controls { display: flex; gap: 3px; align-items: center; flex-shrink: 0; margin-left: 6px; }
-        .treino-info { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
-        .treino-info small { font-size: 9px; font-weight: 600; opacity: .85; }
-
+        .day-content { display: flex; flex-direction: column; flex-grow: 1; margin-bottom: 8px; }
+        .tasks-container { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-height: 40px; }
         .day-card {
             background: #ffffff; border: 1px solid #e2e8f0; border-top: 5px solid #16a34a;
             border-radius: 14px; padding: 10px; box-shadow: 0 4px 12px rgba(15,23,42,.08);
             display: flex; flex-direction: column; position: relative;
         }
-        .dark .day-card { background: #1f2937; border-color: #374151; border-top-color: #22c55e; box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+        .dark .day-card { background: #1f2937; border-color: #374151; border-top-color: #22c55e; }
         .day-title {
-            font-size: 13px; font-weight: 900; text-align: center;
-            background: linear-gradient(135deg, #15803d 0%, #22c55e 100%); color: #ffffff; border: none;
-            border-radius: 10px; padding: 6px 4px; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,.25);
-            box-shadow: 0 2px 6px rgba(21,128,61,.35); flex-shrink: 0;
+            font-size: 13px; font-weight: 900; text-align: center; color: #ffffff;
+            background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+            border-radius: 10px; padding: 6px 4px; margin-bottom: 6px;
+            text-shadow: 0 1px 2px rgba(0,0,0,.25); box-shadow: 0 2px 6px rgba(21,128,61,.35); flex-shrink: 0;
         }
+        .day-title small { font-size: 10px; font-weight: 700; color: #dcfce7; }
+        .day-resources {
+            display: flex; flex-direction: column; gap: 4px; border-top: 2px dashed #99f6e4;
+            padding-top: 6px; margin-top: auto; background: #ffffff; flex-shrink: 0; min-height: 35px;
+        }
+        .dark .day-resources { background: #1f2937; border-top-color: #115e59; }
+        .resources-title {
+            font-size: 8px; font-weight: 800; color: #0f766e; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 2px;
+        }
+        .drag-handle { cursor: grab; font-size: 12px; color: #888; padding: 0 2px; user-select: none; flex-shrink: 0; }
+        .drag-handle:active { cursor: grabbing; }
+        .dragging { opacity: 0.4; }
+        .sortable-ghost { opacity: 0.35; background-color: #c8e6c9 !important; }
 
         .task-box, .tarefa-extra-box, .treinamento-box, .resource-tag {
             font-size: 10px; font-weight: 600; display: flex; justify-content: space-between;
             border-radius: 10px; padding: 6px 8px; text-align: left; align-items: center;
             box-shadow: 0 1px 3px rgba(15,23,42,.10); cursor: grab;
         }
-        .task-box:active, .tarefa-extra-box:active, .treinamento-box:active, .resource-tag:active { cursor: grabbing; }
+        .task-box > span:first-child, .tarefa-extra-box > span:first-child,
+        .treinamento-box > span:first-child, .resource-tag > span:first-child { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+        .item-controls { display: flex; gap: 3px; align-items: center; flex-shrink: 0; margin-left: 6px; }
+        .treino-info { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+        .treino-info small { font-size: 9px; font-weight: 600; opacity: .85; }
         .task-box { background: #f0fdf4; color: #14532d; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; }
         .treinamento-box { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; border-left: 4px solid #6366f1; }
         .tarefa-extra-box { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; border-left: 4px solid #f97316; }
@@ -163,8 +91,8 @@
         .dark .treinamento-box { background: #1e1b4b; color: #c7d2fe; border-color: #3730a3; border-left-color: #818cf8; }
         .dark .tarefa-extra-box { background: #431407; color: #fed7aa; border-color: #9a3412; border-left-color: #fb923c; }
         .dark .resource-tag { background: #042f2e; color: #99f6e4; border-color: #115e59; border-left-color: #2dd4bf; }
+        .task-done { opacity: 0.6; text-decoration: line-through; background-color: #e2e8f0 !important; border-left-color: #94a3b8 !important; color: #64748b !important; }
 
-        /* ===== TIPOS DE ENTRADA COM COR PERSONALIZADA ===== */
         .task-box.tipo-custom {
             background: color-mix(in srgb, var(--tc) 14%, #fff);
             border: 1px solid color-mix(in srgb, var(--tc) 40%, #fff);
@@ -177,19 +105,16 @@
             border-left-color: var(--tc);
             color: color-mix(in srgb, var(--tc) 35%, #fff);
         }
-        .task-box.task-done { border-left-color: #94a3b8 !important; }
 
         .btn-action-item {
             width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 6px; font-size: 11px; background: rgba(255,255,255,.75); padding: 0;
-            border: none; cursor: pointer;
+            border-radius: 6px; font-size: 11px; background: rgba(255,255,255,.75); padding: 0; border: none; cursor: pointer;
         }
         .dark .btn-action-item { background: rgba(255,255,255,.10); }
         .btn-edit-item:hover { background: #e0e7ff; }
         .btn-delete-item { color: #dc2626; }
         .btn-delete-item:hover { background: #fee2e2; }
 
-        /* ===== IMPRESSÃO: sai igual à tela (sem botões de edição) ===== */
         @page { size: A4 landscape; margin: 8mm; }
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -200,28 +125,21 @@
             .header { margin-bottom: 10px; }
             .header .flex { justify-content: center !important; }
             .week-grid, .week-grid.mobile-single-day {
-                display: grid !important;
-                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+                display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
                 gap: 8px; margin-bottom: 0;
             }
-            .week-grid > .day-card, .week-grid.mobile-single-day > .day-card {
-                display: flex !important; break-inside: avoid; page-break-inside: avoid;
-            }
+            .week-grid > .day-card, .week-grid.mobile-single-day > .day-card { display: flex !important; break-inside: avoid; }
             .item-controls, .drag-handle, input[type="checkbox"] { display: none !important; }
         }
 
-        /* ===== PAINEL DE AVISOS ===== */
         @keyframes pulsar {
             0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.65); transform: scale(1); }
-            50%     { box-shadow: 0 0 0 9px rgba(239,68,68,0); transform: scale(1.03); }
+            50% { box-shadow: 0 0 0 9px rgba(239,68,68,0); transform: scale(1.03); }
         }
         @keyframes balancar {
             0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); }
         }
-        .aviso-painel {
-            background: linear-gradient(135deg,#fff7ed,#fef2f2);
-            border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px;
-        }
+        .aviso-painel { background: linear-gradient(135deg,#fff7ed,#fef2f2); border: 2px solid #f97316; border-radius: 14px; padding: 10px 12px; }
         .dark .aviso-painel { background: linear-gradient(135deg,#431407,#450a0a); border-color:#ea580c; }
         .aviso-sino { display:inline-block; animation: balancar 1.2s ease-in-out infinite; }
         .aviso-chip {
@@ -229,14 +147,13 @@
             padding:7px 10px; border-radius:10px; font-size:11px; font-weight:800;
             cursor:pointer; color:#fff; margin-top:6px;
         }
-        .aviso-hoje   { background:linear-gradient(135deg,#dc2626,#f97316); animation:pulsar 1.2s infinite; }
-        .aviso-breve  { background:linear-gradient(135deg,#d97706,#f59e0b); }
+        .aviso-hoje { background:linear-gradient(135deg,#dc2626,#f97316); animation:pulsar 1.2s infinite; }
+        .aviso-breve { background:linear-gradient(135deg,#d97706,#f59e0b); }
         .aviso-normal { background:linear-gradient(135deg,#047857,#10b981); }
         .aviso-feriado.aviso-normal { background:linear-gradient(135deg,#0f766e,#14b8a6); }
         .aviso-chip small { font-weight:600; opacity:.9; display:block; }
         .aviso-prazo { background:rgba(0,0,0,.25); padding:2px 8px; border-radius:999px; white-space:nowrap; }
 
-        /* ===== ARRASTAR ENTRE SEMANAS + BOTÃO SALVAR ===== */
         .dock-semanas {
             position: fixed; left: 0; right: 0; bottom: 60px; z-index: 45;
             display: none; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 10px;
@@ -246,8 +163,7 @@
         .dock-semanas.dock-ativo { display: flex; }
         .dock-semana {
             min-width: 96px; padding: 12px 10px; border-radius: 12px; text-align: center;
-            background: #dcfce7; color: #14532d; border: 2px dashed #16a34a;
-            font-size: 12px; font-weight: 800;
+            background: #dcfce7; color: #14532d; border: 2px dashed #16a34a; font-size: 12px; font-weight: 800;
         }
         .dark .dock-semana { background: #052e16; color: #bbf7d0; }
         .btn-pendente { background: #d97706 !important; animation: pulsar 1.2s infinite; }
@@ -255,10 +171,8 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
-    <!-- TOASTS DE NOTIFICAÇÃO -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="container">
         <div class="header">
             <div class="flex justify-between items-center mb-2 px-2">
@@ -269,29 +183,25 @@
             <div class="week-badge" id="badgeSemana">Semana --</div>
         </div>
 
-        <!-- SELETOR DE ANO, SEMANA, BUSCA RÁPIDA E MÓDULOS -->
+        <!-- ANO, SEMANA E BUSCA -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3.5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-4xl mx-auto mb-4 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-1.5">
                         <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Ano:</label>
-                        <input type="number" id="inputAno" value="2026" onchange="atualizarDatasSemana()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+                        <input type="number" id="inputAno" onchange="irParaSemanaDosCampos()" class="w-16 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
                     </div>
                     <div class="flex items-center gap-1.5">
                         <label class="text-xs font-bold text-gray-600 dark:text-gray-300">Semana:</label>
-                        <input type="number" id="inputNumSemana" value="" min="1" max="53" onchange="atualizarDatasSemana()" class="w-14 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
+                        <input type="number" id="inputNumSemana" min="1" max="53" onchange="irParaSemanaDosCampos()" class="w-14 text-xs p-1.5 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white text-center">
                     </div>
-                    <button onclick="definirSemanaAtualComRegraSexta()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">🔄 Atual</button>
+                    <button onclick="irParaSemanaAtual()" class="bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">🔄 Atual</button>
                 </div>
-
-                <!-- BUSCA EM TEMPO REAL -->
                 <div class="flex-1 min-w-[220px] relative">
                     <input type="text" id="inputBuscaGeral" oninput="filtrarItensEmTempoReal(this.value)" placeholder="🔍 Buscar tarefa, recurso, pessoa ou placa..." class="w-full text-xs p-2 pl-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600">
                     <button id="btnLimparBusca" onclick="limparBusca()" class="hidden absolute right-2.5 top-2 text-xs text-gray-400 hover:text-gray-600 font-bold">✕</button>
                 </div>
             </div>
-
-            <!-- BOTÕES DE MÓDULOS -->
             <div class="flex gap-1.5 items-center flex-wrap pt-2 border-t dark:border-gray-700">
                 <button onclick="abrirModalIndicador()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📊 Indicador</button>
                 <button onclick="abrirModalHistorico()" class="bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">📁 Histórico</button>
@@ -300,30 +210,29 @@
             </div>
         </div>
 
-        <!-- PAINEL DE AVISOS: PRÓXIMOS TREINAMENTOS E FERIADOS -->
         <div id="painelAvisos" class="print-hidden max-w-4xl mx-auto mb-4"></div>
 
-        <!-- ABAS DIÁRIAS PARA CELULAR / MOBILE -->
+        <!-- ABAS DIÁRIAS NO CELULAR -->
         <div class="print-hidden flex md:hidden items-center justify-between gap-1 mb-3 bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl">
-            <button onclick="mudarAbaDiaMobile('todos')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-green-800 dark:text-green-300">Todos</button>
-            <button onclick="mudarAbaDiaMobile('Segunda')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Seg</button>
-            <button onclick="mudarAbaDiaMobile('Terça')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Ter</button>
-            <button onclick="mudarAbaDiaMobile('Quarta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qua</button>
-            <button onclick="mudarAbaDiaMobile('Quinta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qui</button>
-            <button onclick="mudarAbaDiaMobile('Sexta')" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Sex</button>
+            <button onclick="mudarAbaDiaMobile('todos', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-green-800 dark:text-green-300">Todos</button>
+            <button onclick="mudarAbaDiaMobile('Segunda', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Seg</button>
+            <button onclick="mudarAbaDiaMobile('Terça', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Ter</button>
+            <button onclick="mudarAbaDiaMobile('Quarta', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qua</button>
+            <button onclick="mudarAbaDiaMobile('Quinta', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Qui</button>
+            <button onclick="mudarAbaDiaMobile('Sexta', this)" class="btn-tab-mobile flex-1 py-1 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">Sex</button>
         </div>
 
         <!-- CALENDÁRIO SEMANAL -->
         <div class="week-grid" id="weekGridContainer"></div>
 
-        <!-- BARRA DE AÇÕES DA SEMANA -->
+        <!-- BARRA DE AÇÕES -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mb-6 flex flex-wrap justify-center items-center gap-2">
-            <button id="btnSalvarBarra" onclick="salvarMovimentos()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar</button>
+            <button id="btnSalvarBarra" onclick="salvarTudo()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">💾 Salvar</button>
             <button onclick="salvarNoComputador()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Escolhe um arquivo no computador; depois, cada Salvar grava nele também">💻 Salvar no computador</button>
             <button onclick="abrirArquivoDoComputador()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-1.5 rounded-lg text-xs font-bold transition">📂 Abrir arquivo</button>
             <button onclick="exportarParaExcelTabelaVale()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">📊 Exportar Excel (Padrão Vale)</button>
             <button onclick="imprimirProgramacao()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">🖨️ Imprimir PDF</button>
-            <button onclick="imprimirNitido()" class="bg-gray-900 hover:bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Gera uma página de impressão sem sombras, mais nítida">🖨️ Imprimir nítido</button>
+            <button onclick="imprimirNitido()" class="bg-gray-900 hover:bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition" title="Página de impressão sem sombras, mais nítida">🖨️ Imprimir nítido</button>
             <button onclick="limparTudo()" class="bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:text-red-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">🗑️ Limpar</button>
         </div>
 
@@ -343,20 +252,25 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data do Evento</label>
-                    <input type="date" id="inputDataEvento" onchange="sincronizarSemanaPelaData(this.value)" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de início</label>
+                    <input type="date" id="inputDataEvento" onchange="irParaDataEvento(this.value)" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo de Entrada</label>
-                    <select id="inputTipo" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
-                        <option value="task">🟢 Tarefa (Caixa Verde)</option>
-                        <option value="extra">⚡ Tarefa Extra / Fora de Rotina (Caixa Laranja)</option>
-                        <option value="resource">🚙 Recurso / Equipamento (Caixa Verde Vale)</option>
-                    </select>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de fim (opcional)</label>
+                    <input type="date" id="inputDataFim" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
                 </div>
             </div>
+            <p class="text-[10px] text-gray-500 dark:text-gray-400">Para um evento da semana toda, coloque início na segunda e fim na sexta. Sábados e domingos são ignorados.</p>
 
-            <!-- NOVO TIPO DE ENTRADA COM COR -->
+            <div>
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo de Entrada</label>
+                <select id="inputTipo" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <option value="task">🟢 Tarefa (Caixa Verde)</option>
+                    <option value="extra">⚡ Tarefa Extra / Fora de Rotina (Caixa Laranja)</option>
+                    <option value="resource">🚙 Recurso / Equipamento (Caixa Verde Vale)</option>
+                </select>
+            </div>
+
             <div class="flex flex-wrap items-end gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
                 <div class="flex-1 min-w-[140px]">
                     <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Novo tipo de entrada</label>
@@ -370,7 +284,6 @@
                 <button onclick="gerirTiposCustom()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">⚙️ Gerir</button>
             </div>
 
-            <!-- EMOJI (OPCIONAL) -->
             <div>
                 <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Emoji (opcional)</label>
                 <div class="flex gap-2 items-center">
@@ -401,7 +314,7 @@
             </div>
         </div>
 
-        <!-- ANALISADOR INTELIGENTE DE SCRIPT -->
+        <!-- ANALISADOR DE SCRIPT -->
         <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 max-w-xl mx-auto mt-4 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">🔍 Analisador de Reunião (Script)</h3>
@@ -419,43 +332,37 @@
         </div>
     </div>
 
-    <!-- MODAL DE INDICADOR DETALHADO -->
+    <!-- MODAL INDICADOR -->
     <div id="modalIndicador" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-md w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
                 <h3 class="text-sm font-bold uppercase text-amber-700 dark:text-amber-300">📊 Relatório do Indicador</h3>
-                <button onclick="fecharModalIndicador()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
+                <button onclick="fecharModal('modalIndicador')" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
             <div id="conteudoRelatorioIndicador" class="space-y-3 text-xs text-gray-700 dark:text-gray-300"></div>
-            <div class="flex justify-end pt-2">
-                <button onclick="fecharModalIndicador()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button>
-            </div>
+            <div class="flex justify-end pt-2"><button onclick="fecharModal('modalIndicador')" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
     </div>
 
-    <!-- MODAL DE HISTÓRICO -->
+    <!-- MODAL HISTÓRICO -->
     <div id="modalHistorico" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
                 <h3 class="text-sm font-bold uppercase text-purple-800 dark:text-purple-300">📁 Histórico de Semanas</h3>
-                <button onclick="fecharModalHistorico()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
+                <button onclick="fecharModal('modalHistorico')" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
-            <div class="space-y-2">
-                <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">💾 Salvar Programação Atual no Histórico</button>
-            </div>
+            <button onclick="salvarSemanaAtualNoHistorico()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">💾 Salvar Programação Atual no Histórico</button>
             <div id="listaHistoricoSemanas" class="max-h-60 overflow-y-auto space-y-2 pt-2"></div>
-            <div class="flex justify-end pt-2">
-                <button onclick="fecharModalHistorico()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button>
-            </div>
+            <div class="flex justify-end pt-2"><button onclick="fecharModal('modalHistorico')" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
     </div>
 
-    <!-- MODAL POP-UP DE TREINAMENTOS -->
+    <!-- MODAL TREINAMENTOS -->
     <div id="modalTreinamentos" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xl w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
                 <h3 class="text-sm font-bold uppercase text-emerald-800 dark:text-emerald-300">🎓 Gestão de Treinamentos</h3>
-                <button onclick="fecharModalTreinamentos()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
+                <button onclick="fecharModal('modalTreinamentos')" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Início</label><input type="date" id="popTreinoInicio" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
@@ -466,36 +373,31 @@
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Local</label><input type="text" id="popTreinoLocal" placeholder="EX: SALA..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Participante</label><input type="text" id="popTreinoPessoa" placeholder="EX: PESSOA..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="salvarTreinamentoPop()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Treinamento</button>
-            </div>
+            <button onclick="salvarTreinamentoPop()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Treinamento</button>
             <div id="popListaTreinamentos" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
-            <div class="flex justify-end pt-2"><button onclick="fecharModalTreinamentos()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
+            <div class="flex justify-end pt-2"><button onclick="fecharModal('modalTreinamentos')" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
     </div>
 
-    <!-- MODAL POP-UP DE FERIADOS -->
+    <!-- MODAL FERIADOS -->
     <div id="modalFeriados" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-xl w-full space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
                 <h3 class="text-sm font-bold uppercase text-teal-800 dark:text-teal-300">🍃 Feriados e Emendas</h3>
-                <button onclick="fecharModalFeriados()" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
+                <button onclick="fecharModal('modalFeriados')" class="text-gray-400 hover:text-gray-600 font-bold text-base">✕</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data</label><input type="date" id="popFeriadoData" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
                 <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Tipo</label><select id="popFeriadoTipo" class="w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"><option value="feriado">Feriado</option><option value="emenda">Emenda</option></select></div>
             </div>
             <div><label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição</label><input type="text" id="popFeriadoDesc" placeholder="EX: FERIADO MUNICIPAL..." class="uppercase w-full text-xs p-2 bg-gray-50 dark:bg-gray-900 border rounded-lg font-bold dark:text-white"></div>
-            <div class="flex gap-2">
-                <button onclick="salvarFeriadoPop()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
-            </div>
+            <button onclick="salvarFeriadoPop()" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition">✓ Guardar Feriado</button>
             <button onclick="importarFeriadosNacionais()" class="w-full bg-teal-100 hover:bg-teal-200 dark:bg-teal-950 text-teal-800 dark:text-teal-300 font-bold py-2 rounded-xl text-xs transition">📅 Importar feriados nacionais do ano selecionado</button>
             <div id="popListaFeriados" class="max-h-48 overflow-y-auto space-y-2 pt-2"></div>
-            <div class="flex justify-end pt-2"><button onclick="fecharModalFeriados()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
+            <div class="flex justify-end pt-2"><button onclick="fecharModal('modalFeriados')" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-xs font-bold">Fechar</button></div>
         </div>
     </div>
 
-    <!-- FAIXA DE SEMANAS DE DESTINO (ARRASTAR ENTRE SEMANAS) -->
     <div id="dockSemanas" class="dock-semanas"></div>
 
     <!-- BARRA INFERIOR FIXA -->
@@ -503,307 +405,190 @@
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️ Tema</button>
             <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">📱 Instalar</button>
-            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.08 Local</span>
+            <span class="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 text-[10px] font-extrabold shadow-sm">v4.09 Local</span>
+            <button id="btnSalvarMov" onclick="salvarTudo()" class="px-3 py-1.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-xs font-bold shadow-sm">💾 Salvar</button>
         </div>
     </div>
 
     <script>
-        const CHAVE_HISTORICO = "programacao_historico_semanas_definitivo";
-        const CHAVE_LOCAL_TREINOS = "modulo_treinamentos_dados_nuvem";
-        const CHAVE_LOCAL_FERIADOS = "modulo_feriados_dados_nuvem";
-        const CHAVE_TIPOS = "programacao_tipos_custom";
-        const CHAVE_DADOS = "programacao_dados_locais";
-        const nomesMeses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
-        const DIAS_SEMANA = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
-        let elementoArrastado = null;
-        let deferredPrompt = null;
-        let dadosGlobaisNuvem = {};
-        let movimentosPendentes = false;
-
-        let itensFrequentesPadrao = [
+        const CHAVE = "programacao_dados_locais";
+        const DIAS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+        const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+        const FREQ_PADRAO = [
             "🕒 HORA CERTA", "📦 MOVIMENTAÇÃO G4", "🧰 ARRUMAÇÃO DA FERRAMENTARIA",
             "👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)", "EMPILHADEIRA G4", "CAMINHÃO DIA INTEIRO",
             "CAMINHÃO PARTE DA MANHÃ", "CAMINHÃO PARTE DA TARDE", "CARRO", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS"
         ];
-        let palavrasChavePadrao = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
+        const PALAVRAS_PADRAO = ["MARIANA", "ALFREDO", "ALAN", "ALMOXARIFADO", "INVENTÁRIO", "MAGNÉTICOS", "CAMINHÃO", "EMPILHADEIRA", "CARRO", "G4", "APC", "FERRAMENTARIA", "MANUTENÇÃO", "EQUIPE"];
 
-        // SISTEMA DE NOTIFICAÇÃO TOAST VISUAL
+        let estado = {};
+        let semanaExibida = { ano: new Date().getFullYear(), sem: 1 };
+        let movimentosPendentes = false;
+        let arquivoHandle = null;
+        let deferredPrompt = null;
+        let elementoArrastado = null;
+
+        // ===== UTILITÁRIOS =====
         function mostrarToast(mensagem, tipo = 'sucesso') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const cores = {
-                sucesso: 'bg-green-700 text-white',
-                aviso: 'bg-amber-600 text-white',
-                erro: 'bg-red-700 text-white',
-                info: 'bg-blue-700 text-white'
-            };
+            const cores = { sucesso: 'bg-green-700 text-white', aviso: 'bg-amber-600 text-white', erro: 'bg-red-700 text-white', info: 'bg-blue-700 text-white' };
             toast.className = `${cores[tipo] || cores.sucesso} text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto flex items-center gap-2`;
             toast.innerHTML = `<span>${mensagem}</span>`;
             container.appendChild(toast);
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            });
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // ===== PAINEL DE AVISOS: TREINAMENTOS E FERIADOS =====
-        function diasAte(dataStr) {
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            return Math.round((new Date(dataStr + 'T00:00:00') - hoje) / 86400000);
-        }
         function escHtml(s) {
             return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
-        function rotuloPrazo(n, emCurso) {
-            if (emCurso) return '🔥 EM CURSO!';
-            if (n === 0) return '🔥 HOJE!';
-            if (n === 1) return '⚠️ AMANHÃ!';
-            return `⏳ em ${n} dias`;
-        }
-        function classePrazo(n) { return n === 0 ? 'aviso-hoje' : n <= 3 ? 'aviso-breve' : 'aviso-normal'; }
-
-        function alternarAvisos(ocultar) {
-            if (ocultar) sessionStorage.setItem('avisos_ocultos', '1');
-            else sessionStorage.removeItem('avisos_ocultos');
-            renderizarAvisos();
-        }
-
-        function renderizarAvisos() {
-            const painel = document.getElementById('painelAvisos');
-            if (!painel) return;
-            const JANELA = 30;
-            const treinos = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            const feriados = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            const itens = [];
-
-            treinos.forEach(t => {
-                const n = diasAte(t.inicio), fimN = diasAte(t.fim || t.inicio);
-                if (fimN < 0 || n > JANELA) return;
-                const emCurso = n < 0;
-                itens.push({ n: Math.max(0, n), emCurso, data: t.inicio, tipo: 'treino',
-                    titulo: `🎓 ${escHtml(t.nome)}`, sub: `👤 ${escHtml(t.pessoa)} · 📍 ${escHtml(t.local)}` });
-            });
-            feriados.forEach(f => {
-                const n = diasAte(f.data);
-                if (n < 0 || n > JANELA) return;
-                itens.push({ n, emCurso: false, data: f.data, tipo: 'feriado',
-                    titulo: `${f.tipo === 'emenda' ? '📌' : '🍃'} ${escHtml(f.desc)}`,
-                    sub: f.data.split('-').reverse().join('/') });
-            });
-
-            if (itens.length === 0) {
-                painel.innerHTML = '';
-                return;
-            }
-            itens.sort((a, b) => a.n - b.n);
-
-            if (sessionStorage.getItem('avisos_ocultos') === '1') {
-                painel.innerHTML = `
-                    <button onclick="alternarAvisos(false)" class="aviso-chip aviso-hoje w-full justify-center" style="margin-top:0" title="Mostrar avisos">
-                        <span><span class="aviso-sino">🔔</span> Mostrar avisos (${itens.length})</span>
-                    </button>`;
-                return;
-            }
-
-            painel.innerHTML = `
-                <div class="aviso-painel shadow-md">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-black uppercase text-orange-700 dark:text-orange-300">
-                            <span class="aviso-sino">🔔</span> Atenção! Próximos treinamentos e feriados
-                        </span>
-                        <button onclick="alternarAvisos(true)" class="text-gray-400 hover:text-gray-600 font-bold text-sm" title="Recolher">✕</button>
-                    </div>
-                    ${itens.map(i => `
-                        <div class="aviso-chip ${classePrazo(i.n)} aviso-${i.tipo}" onclick="sincronizarSemanaPelaData('${i.data}')" title="Ir para a semana">
-                            <span>${i.titulo}<small>${i.sub}</small></span>
-                            <span class="aviso-prazo">${rotuloPrazo(i.n, i.emCurso)}</span>
-                        </div>`).join('')}
-                </div>`;
-        }
-
-        // BUSCA RÁPIDA EM TEMPO REAL
-        function filtrarItensEmTempoReal(termo) {
-            termo = termo.trim().toLowerCase();
-            const btnLimpar = document.getElementById('btnLimparBusca');
-            if (termo) btnLimpar.classList.remove('hidden');
-            else btnLimpar.classList.add('hidden');
-
-            const caixas = document.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag');
-            caixas.forEach(cx => {
-                const texto = cx.innerText.toLowerCase();
-                if (!termo || texto.includes(termo)) {
-                    cx.style.display = '';
-                    if (termo) cx.classList.add('ring-2', 'ring-amber-400');
-                    else cx.classList.remove('ring-2', 'ring-amber-400');
-                } else {
-                    cx.style.display = 'none';
-                    cx.classList.remove('ring-2', 'ring-amber-400');
-                }
-            });
-        }
-
-        function limparBusca() {
-            document.getElementById('inputBuscaGeral').value = '';
-            filtrarItensEmTempoReal('');
-        }
-
-        // NAVEGAÇÃO POR ABAS NO CELULAR
-        function mudarAbaDiaMobile(diaNome) {
-            document.querySelectorAll('.btn-tab-mobile').forEach(b => {
-                b.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
-                b.classList.add('text-gray-600', 'dark:text-gray-300');
-            });
-            event.target.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
-
-            const container = document.getElementById('weekGridContainer');
-            const cards = container.querySelectorAll('.day-card');
-
-            if (diaNome === 'todos') {
-                container.classList.remove('mobile-single-day');
-                cards.forEach(c => c.classList.remove('active-day'));
-            } else {
-                container.classList.add('mobile-single-day');
-                cards.forEach(c => {
-                    if (c.getAttribute('data-dia-nome') === diaNome) c.classList.add('active-day');
-                    else c.classList.remove('active-day');
-                });
-            }
+        function pad2(n) { return String(n).padStart(2, '0'); }
+        function dataISO(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+        function parseISO(s) { return new Date(s + 'T00:00:00'); }
+        function diasAte(dataStr) {
+            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+            return Math.round((parseISO(dataStr) - hoje) / 86400000);
         }
 
         function aplicarCorrecao(texto) {
             if (!texto) return "";
-            const mapaAcentos = {
-                'á': 'Á', 'à': 'À', 'â': 'Â', 'ã': 'Ã', 'ä': 'Ä',
-                'é': 'É', 'è': 'È', 'ê': 'Ê', 'ë': 'Ë',
-                'í': 'Í', 'ì': 'Ì', 'î': 'Î', 'ï': 'Ï',
-                'ó': 'Ó', 'ò': 'Ò', 'ô': 'Ô', 'õ': 'Õ', 'ö': 'Ö',
-                'ú': 'Ú', 'ù': 'Ù', 'û': 'Û', 'ü': 'Ü',
-                'ç': 'Ç', 'ñ': 'Ñ'
-            };
-            let limpo = texto.trim();
-            let convertido = limpo.split('').map(char => mapaAcentos[char] || char).join('');
-            return convertido.toLocaleUpperCase('pt-PT');
+            const mapa = { 'á':'Á','à':'À','â':'Â','ã':'Ã','ä':'Ä','é':'É','è':'È','ê':'Ê','ë':'Ë','í':'Í','ì':'Ì','î':'Î','ï':'Ï','ó':'Ó','ò':'Ò','ô':'Ô','õ':'Õ','ö':'Ö','ú':'Ú','ù':'Ù','û':'Û','ü':'Ü','ç':'Ç','ñ':'Ñ' };
+            return texto.trim().split('').map(c => mapa[c] || c).join('').toLocaleUpperCase('pt-PT');
         }
 
         function limparSimbolosTexto(texto) {
             if (!texto) return "";
             return texto
-                .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2300}-\u{23FF}]/gu, '')
-                .replace(/[✓✕✔❌✏️📊📁🎓🍃📌🕒📦🧰👥🧹🚙⚡]/g, '')
+                .replace(/[\u{1F300}-\u{1FAFF}\u{2300}-\u{27BF}]/gu, '')
                 .replace(/\[.*?\]/g, '')
                 .replace(/\s+/g, ' ')
                 .trim();
         }
 
-        function getWeekKey() {
-            const ano = document.getElementById('inputAno').value;
-            const semana = document.getElementById('inputNumSemana').value;
-            return `prog_grid_${ano}_semana_${semana}`;
+        // ===== SEMANAS (ISO) =====
+        function dataParaSemana(d) {
+            const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const dayNum = x.getUTCDay() || 7;
+            x.setUTCDate(x.getUTCDate() + 4 - dayNum);
+            const inicio = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+            return { ano: x.getUTCFullYear(), sem: Math.ceil((((x - inicio) / 86400000) + 1) / 7) };
         }
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
+        function segundaDaSemana(ano, sem) {
+            const jan4 = new Date(ano, 0, 4);
+            const diaSemana = jan4.getDay() || 7;
+            return new Date(ano, 0, 4 - (diaSemana - 1) + (sem - 1) * 7);
+        }
 
-        function atualizarIndicadorProgresso() {
-            document.querySelectorAll('.day-card').forEach(card => {
-                const masterCheck = card.querySelector('.check-concluir-dia');
-                if (!masterCheck) return;
-                const itemsCheck = card.querySelectorAll('input[type="checkbox"].task-check');
-                masterCheck.checked = itemsCheck.length > 0 && [...itemsCheck].every(cb => cb.checked);
+        function chaveSemana(ano, sem) { return `prog_grid_${ano}_semana_${sem}`; }
+
+        // ===== ESTADO (dados locais) =====
+        function carregarEstado(origem = null) {
+            let salvo = origem;
+            if (!salvo) {
+                try { salvo = JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch (e) { salvo = {}; }
+            }
+            const antigo = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+            const migrar = !origem;
+            estado = {
+                semanas: salvo.semanas || {},
+                historico: salvo.historico || (migrar ? antigo("programacao_historico_semanas_definitivo") : null) || {},
+                treinamentos: salvo.treinamentos || (migrar ? antigo("modulo_treinamentos_dados_nuvem") : null) || [],
+                feriados: salvo.feriados || (migrar ? antigo("modulo_feriados_dados_nuvem") : null) || [],
+                tipos: salvo.tipos || (migrar ? antigo("programacao_tipos_custom") : null) || [],
+                dispensados: salvo.dispensados || [],
+                frequentes: salvo.frequentes || (migrar ? antigo("programacao_frequentes_custom") : null) || FREQ_PADRAO.slice(),
+                palavras: salvo.palavras || (migrar ? antigo("programacao_palavras_chave_custom") : null) || PALAVRAS_PADRAO.slice()
+            };
+        }
+
+        function persistirLocal() {
+            try {
+                localStorage.setItem(CHAVE, JSON.stringify(estado));
+                return true;
+            } catch (e) {
+                console.error("Erro ao gravar no navegador:", e);
+                return false;
+            }
+        }
+
+        // Copia a semana que está na tela para o estado (só a semana exibida)
+        function snapshotSemanaExibida() {
+            const cont = document.getElementById('weekGridContainer');
+            if (!cont.querySelector('.day-card')) return;
+            sincronizarChecks(cont);
+            estado.semanas[chaveSemana(semanaExibida.ano, semanaExibida.sem)] = cont.innerHTML;
+        }
+
+        function sincronizarChecks(root) {
+            root.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.toggleAttribute('checked', cb.checked));
+        }
+
+        // Toda alteração passa aqui: copia a tela, grava no navegador e marca como pendente
+        function alterou() {
+            snapshotSemanaExibida();
+            persistirLocal();
+            movimentosPendentes = true;
+            atualizarBotaoSalvar();
+        }
+
+        function atualizarBotaoSalvar() {
+            ['btnSalvarBarra', 'btnSalvarMov'].forEach(id => {
+                const b = document.getElementById(id);
+                if (!b) return;
+                b.classList.toggle('btn-pendente', movimentosPendentes);
+                b.textContent = movimentosPendentes ? '💾 Salvar •' : '💾 Salvar';
             });
         }
 
-        function alternarConclusaoDia(masterCheckbox) {
-            const card = masterCheckbox.closest('.day-card');
-            if (!card) return;
-            const marcar = masterCheckbox.checked;
-            card.querySelectorAll('input[type="checkbox"].task-check').forEach(cb => {
-                cb.checked = marcar;
-                const taskBox = cb.closest('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag');
-                if (taskBox) taskBox.classList.toggle('task-done', marcar);
-            });
-            atualizarIndicadorProgresso();
-            guardarEstadoDOM();
+        async function salvarTudo() {
+            snapshotSemanaExibida();
+            const ok = persistirLocal();
+            let noArquivo = false;
+            if (ok && arquivoHandle) noArquivo = await gravarArquivoLocal();
+            if (!ok) {
+                mostrarToast('❌ Não foi possível salvar.', 'erro');
+                return;
+            }
+            movimentosPendentes = false;
+            atualizarBotaoSalvar();
+            mostrarToast(noArquivo ? `💾 Salvo no navegador e em "${arquivoHandle.name}"!` : '💾 Programação salva no navegador!');
         }
 
-        function abrirModalIndicador() {
-            const checkboxes = document.querySelectorAll('#weekGridContainer input[type="checkbox"].task-check');
-            const total = checkboxes.length;
-            let concluidas = 0;
-            checkboxes.forEach(cb => { if (cb.checked) concluidas++; });
-            let pendentes = total - concluidas;
-            let percentual = total > 0 ? Math.round((concluidas / total) * 100) : 0;
-
-            document.getElementById('conteudoRelatorioIndicador').innerHTML = `
-                <div class="bg-amber-50 dark:bg-amber-950/40 p-4 rounded-xl border border-amber-200 dark:border-amber-900 space-y-3 text-xs">
-                    <p class="text-sm font-bold text-amber-900 dark:text-amber-200">📌 Relatório Detalhado</p>
-                    <p><strong>Semana Atual:</strong> ${document.getElementById('badgeSemana').innerText} (${document.getElementById('inputAno').value})</p>
-                    <p><strong>Total de Itens na Semana:</strong> ${total}</p>
-                    <p><strong>Tarefas Concluídas:</strong> <span class="text-green-700 font-bold text-sm">${concluidas}</span></p>
-                    <p><strong>Tarefas Pendentes:</strong> <span class="text-amber-600 font-bold text-sm">${pendentes}</span></p>
-                    <div class="pt-2 border-t dark:border-gray-700">
-                        <p class="font-bold mb-1">Aproveitamento Geral:</p>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                            <div class="bg-amber-600 h-3 rounded-full" style="width: ${percentual}%"></div>
-                        </div>
-                        <p class="text-right font-bold text-amber-700 dark:text-amber-400 mt-1">${percentual}% Concluído</p>
-                    </div>
-                </div>`;
-            document.getElementById('modalIndicador').classList.remove('hidden');
+        // ===== HTML DE ITENS E BLOCOS =====
+        function htmlItem({ tipo = 'task', desc = '', extra = '', treinoId = '', chave = '', cor = '' }) {
+            const esc = escHtml(desc);
+            let cls = 'task-box', attrs = '', pre = '';
+            if (tipo === 'resource') cls = 'resource-tag';
+            else if (tipo === 'extra') { cls = 'tarefa-extra-box'; pre = '⚡ '; }
+            else if (tipo === 'treino') { cls = 'treinamento-box'; attrs += ` data-treino-id="${escHtml(treinoId)}"`; }
+            else if (tipo.startsWith('custom:')) { cls = 'task-box tipo-custom'; attrs += ` style="--tc:${escHtml(cor)}"`; }
+            if (chave) attrs += ` data-evento-chave="${escHtml(chave)}"`;
+            const corpo = tipo === 'treino'
+                ? `<div class="treino-info"><div>🎓 <span class="item-text">${esc}</span></div><small>${escHtml(extra)}</small></div>`
+                : `${pre}<span class="item-text">${esc}</span>`;
+            return `<div class="${cls}"${attrs} draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> ${corpo}</span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>`;
         }
 
-        function fecharModalIndicador() {
-            document.getElementById('modalIndicador').classList.add('hidden');
+        function htmlTarefasPadrao() {
+            return htmlItem({ desc: '🕒 HORA CERTA' }) + htmlItem({ desc: '📦 MOVIMENTAÇÃO G4' });
         }
 
-        function exportarParaExcelTabelaVale() {
-            const semana = document.getElementById('inputNumSemana').value;
-            let csvContent = "\uFEFFITEM;OS;Área Responsável;Atividade;Local de execução;Sala/Equipamento;Data de execução;Dia da Semana;Tem Bloqueio elétrico?;Tem Bloqueio mecânico?;Tem PTS?;Tem solicitação ao almoxarifado;Necessidade de Recurso (Equip. moveis)?\n";
-            const diasMap = { "Segunda": "segunda-feira", "Terça": "terça-feira", "Quarta": "quarta-feira", "Quinta": "quinta-feira", "Sexta": "sexta-feira" };
-
-            document.querySelectorAll('.day-card').forEach(card => {
-                const diaNomePt = card.querySelector('.day-title').innerText.split('\n')[0].trim();
-                const diaSemanaStr = diasMap[diaNomePt] || diaNomePt.toLowerCase();
-                const dataExec = card.querySelector('.day-title small') ? card.querySelector('.day-title small').innerText : '';
-
-                card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
-                    const descEl = box.querySelector('.item-text') || box.querySelector('strong');
-                    const atividade = limparSimbolosTexto(descEl ? descEl.innerText.trim() : '');
-
-                    const recursosDia = [];
-                    card.querySelectorAll('.resource-tag').forEach(tag => {
-                        const rEl = tag.querySelector('.item-text');
-                        if (rEl) {
-                            const recursoLimpo = limparSimbolosTexto(rEl.innerText.trim());
-                            if (recursoLimpo) recursosDia.push(recursoLimpo);
-                        }
-                    });
-
-                    csvContent += `1;;ALMOXARIFADO;"${atividade}";;;"${dataExec}";"${diaSemanaStr}";NÃO;NÃO;NÃO;NÃO;"${recursosDia.join(', ')}"\n`;
-                });
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `PROGRAMACAO_SEMANAL_SEMANA_${semana}_VALE.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            mostrarToast("📊 Exportado para Excel (Padrão Vale)!");
+        function htmlRecursosPadrao() {
+            return `<div class="resources-title">Recursos</div>` +
+                htmlItem({ tipo: 'resource', desc: 'CARRO' }) +
+                htmlItem({ tipo: 'resource', desc: 'EMPILHADEIRA G4' });
         }
 
-        // ===== MONTAGEM DO BLOCO DE FERIADO / EMENDA E DA BARRA DO DIA =====
         function htmlBarraDia(fChecked, eChecked) {
             return `
                 <div class="flex items-center justify-between gap-1 mb-2 px-1.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 border rounded-md text-[9px] flex-shrink-0">
-                    <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia de uma só vez">
-                        <input type="checkbox" class="check-concluir-dia w-3 h-3 accent-emerald-600" onchange="alternarConclusaoDia(this)"> ✔️ Dia
+                    <label class="flex items-center gap-0.5 font-bold cursor-pointer text-emerald-800 dark:text-emerald-300" title="Marcar ou desmarcar todas as tarefas e recursos deste dia">
+                        <input type="checkbox" class="check-concluir-dia w-3 h-3" onchange="alternarConclusaoDia(this)"> ✔️ Dia
                     </label>
                     <div class="flex items-center gap-1.5">
                         <label class="flex items-center gap-0.5 font-bold cursor-pointer text-green-700 dark:text-green-300"><input type="checkbox" class="check-feriado w-3 h-3" ${fChecked ? 'checked' : ''} onchange="alternarBloqueioDia(this)"> Feriado</label>
@@ -812,198 +597,344 @@
                 </div>`;
         }
 
-        // Garante a barra de controle em cada dia e corrige itens gravados em versões antigas
-        function garantirCaixinhasEmHtmlSalvo(htmlString) {
-            if (!htmlString) return htmlString;
-            const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+        function htmlBloco(ehFeriado, desc) {
+            const c = ehFeriado
+                ? { bg: '#e8f5e9', borda: '#2e7d32', txt: '#1b5e20', sub: '#2e7d32' }
+                : { bg: '#e0f2f1', borda: '#00897b', txt: '#004d40', sub: '#00695c' };
+            return `<div style="background:${c.bg};border:1px solid #a3e4d7;border-left:4px solid ${c.borda};border-radius:6px;padding:15px;text-align:center;">
+                <span style="color:${c.txt};font-weight:900;font-size:12px;">${ehFeriado ? '🍃 FERIADO' : '📌 EMENDA'}</span>
+                ${desc ? `<div style="color:${c.sub};font-size:10px;font-weight:700;margin-top:4px;">${escHtml(desc)}</div>` : ''}
+                <br><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button>
+            </div>`;
+        }
 
+        function gerarGridBase() {
+            return DIAS.map(d => `
+                <div class="day-card" data-dia-nome="${d}" data-data="">
+                    <div class="day-title">${d}<br><small>--/---</small></div>
+                    <div class="day-content">
+                        ${htmlBarraDia(false, false)}
+                        <div class="tasks-container">${htmlTarefasPadrao()}</div>
+                    </div>
+                    <div class="day-resources">${htmlRecursosPadrao()}</div>
+                </div>`).join('');
+        }
+
+        // Semana salva (ou nova, com rotinas fixas)
+        function obterHtmlSemana(ano, sem) {
+            const salvo = estado.semanas[chaveSemana(ano, sem)];
+            if (salvo) return garantirCaixinhas(salvo);
+            const doc = new DOMParser().parseFromString(gerarGridBase(), 'text/html');
+            const seg = segundaDaSemana(ano, sem);
+            DIAS.forEach((nome, i) => {
+                const d = new Date(seg); d.setDate(seg.getDate() + i);
+                const card = doc.querySelector(`.day-card[data-dia-nome="${nome}"]`);
+                if (!card) return;
+                const tarefas = card.querySelector('.tasks-container');
+                if (nome === 'Quarta') tarefas.insertAdjacentHTML('beforeend', htmlItem({ desc: '👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)' }));
+                const ultimo = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+                if (d.getDate() >= ultimo - 6) tarefas.insertAdjacentHTML('beforeend', htmlItem({ desc: '🧹 AVALIAÇÃO DOS POSTOS DO 5S' }));
+            });
+            return doc.body.innerHTML;
+        }
+
+        // Garante a barra de dia em semanas gravadas em versões antigas
+        function garantirCaixinhas(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
             doc.querySelectorAll('.day-card').forEach(card => {
-                const dayContent = card.querySelector('.day-content');
-                if (!dayContent) return;
-                let fChecked = false, eChecked = false;
-                const barraVelha = dayContent.querySelector('.flex.items-center.justify-between');
-                if (barraVelha) {
-                    const cf = barraVelha.querySelector('.check-feriado');
-                    const ce = barraVelha.querySelector('.check-emenda');
-                    if (cf && cf.checked) fChecked = true;
-                    if (ce && ce.checked) eChecked = true;
-                    barraVelha.remove();
+                const dc = card.querySelector('.day-content');
+                if (!dc) return;
+                let f = false, e = false;
+                const velha = dc.querySelector(':scope > .flex.items-center.justify-between');
+                if (velha) {
+                    f = !!velha.querySelector('.check-feriado:checked');
+                    e = !!velha.querySelector('.check-emenda:checked');
+                    velha.remove();
                 }
-                dayContent.insertAdjacentHTML('afterbegin', htmlBarraDia(fChecked, eChecked));
-            });
-
-            doc.querySelectorAll('.treinamento-box').forEach(box => {
-                if (box.querySelector('.treino-info')) return;
-                const span = box.firstElementChild;
-                const strong = box.querySelector('strong.item-text');
-                const small = box.querySelector('small');
-                if (!span || !strong) return;
-                const info = doc.createElement('div');
-                info.className = 'treino-info';
-                const titulo = doc.createElement('div');
-                titulo.appendChild(doc.createTextNode('🎓 '));
-                titulo.appendChild(strong);
-                info.appendChild(titulo);
-                if (small) { small.classList.remove('pl-5'); info.appendChild(small); }
-                span.querySelectorAll('br').forEach(b => b.remove());
-                [...span.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.includes('🎓')) n.remove(); });
-                span.appendChild(info);
-            });
-
-            doc.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(box => {
-                if (box.querySelector('input[type="checkbox"].task-check')) return;
-                const innerSpan = box.querySelector('span');
-                if (innerSpan && !innerSpan.classList.contains('item-controls')) {
-                    const check = doc.createElement('input');
-                    check.type = 'checkbox';
-                    check.className = 'task-check w-3.5 h-3.5 accent-green-700 cursor-pointer mr-1.5';
-                    check.setAttribute('onchange', 'alternarConclusaoTarefa(this)');
-                    innerSpan.insertBefore(check, innerSpan.firstChild);
-                    innerSpan.classList.add('flex', 'items-center', 'gap-1.5');
+                if (!dc.querySelector(':scope > .check-concluir-dia') && !dc.querySelector('.check-concluir-dia')) {
+                    dc.insertAdjacentHTML('afterbegin', htmlBarraDia(f, e));
                 }
             });
             return doc.body.innerHTML;
         }
 
-        function forcarCaixinhasDiaNoDOM() {
-            document.querySelectorAll('.day-card').forEach(card => {
-                const dayContent = card.querySelector('.day-content');
-                if (!dayContent || card.querySelector('.check-concluir-dia')) return;
-                let fChecked = false, eChecked = false;
-                const barra = dayContent.querySelector('.flex.items-center.justify-between');
-                if (barra) {
-                    const cf = barra.querySelector('.check-feriado');
-                    const ce = barra.querySelector('.check-emenda');
-                    if (cf && cf.checked) fChecked = true;
-                    if (ce && ce.checked) eChecked = true;
-                    barra.remove();
-                }
-                dayContent.insertAdjacentHTML('afterbegin', htmlBarraDia(fChecked, eChecked));
+        // ===== RENDERIZAÇÃO DA SEMANA =====
+        function renderSemana(ano, sem) {
+            semanaExibida = { ano, sem };
+            document.getElementById('inputAno').value = ano;
+            document.getElementById('inputNumSemana').value = sem;
+            document.getElementById('badgeSemana').innerText = `Semana ${sem}`;
+
+            const cont = document.getElementById('weekGridContainer');
+            cont.innerHTML = obterHtmlSemana(ano, sem);
+
+            const seg = segundaDaSemana(ano, sem);
+            DIAS.forEach((nome, i) => {
+                const card = cont.querySelector(`.day-card[data-dia-nome="${nome}"]`);
+                if (!card) return;
+                const d = new Date(seg); d.setDate(seg.getDate() + i);
+                const iso = dataISO(d);
+                card.dataset.data = iso;
+                card.querySelector('.day-title').innerHTML = `${nome}<br><small>${pad2(d.getDate())}/${MESES[d.getMonth()]}</small>`;
+                aplicarEventosNoDia(card, iso);
+            });
+
+            reativarDragDrop();
+            atualizarIndicador();
+            atualizarBotaoSalvar();
+        }
+
+        // Pega a semana atual pelo campo "Semana" e troca (salvando a anterior antes)
+        function irParaSemana(ano, sem) {
+            snapshotSemanaExibida();
+            persistirLocal();
+            renderSemana(ano, sem);
+        }
+
+        function irParaSemanaDosCampos() {
+            const ano = parseInt(document.getElementById('inputAno').value) || semanaExibida.ano;
+            const sem = parseInt(document.getElementById('inputNumSemana').value) || semanaExibida.sem;
+            irParaSemana(ano, sem);
+        }
+
+        function irParaSemanaAtual() {
+            const hoje = new Date();
+            const base = new Date(hoje);
+            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) base.setDate(hoje.getDate() + 3);
+            const info = dataParaSemana(base);
+            irParaSemana(info.ano, info.sem);
+        }
+
+        function irParaDataEvento(dataStr) {
+            if (!dataStr) return;
+            const info = dataParaSemana(parseISO(dataStr));
+            irParaSemana(info.ano, info.sem);
+        }
+
+        // Aplica feriado/emenda e treinamentos cadastrados no dia
+        function aplicarEventosNoDia(card, iso) {
+            const feriado = estado.feriados.find(f => f.data === iso && !estado.dispensados.includes(`feriado:${f.id}:${iso}`));
+            if (feriado && !card.dataset.eventoChave && !diaBloqueado(card)) {
+                aplicarBloqueio(card, feriado.tipo !== 'emenda', feriado.desc, `feriado:${feriado.id}:${iso}`);
+            }
+            if (diaBloqueado(card)) return;
+            const tarefas = card.querySelector('.tasks-container');
+            estado.treinamentos.forEach(t => {
+                const fim = t.fim || t.inicio;
+                if (iso < t.inicio || iso > fim) return;
+                const chave = `treino:${t.id}:${iso}`;
+                if (estado.dispensados.includes(chave)) return;
+                if (tarefas.querySelector(`[data-treino-id="${t.id}"]`)) return;
+                tarefas.insertAdjacentHTML('beforeend', htmlItem({ tipo: 'treino', desc: t.nome, extra: `📍 ${t.local} | 👤 ${t.pessoa}`, treinoId: t.id, chave }));
             });
         }
 
-        // ===== DADOS: SOMENTE NO NAVEGADOR (localStorage) + ARQUIVO DO COMPUTADOR =====
-        async function sincronizarComNuvem() {
-            try {
-                const bruto = localStorage.getItem(CHAVE_DADOS);
-                dadosGlobaisNuvem = bruto ? JSON.parse(bruto) : {};
-                if (dadosGlobaisNuvem.semanas) {
-                    for (let k in dadosGlobaisNuvem.semanas) {
-                        dadosGlobaisNuvem.semanas[k] = garantirCaixinhasEmHtmlSalvo(dadosGlobaisNuvem.semanas[k]);
-                    }
-                }
-                if (dadosGlobaisNuvem.historico) localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dadosGlobaisNuvem.historico));
-                if (dadosGlobaisNuvem.treinamentos) localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(dadosGlobaisNuvem.treinamentos));
-                if (dadosGlobaisNuvem.feriados) localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dadosGlobaisNuvem.feriados));
-                if (dadosGlobaisNuvem.tipos) localStorage.setItem(CHAVE_TIPOS, JSON.stringify(dadosGlobaisNuvem.tipos));
-            } catch (e) {
-                console.error("Erro ao carregar dados salvos:", e);
-                dadosGlobaisNuvem = {};
-            }
+        function diaBloqueado(card) {
+            const cf = card.querySelector('.check-feriado'), ce = card.querySelector('.check-emenda');
+            return !!((cf && cf.checked) || (ce && ce.checked) || card.dataset.backupTarefas !== undefined);
         }
 
-        async function salvarNaNuvem() {
-            const semanas = dadosGlobaisNuvem.semanas || {};
-            semanas[getWeekKey()] = document.getElementById('weekGridContainer').innerHTML;
-
-            dadosGlobaisNuvem = {
-                historico: JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {},
-                treinamentos: JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [],
-                feriados: JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [],
-                semanas,
-                dispensados: dadosGlobaisNuvem.dispensados || [],
-                tipos: JSON.parse(localStorage.getItem(CHAVE_TIPOS)) || []
-            };
-
-            try {
-                localStorage.setItem(CHAVE_DADOS, JSON.stringify(dadosGlobaisNuvem));
-            } catch (e) {
-                console.error("Erro ao gravar no navegador:", e);
-                return false;
+        function aplicarBloqueio(card, ehFeriado, desc, chave) {
+            if (card.dataset.backupTarefas === undefined) {
+                card.dataset.backupTarefas = card.querySelector('.tasks-container').innerHTML;
+                card.dataset.backupRecursos = card.querySelector('.day-resources').innerHTML;
             }
-
-            await gravarArquivoLocal(); // grava também no arquivo do computador, se você escolheu um
-            return true;
+            const cf = card.querySelector('.check-feriado'), ce = card.querySelector('.check-emenda');
+            if (cf) cf.checked = ehFeriado;
+            if (ce) ce.checked = !ehFeriado;
+            if (chave) card.dataset.eventoChave = chave;
+            card.querySelector('.tasks-container').innerHTML = htmlBloco(ehFeriado, desc);
+            card.querySelector('.day-resources').innerHTML = '';
         }
 
-        async function salvarMovimentos() {
-            const ok = await salvarNaNuvem();
-            if (ok) {
-                movimentosPendentes = false;
-                atualizarBotaoSalvarMov();
-                mostrarToast('💾 Programação salva!');
+        // Devolve o dia ao normal (puro DOM: serve para a tela e para semanas guardadas)
+        function restaurarDia(card) {
+            const chave = card.dataset.eventoChave;
+            if (chave) {
+                if (!estado.dispensados.includes(chave)) estado.dispensados.push(chave);
+                delete card.dataset.eventoChave;
+            }
+            card.querySelectorAll('.check-feriado, .check-emenda, .check-concluir-dia').forEach(cb => cb.checked = false);
+            if (card.dataset.backupTarefas !== undefined) {
+                card.querySelector('.tasks-container').innerHTML = card.dataset.backupTarefas;
+                card.querySelector('.day-resources').innerHTML = card.dataset.backupRecursos || '';
+                delete card.dataset.backupTarefas;
+                delete card.dataset.backupRecursos;
             } else {
-                mostrarToast('❌ Não foi possível salvar.', 'erro');
+                card.querySelector('.tasks-container').innerHTML = htmlTarefasPadrao();
+                card.querySelector('.day-resources').innerHTML = htmlRecursosPadrao();
             }
         }
 
-        function atualizarBotaoSalvarMov() {
-            const b = document.getElementById('btnSalvarBarra');
-            if (!b) return;
-            b.classList.toggle('btn-pendente', movimentosPendentes);
-            b.textContent = movimentosPendentes ? '💾 Salvar •' : '💾 Salvar';
+        function restaurarDiaNormal(botao) {
+            const card = botao.closest('.day-card');
+            if (!card) return;
+            restaurarDia(card);
+            alterou();
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
         }
 
-        async function guardarEstadoDOM() {
-            movimentosPendentes = true;
-            atualizarBotaoSalvarMov();
+        function alternarBloqueioDia(cb) {
+            const card = cb.closest('.day-card');
+            const cf = card.querySelector('.check-feriado'), ce = card.querySelector('.check-emenda');
+            if (cb.checked) {
+                if (cb === cf) ce.checked = false; else cf.checked = false;
+            }
+            if (cf.checked || ce.checked) aplicarBloqueio(card, cf.checked, '', '');
+            else restaurarDia(card);
+            alterou();
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('popTreinoInicio').valueAsDate = new Date();
-            document.getElementById('popTreinoFim').valueAsDate = new Date();
-            document.getElementById('popFeriadoData').valueAsDate = new Date();
+        // ===== CHECKS E INDICADOR =====
+        function atualizarIndicador() {
+            document.querySelectorAll('.day-card').forEach(card => {
+                const mestre = card.querySelector('.check-concluir-dia');
+                if (!mestre) return;
+                const itens = card.querySelectorAll('input.task-check');
+                mestre.checked = itens.length > 0 && [...itens].every(c => c.checked);
+            });
+        }
 
-            await sincronizarComNuvem();
+        function alternarConclusaoTarefa(cb) {
+            const box = cb.closest('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag');
+            if (box) box.classList.toggle('task-done', cb.checked);
+            cb.toggleAttribute('checked', cb.checked);
+            atualizarIndicador();
+            alterou();
+        }
+
+        function alternarConclusaoDia(mestre) {
+            const card = mestre.closest('.day-card');
+            if (!card) return;
+            card.querySelectorAll('input.task-check').forEach(cb => {
+                cb.checked = mestre.checked;
+                cb.toggleAttribute('checked', mestre.checked);
+                const box = cb.closest('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag');
+                if (box) box.classList.toggle('task-done', mestre.checked);
+            });
+            atualizarIndicador();
+            alterou();
+        }
+
+        function abrirModalIndicador() {
+            const checks = document.querySelectorAll('#weekGridContainer input.task-check');
+            const total = checks.length;
+            const concluidas = [...checks].filter(c => c.checked).length;
+            const pendentes = total - concluidas;
+            const pct = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+            document.getElementById('conteudoRelatorioIndicador').innerHTML = `
+                <div class="bg-amber-50 dark:bg-amber-950/40 p-4 rounded-xl border border-amber-200 dark:border-amber-900 space-y-3 text-xs">
+                    <p class="text-sm font-bold text-amber-900 dark:text-amber-200">📌 Relatório Detalhado</p>
+                    <p><strong>Semana Atual:</strong> ${semanaExibida.sem} (${semanaExibida.ano})</p>
+                    <p><strong>Total de Itens na Semana:</strong> ${total}</p>
+                    <p><strong>Tarefas Concluídas:</strong> <span class="text-green-700 font-bold text-sm">${concluidas}</span></p>
+                    <p><strong>Tarefas Pendentes:</strong> <span class="text-amber-600 font-bold text-sm">${pendentes}</span></p>
+                    <div class="pt-2 border-t dark:border-gray-700">
+                        <p class="font-bold mb-1">Aproveitamento Geral:</p>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-amber-600 h-3 rounded-full" style="width: ${pct}%"></div></div>
+                        <p class="text-right font-bold text-amber-700 dark:text-amber-400 mt-1">${pct}% Concluído</p>
+                    </div>
+                </div>`;
+            document.getElementById('modalIndicador').classList.remove('hidden');
+        }
+
+        function fecharModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // ===== PAINEL DE AVISOS =====
+        function renderizarAvisos() {
+            const painel = document.getElementById('painelAvisos');
+            if (!painel) return;
+            const JANELA = 30;
+            const itens = [];
+            estado.treinamentos.forEach(t => {
+                const n = diasAte(t.inicio), fimN = diasAte(t.fim || t.inicio);
+                if (fimN < 0 || n > JANELA) return;
+                itens.push({ n: Math.max(0, n), emCurso: n < 0, data: t.inicio, tipo: 'treino',
+                    titulo: `🎓 ${escHtml(t.nome)}`, sub: `👤 ${escHtml(t.pessoa)} · 📍 ${escHtml(t.local)}` });
+            });
+            estado.feriados.forEach(f => {
+                const n = diasAte(f.data);
+                if (n < 0 || n > JANELA) return;
+                itens.push({ n, emCurso: false, data: f.data, tipo: 'feriado',
+                    titulo: `${f.tipo === 'emenda' ? '📌' : '🍃'} ${escHtml(f.desc)}`,
+                    sub: f.data.split('-').reverse().join('/') });
+            });
+            if (itens.length === 0) { painel.innerHTML = ''; return; }
+            itens.sort((a, b) => a.n - b.n);
+
+            const rotulo = (n, emCurso) => emCurso ? '🔥 EM CURSO!' : n === 0 ? '🔥 HOJE!' : n === 1 ? '⚠️ AMANHÃ!' : `⏳ em ${n} dias`;
+            const classe = n => n === 0 ? 'aviso-hoje' : n <= 3 ? 'aviso-breve' : 'aviso-normal';
+
+            if (sessionStorage.getItem('avisos_ocultos') === '1') {
+                painel.innerHTML = `<button onclick="alternarAvisos(false)" class="aviso-chip aviso-hoje w-full justify-center" style="margin-top:0"><span><span class="aviso-sino">🔔</span> Mostrar avisos (${itens.length})</span></button>`;
+                return;
+            }
+            painel.innerHTML = `
+                <div class="aviso-painel shadow-md">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-black uppercase text-orange-700 dark:text-orange-300"><span class="aviso-sino">🔔</span> Atenção! Próximos treinamentos e feriados</span>
+                        <button onclick="alternarAvisos(true)" class="text-gray-400 hover:text-gray-600 font-bold text-sm" title="Recolher">✕</button>
+                    </div>
+                    ${itens.map(i => `
+                        <div class="aviso-chip ${classe(i.n)} aviso-${i.tipo}" onclick="irParaDataEvento('${i.data}')" title="Ir para a semana">
+                            <span>${i.titulo}<small>${i.sub}</small></span>
+                            <span class="aviso-prazo">${rotulo(i.n, i.emCurso)}</span>
+                        </div>`).join('')}
+                </div>`;
+        }
+
+        function alternarAvisos(ocultar) {
+            if (ocultar) sessionStorage.setItem('avisos_ocultos', '1');
+            else sessionStorage.removeItem('avisos_ocultos');
             renderizarAvisos();
-
-            const manifestObj = {
-                "name": "Programação Semanal", "short_name": "ProgSemanal", "start_url": ".",
-                "display": "standalone", "background_color": "#f9f9f9", "theme_color": "#1b5e20",
-                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", "sizes": "512x512", "type": "image/png"}]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/manifest+json'});
-            document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
-
-            if (localStorage.getItem('dark_mode') === 'true') {
-                document.documentElement.classList.add('dark');
-            }
-            carregarFrequentes();
-            carregarTipos();
-            definirSemanaAtualComRegraSexta();
-            document.getElementById('inputDataEvento').valueAsDate = new Date();
-        });
-
-        function instalarApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-            } else {
-                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
-            }
         }
 
+        // ===== BUSCA E ABAS DO CELULAR =====
+        function filtrarItensEmTempoReal(termo) {
+            termo = termo.trim().toLowerCase();
+            document.getElementById('btnLimparBusca').classList.toggle('hidden', !termo);
+            document.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag').forEach(cx => {
+                const bate = !termo || cx.innerText.toLowerCase().includes(termo);
+                cx.style.display = bate ? '' : 'none';
+                cx.classList.toggle('ring-2', !!termo && bate);
+                cx.classList.toggle('ring-amber-400', !!termo && bate);
+            });
+        }
+
+        function limparBusca() {
+            document.getElementById('inputBuscaGeral').value = '';
+            filtrarItensEmTempoReal('');
+        }
+
+        function mudarAbaDiaMobile(diaNome, botao) {
+            document.querySelectorAll('.btn-tab-mobile').forEach(b => {
+                b.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
+                b.classList.add('text-gray-600', 'dark:text-gray-300');
+            });
+            botao.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm', 'text-green-800', 'dark:text-green-300');
+            const container = document.getElementById('weekGridContainer');
+            container.classList.toggle('mobile-single-day', diaNome !== 'todos');
+            container.querySelectorAll('.day-card').forEach(c => c.classList.toggle('active-day', c.dataset.diaNome === diaNome));
+        }
+
+        // ===== MODAIS: TREINAMENTOS E FERIADOS =====
         function abrirModalHistorico() { renderizarListaHistorico(); document.getElementById('modalHistorico').classList.remove('hidden'); }
-        function fecharModalHistorico() { document.getElementById('modalHistorico').classList.add('hidden'); }
         function abrirModalTreinamentos() { renderizarPopTreinamentos(); document.getElementById('modalTreinamentos').classList.remove('hidden'); }
-        function fecharModalTreinamentos() { document.getElementById('modalTreinamentos').classList.add('hidden'); }
         function abrirModalFeriados() { renderizarPopFeriados(); document.getElementById('modalFeriados').classList.remove('hidden'); }
-        function fecharModalFeriados() { document.getElementById('modalFeriados').classList.add('hidden'); }
 
         function renderizarPopTreinamentos() {
             const container = document.getElementById('popListaTreinamentos');
             container.innerHTML = '';
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            if (lista.length === 0) {
+            if (estado.treinamentos.length === 0) {
                 container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum treinamento registado.</p>';
                 return;
             }
-            lista.forEach(t => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
+            estado.treinamentos.forEach(t => {
                 const periodo = (t.fim && t.fim !== t.inicio)
                     ? `${t.inicio.split('-').reverse().join('/')} a ${t.fim.split('-').reverse().join('/')}`
                     : t.inicio.split('-').reverse().join('/');
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
                 div.innerHTML = `
                     <div><span class="font-bold text-emerald-800 dark:text-emerald-300">🎓 ${escHtml(t.nome)} (${escHtml(t.pessoa)})</span><br><small class="text-gray-400">${periodo} · ${escHtml(t.local)}</small></div>
                     <div class="flex gap-1">
@@ -1014,83 +945,58 @@
             });
         }
 
-        async function salvarTreinamentoPop() {
+        function salvarTreinamentoPop() {
             const inicio = document.getElementById('popTreinoInicio').value;
-            const fim = document.getElementById('popTreinoFim').value;
+            const fim = document.getElementById('popTreinoFim').value || inicio;
             const nome = aplicarCorrecao(document.getElementById('popTreinoNome').value);
             const local = aplicarCorrecao(document.getElementById('popTreinoLocal').value);
             const pessoa = aplicarCorrecao(document.getElementById('popTreinoPessoa').value);
-
-            if (!inicio || !fim || !nome || !local || !pessoa) { alert("Preencha todos os campos."); return; }
-
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            lista.push({ id: 'treino_' + Date.now(), inicio, fim, nome, local, pessoa });
-            localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista));
-            await salvarNaNuvem();
+            if (!inicio || !nome || !local || !pessoa) { alert("Preencha os campos obrigatórios."); return; }
+            if (fim < inicio) { alert("A data final é anterior à inicial."); return; }
+            snapshotSemanaExibida();
+            estado.treinamentos.push({ id: 'treino_' + Date.now(), inicio, fim, nome, local, pessoa });
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
             renderizarAvisos();
             renderizarPopTreinamentos();
-            atualizarDatasSemana();
             mostrarToast("✅ Treinamento guardado!");
         }
 
-        function dataParaSemana(dataObj) {
-            const d = new Date(Date.UTC(dataObj.getFullYear(), dataObj.getMonth(), dataObj.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return { ano: dObjAno(dataObj), semana: Math.ceil((((d - yearStart) / 86400000) + 1) / 7) };
-        }
-        function dObjAno(dataObj) { return dataObj.getFullYear(); }
-
-        async function enviarTreinamentoParaProgramacao(id) {
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            const t = lista.find(item => item.id === id);
+        function enviarTreinamentoParaProgramacao(id) {
+            const t = estado.treinamentos.find(x => x.id === id);
             if (!t) return;
+            estado.dispensados = estado.dispensados.filter(k => !k.startsWith(`treino:${id}:`));
+            const info = dataParaSemana(parseISO(t.inicio));
+            fecharModal('modalTreinamentos');
+            irParaSemana(info.ano, info.sem);
+            alterou();
+            mostrarToast(`✅ Treinamento na Semana ${info.sem}!`);
+        }
 
-            const dObj = new Date(t.inicio + 'T00:00:00');
-            const { ano, semana: semanaNo } = dataParaSemana(dObj);
-
-            document.getElementById('inputAno').value = ano;
-            document.getElementById('inputNumSemana').value = semanaNo;
-            atualizarDatasSemana();
-
-            const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const diaSemanaNum = dObj.getDay();
-
-            if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
-                const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
-                if (cardDia) {
-                    const tasksCont = cardDia.querySelector('.tasks-container');
-                    const identificadorUnico = `treino_id_${t.id}`;
-                    if (!tasksCont.innerHTML.includes(identificadorUnico)) {
-                        const divTreino = document.createElement('div');
-                        divTreino.className = 'treinamento-box';
-                        divTreino.setAttribute('draggable', 'true');
-                        divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                        divTreino.dataset.eventoChave = `treino:${t.id}:${t.inicio}`;
-                        divTreino.innerHTML = `
-                            <span class="${identificadorUnico} flex items-center gap-1.5">
-                                <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
-                                <span class="drag-handle">⠿</span> <div class="treino-info"><div>🎓 <strong class="item-text">${escHtml(t.nome)}</strong></div><small>📍 ${escHtml(t.local)} | 👤 ${escHtml(t.pessoa)}</small></div>
-                            </span>
-                            <span class="item-controls">
-                                <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
-                                <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
-                            </span>`;
-                        tasksCont.appendChild(divTreino);
-                        await salvarNaNuvem();
-                        atualizarIndicadorProgresso();
-                        fecharModalTreinamentos();
-                        mostrarToast(`✅ Treinamento enviado para a Semana ${semanaNo}!`);
-                    } else { alert("⚠️ Este treinamento já consta nesta semana."); }
-                }
-            } else { alert("⚠️ A data deste treinamento cai em fim de semana."); }
+        function excluirTreinamento(id) {
+            const t = estado.treinamentos.find(x => x.id === id);
+            if (!t) return;
+            if (!confirm(`Excluir o treinamento "${t.nome}"?\nEle também será retirado de todas as semanas.`)) return;
+            snapshotSemanaExibida();
+            estado.treinamentos = estado.treinamentos.filter(x => x.id !== id);
+            Object.keys(estado.semanas).forEach(k => {
+                const doc = new DOMParser().parseFromString(estado.semanas[k], 'text/html');
+                const alvos = doc.querySelectorAll(`[data-treino-id="${id}"]`);
+                if (!alvos.length) return;
+                alvos.forEach(el => el.remove());
+                estado.semanas[k] = doc.body.innerHTML;
+            });
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
+            renderizarAvisos();
+            renderizarPopTreinamentos();
+            mostrarToast("🗑️ Treinamento excluído.", "info");
         }
 
         function renderizarPopFeriados() {
             const container = document.getElementById('popListaFeriados');
             container.innerHTML = '';
-            const lista = (JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || []).slice().sort((a, b) => a.data.localeCompare(b.data));
+            const lista = estado.feriados.slice().sort((a, b) => a.data.localeCompare(b.data));
             if (lista.length === 0) {
                 container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-2">Nenhum feriado registado.</p>';
                 return;
@@ -1108,101 +1014,53 @@
             });
         }
 
-        async function salvarFeriadoPop() {
+        function salvarFeriadoPop() {
             const data = document.getElementById('popFeriadoData').value;
             const tipo = document.getElementById('popFeriadoTipo').value;
             const desc = aplicarCorrecao(document.getElementById('popFeriadoDesc').value);
-
-            if (!data || !desc) { alert("Preencha todos os campos."); return; }
-
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            lista.push({ id: 'feriado_custom_' + Date.now(), data, tipo, desc });
-            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
-            await salvarNaNuvem();
+            if (!data || !desc) { alert("Preencha a data e a descrição."); return; }
+            snapshotSemanaExibida();
+            estado.feriados.push({ id: 'feriado_custom_' + Date.now(), data, tipo, desc });
+            const info = dataParaSemana(parseISO(data));
+            irParaSemana(info.ano, info.sem);
+            alterou();
             renderizarAvisos();
             renderizarPopFeriados();
-            atualizarDatasSemana();
-            mostrarToast("✅ Feriado guardado!");
+            mostrarToast("✅ Feriado guardado e aplicado!");
         }
 
-        async function enviarFeriadoParaProgramacao(id) {
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            const f = lista.find(item => item.id === id);
+        function enviarFeriadoParaProgramacao(id) {
+            const f = estado.feriados.find(x => x.id === id);
             if (!f) return;
-
-            const dObj = new Date(f.data + 'T00:00:00');
-            const { ano, semana: semanaNo } = dataParaSemana(dObj);
-
-            document.getElementById('inputAno').value = ano;
-            document.getElementById('inputNumSemana').value = semanaNo;
-            atualizarDatasSemana();
-
-            const diasMap = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const diaSemanaNum = dObj.getDay();
-
-            if (diaSemanaNum >= 1 && diaSemanaNum <= 5) {
-                const cardDia = document.querySelector(`.day-card[data-dia-nome="${diasMap[diaSemanaNum]}"]`);
-                if (cardDia) {
-                    const tasksCont = cardDia.querySelector('.tasks-container');
-                    const tituloFeriado = f.tipo === 'feriado' ? '🍃 FERIADO' : '📌 EMENDA';
-
-                    guardarBackupDia(cardDia);
-                    cardDia.dataset.eventoChave = `feriado:${f.id || f.data}:${f.data}`;
-
-                    const cf = cardDia.querySelector('.check-feriado');
-                    const ce = cardDia.querySelector('.check-emenda');
-                    if (cf) cf.checked = (f.tipo === 'feriado');
-                    if (ce) ce.checked = (f.tipo === 'emenda');
-
-                    tasksCont.innerHTML = `
-                        <div style="background-color: ${f.tipo === 'feriado' ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${f.tipo === 'feriado' ? '#2e7d32' : '#00897b'}; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm">
-                            <span style="color: ${f.tipo === 'feriado' ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 12px;">${tituloFeriado}</span>
-                            <div style="color: ${f.tipo === 'feriado' ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${escHtml(f.desc)}</div>
-                            <button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button>
-                        </div>`;
-                    cardDia.querySelector('.day-resources').innerHTML = '';
-                    await salvarNaNuvem();
-                    atualizarIndicadorProgresso();
-                    fecharModalFeriados();
-                    mostrarToast(`✅ ${f.desc} aplicado na Semana ${semanaNo}!`);
-                }
-            } else { alert("⚠️ A data deste evento cai em fim de semana."); }
+            estado.dispensados = estado.dispensados.filter(k => !k.startsWith(`feriado:${id}:`));
+            const info = dataParaSemana(parseISO(f.data));
+            fecharModal('modalFeriados');
+            irParaSemana(info.ano, info.sem);
+            alterou();
+            mostrarToast(`✅ ${f.desc} aplicado na Semana ${info.sem}!`);
         }
 
-        // ===== EXCLUIR TREINAMENTO / FERIADO CADASTRADO =====
-        async function excluirTreinamento(id) {
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            const t = lista.find(x => x.id === id);
-            if (!t) return;
-            if (!confirm(`Excluir o treinamento "${t.nome}"?\nEle também será retirado da semana exibida.`)) return;
-            localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(lista.filter(x => x.id !== id)));
-            document.querySelectorAll('.treino_id_' + id).forEach(el => {
-                const box = el.closest('.treinamento-box');
-                if (box) box.remove();
-            });
-            await salvarNaNuvem();
-            renderizarAvisos();
-            renderizarPopTreinamentos();
-            atualizarIndicadorProgresso();
-            mostrarToast("🗑️ Treinamento excluído.", "info");
-        }
-
-        async function excluirFeriado(id) {
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            const f = lista.find(x => x.id === id);
+        function excluirFeriado(id) {
+            const f = estado.feriados.find(x => x.id === id);
             if (!f) return;
-            if (!confirm(`Excluir "${f.desc}"?\nO dia volta ao normal na semana exibida.`)) return;
-            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista.filter(x => x.id !== id)));
-            document.querySelectorAll('.day-card').forEach(card => {
-                if ((card.dataset.eventoChave || '').startsWith(`feriado:${id}:`)) restaurarDiaNormal(card);
+            if (!confirm(`Excluir "${f.desc}"?\nOs dias voltam ao normal em todas as semanas.`)) return;
+            snapshotSemanaExibida();
+            estado.feriados = estado.feriados.filter(x => x.id !== id);
+            Object.keys(estado.semanas).forEach(k => {
+                const doc = new DOMParser().parseFromString(estado.semanas[k], 'text/html');
+                let mudou = false;
+                doc.querySelectorAll('.day-card').forEach(card => {
+                    if ((card.dataset.eventoChave || '').startsWith(`feriado:${id}:`)) { restaurarDia(card); mudou = true; }
+                });
+                if (mudou) estado.semanas[k] = doc.body.innerHTML;
             });
-            await salvarNaNuvem();
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
             renderizarAvisos();
             renderizarPopFeriados();
             mostrarToast("🗑️ Feriado excluído.", "info");
         }
 
-        // ===== IMPORTAR FERIADOS NACIONAIS (BRASIL) =====
         function calcularPascoa(ano) {
             const a = ano % 19, b = Math.floor(ano / 100), c = ano % 100;
             const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
@@ -1216,224 +1074,82 @@
             return new Date(ano, mes - 1, dia);
         }
 
-        async function importarFeriadosNacionais() {
+        function importarFeriadosNacionais() {
             const ano = parseInt(document.getElementById('inputAno').value) || new Date().getFullYear();
-            if (!confirm(`Importar os feriados nacionais de ${ano}?\n(Feriados estaduais e municipais você cadastra manualmente.)`)) return;
-
+            if (!confirm(`Importar os feriados nacionais de ${ano}?`)) return;
             const pascoa = calcularPascoa(ano);
             const sextaSanta = new Date(pascoa); sextaSanta.setDate(pascoa.getDate() - 2);
             const fixos = [
-                [`${ano}-01-01`, 'CONFRATERNIZAÇÃO UNIVERSAL'],
-                [dataISO(sextaSanta), 'SEXTA-FEIRA SANTA'],
-                [`${ano}-04-21`, 'TIRADENTES'],
-                [`${ano}-05-01`, 'DIA DO TRABALHO'],
-                [`${ano}-09-07`, 'INDEPENDÊNCIA DO BRASIL'],
-                [`${ano}-10-12`, 'NOSSA SENHORA APARECIDA'],
-                [`${ano}-11-02`, 'FINADOS'],
-                [`${ano}-11-15`, 'PROCLAMAÇÃO DA REPÚBLICA']
+                [`${ano}-01-01`, 'CONFRATERNIZAÇÃO UNIVERSAL'], [dataISO(sextaSanta), 'SEXTA-FEIRA SANTA'],
+                [`${ano}-04-21`, 'TIRADENTES'], [`${ano}-05-01`, 'DIA DO TRABALHO'],
+                [`${ano}-09-07`, 'INDEPENDÊNCIA DO BRASIL'], [`${ano}-10-12`, 'NOSSA SENHORA APARECIDA'],
+                [`${ano}-11-02`, 'FINADOS'], [`${ano}-11-15`, 'PROCLAMAÇÃO DA REPÚBLICA']
             ];
             if (ano >= 2024) fixos.push([`${ano}-11-20`, 'DIA DA CONSCIÊNCIA NEGRA']);
             fixos.push([`${ano}-12-25`, 'NATAL']);
-
-            const lista = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
             let novos = 0;
             fixos.forEach(([data, desc]) => {
-                if (lista.some(f => f.data === data)) return;
-                lista.push({ id: 'feriado_nac_' + data, data, tipo: 'feriado', desc });
+                if (estado.feriados.some(f => f.data === data)) return;
+                estado.feriados.push({ id: 'feriado_nac_' + data, data, tipo: 'feriado', desc });
                 novos++;
             });
-            localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(lista));
-            await salvarNaNuvem();
+            snapshotSemanaExibida();
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
             renderizarAvisos();
             renderizarPopFeriados();
-            atualizarDatasSemana();
             mostrarToast(novos ? `✅ ${novos} feriados nacionais importados!` : "ℹ️ Todos já estavam cadastrados.", novos ? 'sucesso' : 'info');
         }
 
-        // ===== AUTOMÁTICO: TREINAMENTOS E FERIADOS ENTRAM SOZINHOS NA SEMANA =====
-        function dataISO(d) {
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        }
-        function eventoDispensado(chave) {
-            return (dadosGlobaisNuvem.dispensados || []).includes(chave);
-        }
-        function dispensarEvento(chave) {
-            if (!chave) return;
-            if (!dadosGlobaisNuvem.dispensados) dadosGlobaisNuvem.dispensados = [];
-            if (!dadosGlobaisNuvem.dispensados.includes(chave)) dadosGlobaisNuvem.dispensados.push(chave);
-        }
-
-        function aplicarEventosAutomaticos(datas) {
-            const treinos = JSON.parse(localStorage.getItem(CHAVE_LOCAL_TREINOS)) || [];
-            const feriados = JSON.parse(localStorage.getItem(CHAVE_LOCAL_FERIADOS)) || [];
-            let mudou = false;
-
-            datas.forEach((dataObj, index) => {
-                const card = document.querySelector(`.day-card[data-dia-nome="${DIAS_SEMANA[index]}"]`);
-                if (!card) return;
-                const iso = dataISO(dataObj);
-
-                const f = feriados.find(x => x.data === iso && !eventoDispensado(`feriado:${x.id || x.data}:${iso}`));
-                if (f && !diaEstaBloqueado(card)) {
-                    guardarBackupDia(card);
-                    const ehFeriado = f.tipo !== 'emenda';
-                    const cf = card.querySelector('.check-feriado');
-                    const ce = card.querySelector('.check-emenda');
-                    if (cf) cf.checked = ehFeriado;
-                    if (ce) ce.checked = !ehFeriado;
-                    card.dataset.eventoChave = `feriado:${f.id || f.data}:${iso}`;
-                    card.querySelector('.tasks-container').innerHTML = `
-                        <div style="background-color: ${ehFeriado ? '#e8f5e9' : '#e0f2f1'}; border: 1px solid #a3e4d7; border-left: 4px solid ${ehFeriado ? '#2e7d32' : '#00897b'}; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm">
-                            <span style="color: ${ehFeriado ? '#1b5e20' : '#004d40'}; font-weight: 900; font-size: 12px;">${ehFeriado ? '🍃 FERIADO' : '📌 EMENDA'}</span>
-                            <div style="color: ${ehFeriado ? '#2e7d32' : '#00695c'}; font-size: 10px; font-weight: 700; margin-top: 4px;">${escHtml(f.desc)}</div>
-                            <button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button>
-                        </div>`;
-                    card.querySelector('.day-resources').innerHTML = '';
-                    mudou = true;
-                }
-
-                if (diaEstaBloqueado(card)) return;
-                const tasksCont = card.querySelector('.tasks-container');
-                treinos.forEach(t => {
-                    const fim = t.fim || t.inicio;
-                    if (iso < t.inicio || iso > fim) return;
-                    const chave = `treino:${t.id}:${iso}`;
-                    if (eventoDispensado(chave)) return;
-                    const identificadorUnico = `treino_id_${t.id}`;
-                    if (tasksCont.innerHTML.includes(identificadorUnico)) return;
-
-                    const divTreino = document.createElement('div');
-                    divTreino.className = 'treinamento-box';
-                    divTreino.setAttribute('draggable', 'true');
-                    divTreino.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    divTreino.dataset.eventoChave = chave;
-                    divTreino.innerHTML = `
-                        <span class="${identificadorUnico} flex items-center gap-1.5">
-                            <input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">
-                            <span class="drag-handle">⠿</span> <div class="treino-info"><div>🎓 <strong class="item-text">${escHtml(t.nome)}</strong></div><small>📍 ${escHtml(t.local)} | 👤 ${escHtml(t.pessoa)}</small></div>
-                        </span>
-                        <span class="item-controls">
-                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
-                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
-                        </span>`;
-                    tasksCont.appendChild(divTreino);
-                    mudou = true;
-                });
-            });
-
-            if (mudou) salvarNaNuvem();
-        }
-
-        // ===== BACKUP / RESTAURO DO DIA ANTES DE FERIADO OU EMENDA =====
-        function diaEstaBloqueado(card) {
-            const cf = card.querySelector('.check-feriado');
-            const ce = card.querySelector('.check-emenda');
-            return !!((cf && cf.checked) || (ce && ce.checked) || card.dataset.backupTarefas !== undefined);
-        }
-
-        function guardarBackupDia(card) {
-            if (card.dataset.backupTarefas !== undefined) return;
-            card.dataset.backupTarefas = card.querySelector('.tasks-container').innerHTML;
-            card.dataset.backupRecursos = card.querySelector('.day-resources').innerHTML;
-        }
-
-        function restaurarDiaNormal(botao) {
-            const card = botao.closest('.day-card');
-            if (!card) return;
-            const cf = card.querySelector('.check-feriado');
-            const ce = card.querySelector('.check-emenda');
-            const cc = card.querySelector('.check-concluir-dia');
-            if (card.dataset.eventoChave) {
-                dispensarEvento(card.dataset.eventoChave);
-                delete card.dataset.eventoChave;
-            }
-            if (cf) cf.checked = false;
-            if (ce) ce.checked = false;
-            if (cc) cc.checked = false;
-
-            const tasksCont = card.querySelector('.tasks-container');
-            const resCont = card.querySelector('.day-resources');
-
-            if (card.dataset.backupTarefas !== undefined) {
-                tasksCont.innerHTML = card.dataset.backupTarefas;
-                resCont.innerHTML = card.dataset.backupRecursos || '';
-                delete card.dataset.backupTarefas;
-                delete card.dataset.backupRecursos;
-            } else {
-                tasksCont.innerHTML = `
-                    <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🕒 HORA CERTA</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                    <div class="task-box" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">📦 MOVIMENTAÇÃO G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>`;
-                resCont.innerHTML = `
-                    <div class="resources-title">Recursos</div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">CARRO</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>
-                    <div class="resource-tag" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">EMPILHADEIRA G4</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>`;
-            }
-            guardarEstadoDOM();
-            reativarEventosDragDrop();
-            atualizarIndicadorProgresso();
-        }
-
-        function alternarConclusaoTarefa(checkbox) {
-            const taskBox = checkbox.closest('.task-box, .tarefa-extra-box, .treinamento-box, .resource-tag');
-            if (!taskBox) return;
-            taskBox.classList.toggle('task-done', checkbox.checked);
-            atualizarIndicadorProgresso();
-            guardarEstadoDOM();
-        }
-
+        // ===== HISTÓRICO =====
         function renderizarListaHistorico() {
             const container = document.getElementById('listaHistoricoSemanas');
             container.innerHTML = '';
-            const historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            const chaves = Object.keys(historico);
+            const chaves = Object.keys(estado.historico);
             if (chaves.length === 0) {
                 container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhuma semana guardada.</p>';
                 return;
             }
             chaves.forEach(key => {
-                const item = historico[key];
+                const item = estado.historico[key];
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs';
                 div.innerHTML = `
-                    <div><span class="font-bold text-gray-800 dark:text-gray-200 block">${item.titulo}</span><small class="text-gray-400">${item.dataSalvo}</small></div>
+                    <div><span class="font-bold text-gray-800 dark:text-gray-200 block">${escHtml(item.titulo)}</span><small class="text-gray-400">${escHtml(item.dataSalvo)}</small></div>
                     <button onclick="carregarSemanaHistorico('${item.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Carregar</button>`;
                 container.appendChild(div);
             });
         }
 
-        async function carregarSemanaHistorico(id) {
-            const historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            if (historico[id]) {
-                document.getElementById('weekGridContainer').innerHTML = garantirCaixinhasEmHtmlSalvo(historico[id].html);
-                forcarCaixinhasDiaNoDOM();
-                await guardarEstadoDOM();
-                reativarEventosDragDrop();
-                atualizarIndicadorProgresso();
-                fecharModalHistorico();
-                mostrarToast("Semana carregada com sucesso!");
-            }
+        function carregarSemanaHistorico(id) {
+            const item = estado.historico[id];
+            if (!item) return;
+            snapshotSemanaExibida();
+            estado.semanas[chaveSemana(semanaExibida.ano, semanaExibida.sem)] = item.html;
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
+            fecharModal('modalHistorico');
+            mostrarToast("Semana carregada com sucesso!");
         }
 
-        async function salvarSemanaAtualNoHistorico() {
-            const numSemana = document.getElementById('inputNumSemana').value;
-            const ano = document.getElementById('inputAno').value;
-            const idHistorico = `Semana_${numSemana}_${ano}`;
-            const historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || {};
-            historico[idHistorico] = {
-                id: idHistorico, titulo: `Semana ${numSemana} (${ano})`,
-                dataSalvo: new Date().toLocaleDateString('pt-PT'), html: document.getElementById('weekGridContainer').innerHTML
+        function salvarSemanaAtualNoHistorico() {
+            snapshotSemanaExibida();
+            const id = `Semana_${semanaExibida.sem}_${semanaExibida.ano}`;
+            estado.historico[id] = {
+                id, titulo: `Semana ${semanaExibida.sem} (${semanaExibida.ano})`,
+                dataSalvo: new Date().toLocaleDateString('pt-PT'),
+                html: document.getElementById('weekGridContainer').innerHTML
             };
-            localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(historico));
-            await salvarNaNuvem();
-            mostrarToast("✅ Programação guardada no histórico!");
+            alterou();
             renderizarListaHistorico();
+            mostrarToast("✅ Programação guardada no histórico!");
         }
 
+        // ===== FREQUENTES, TIPOS E PALAVRAS =====
         function carregarFrequentes() {
-            const salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
             const select = document.getElementById('selectFrequentes');
             select.innerHTML = '<option value="">-- Escolher item frequente --</option>';
-            salvos.forEach(item => {
+            estado.frequentes.forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item; opt.innerText = item;
                 select.appendChild(opt);
@@ -1441,161 +1157,116 @@
         }
 
         function preencherPredefinido() {
-            const select = document.getElementById('selectFrequentes');
-            if (select.value) document.getElementById('inputDesc').value = select.value;
+            const v = document.getElementById('selectFrequentes').value;
+            if (v) document.getElementById('inputDesc').value = v;
         }
 
-        async function adicionarNovoFrequente() {
+        function adicionarNovoFrequente() {
             const novo = prompt("Digite o nome da nova tarefa ou recurso frequente:");
-            if (novo && novo.trim() !== "") {
-                const itemMaiusculo = aplicarCorrecao(novo);
-                const salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-                if (!salvos.includes(itemMaiusculo)) {
-                    salvos.push(itemMaiusculo);
-                    localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                    carregarFrequentes();
-                    document.getElementById('selectFrequentes').value = itemMaiusculo;
-                    preencherPredefinido();
-                    mostrarToast("Item frequente adicionado!");
-                }
+            if (!novo || !novo.trim()) return;
+            const item = aplicarCorrecao(novo);
+            if (!estado.frequentes.includes(item)) {
+                estado.frequentes.push(item);
+                persistirLocal();
+                carregarFrequentes();
+                document.getElementById('selectFrequentes').value = item;
+                preencherPredefinido();
+                mostrarToast("Item frequente adicionado!");
             }
         }
 
         function gerenciarFrequentes() {
-            const salvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || itensFrequentesPadrao;
-            const listaStr = salvos.map((item, idx) => `${idx + 1}.${item}`).join('\n');
-            const escolha = prompt(`Itens Frequentes:\n\n${listaStr}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
-            if (escolha !== null && !isNaN(escolha)) {
-                const index = parseInt(escolha) - 1;
-                if (index >= 0 && index < salvos.length) {
-                    const itemSelecionado = salvos[index];
-                    const acao = prompt(`Item: "${itemSelecionado}"\n\n1 - Editar nome\n2 - Apagar item`, "1");
-                    if (acao === "1") {
-                        const novoNome = prompt("Novo nome:", itemSelecionado);
-                        if (novoNome && novoNome.trim() !== "") {
-                            salvos[index] = aplicarCorrecao(novoNome);
-                            localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                            carregarFrequentes();
-                        }
-                    } else if (acao === "2") {
-                        salvos.splice(index, 1);
-                        localStorage.setItem('programacao_frequentes_custom', JSON.stringify(salvos));
-                        carregarFrequentes();
-                    }
-                }
+            const lista = estado.frequentes.map((item, idx) => `${idx + 1}.${item}`).join('\n');
+            const escolha = prompt(`Itens Frequentes:\n\n${lista}\n\nDigite o número para EDITAR ou APAGAR:`, "1");
+            if (escolha === null || isNaN(escolha)) return;
+            const i = parseInt(escolha) - 1;
+            if (i < 0 || i >= estado.frequentes.length) return;
+            const acao = prompt(`Item: "${estado.frequentes[i]}"\n\n1 - Editar nome\n2 - Apagar item`, "1");
+            if (acao === "1") {
+                const novo = prompt("Novo nome:", estado.frequentes[i]);
+                if (novo && novo.trim()) estado.frequentes[i] = aplicarCorrecao(novo);
+            } else if (acao === "2") {
+                estado.frequentes.splice(i, 1);
+            }
+            persistirLocal();
+            carregarFrequentes();
+        }
+
+        function carregarTipos() {
+            const sel = document.getElementById('inputTipo');
+            const atual = sel.value;
+            sel.querySelectorAll('option[data-custom]').forEach(o => o.remove());
+            estado.tipos.forEach(t => {
+                const o = document.createElement('option');
+                o.value = 'custom:' + t.id;
+                o.dataset.custom = '1';
+                o.textContent = '🎨 ' + t.nome;
+                o.style.color = t.cor;
+                o.style.fontWeight = 'bold';
+                sel.appendChild(o);
+            });
+            sel.value = [...sel.options].some(o => o.value === atual) ? atual : 'task';
+        }
+
+        function adicionarTipoCustom() {
+            const nome = aplicarCorrecao(document.getElementById('novoTipoNome').value);
+            const cor = document.getElementById('novoTipoCor').value;
+            if (!nome) { alert("Escreva o nome do tipo."); return; }
+            const id = 'tipo_' + Date.now();
+            estado.tipos.push({ id, nome, cor });
+            persistirLocal();
+            carregarTipos();
+            document.getElementById('inputTipo').value = 'custom:' + id;
+            document.getElementById('novoTipoNome').value = '';
+            mostrarToast(`✅ Tipo "${nome}" criado!`);
+        }
+
+        function gerirTiposCustom() {
+            if (!estado.tipos.length) { alert("Ainda não há tipos personalizados."); return; }
+            const n = prompt(`Tipos:\n\n${estado.tipos.map((t, i) => `${i + 1}. ${t.nome} (${t.cor})`).join('\n')}\n\nNúmero para APAGAR (itens já lançados mantêm a cor):`);
+            const i = parseInt(n) - 1;
+            if (i >= 0 && i < estado.tipos.length) {
+                estado.tipos.splice(i, 1);
+                persistirLocal();
+                carregarTipos();
+                mostrarToast("Tipo apagado.", "info");
             }
         }
 
         function adicionarNovaPalavraChave() {
             const nova = prompt("Palavra-chave para o analisador:");
-            if (nova && nova.trim() !== "") {
-                const chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-                chaves.push(aplicarCorrecao(nova));
-                localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
+            if (nova && nova.trim()) {
+                estado.palavras.push(aplicarCorrecao(nova));
+                persistirLocal();
                 mostrarToast("Palavra adicionada!");
             }
         }
 
         function gerenciarPalavrasChave() {
-            const chaves = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            const escolha = prompt(`Palavras-Chave:\n${chaves.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}\n\nNúmero para APAGAR:`);
-            if (escolha !== null && !isNaN(escolha)) {
-                const index = parseInt(escolha) - 1;
-                if (index >= 0 && index < chaves.length) {
-                    chaves.splice(index, 1);
-                    localStorage.setItem('programacao_palavras_chave_custom', JSON.stringify(chaves));
-                    mostrarToast("Palavra apagada!");
-                }
+            const escolha = prompt(`Palavras-Chave:\n${estado.palavras.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}\n\nNúmero para APAGAR:`);
+            if (escolha === null || isNaN(escolha)) return;
+            const i = parseInt(escolha) - 1;
+            if (i >= 0 && i < estado.palavras.length) {
+                estado.palavras.splice(i, 1);
+                persistirLocal();
+                mostrarToast("Palavra apagada!");
             }
-        }
-
-        function alternarBloqueioDia(checkbox) {
-            const card = checkbox.closest('.day-card');
-            const cf = card.querySelector('.check-feriado');
-            const ce = card.querySelector('.check-emenda');
-            const tasksCont = card.querySelector('.tasks-container');
-            const resCont = card.querySelector('.day-resources');
-
-            if (checkbox.checked) {
-                if (checkbox === cf) ce.checked = false;
-                else cf.checked = false;
-            }
-
-            const isFeriado = cf.checked;
-            const isEmenda = ce.checked;
-
-            if (isFeriado || isEmenda) {
-                guardarBackupDia(card);
-                if (isFeriado) {
-                    tasksCont.innerHTML = `<div style="background-color: #e8f5e9; border: 1px solid #a3e4d7; border-left: 4px solid #2e7d32; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #1b5e20; font-weight: 900; font-size: 12px;">🍃 FERIADO</span><br><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
-                } else {
-                    tasksCont.innerHTML = `<div style="background-color: #e0f2f1; border: 1px solid #b2dfdb; border-left: 4px solid #00897b; border-radius: 6px; padding: 15px; text-align: center;" class="shadow-sm"><span style="color: #004d40; font-weight: 900; font-size: 12px;">📌 EMENDA</span><br><button onclick="restaurarDiaNormal(this)" class="mt-2 bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer">Remover / Deletar</button></div>`;
-                }
-                resCont.innerHTML = ``;
-            } else {
-                restaurarDiaNormal(checkbox);
-                return;
-            }
-            atualizarIndicadorProgresso();
-            guardarEstadoDOM();
-        }
-
-        function injetarRotinasFixas(datasDaSemana) {
-            datasDaSemana.forEach((dataObj, index) => {
-                const diaNome = DIAS_SEMANA[index];
-                const card = document.querySelector(`.day-card[data-dia-nome="${diaNome}"]`);
-                if (!card) return;
-                const tasksCont = card.querySelector('.tasks-container');
-                if (!tasksCont || diaEstaBloqueado(card)) return;
-
-                if (diaNome === "Quarta" && !tasksCont.innerText.includes("APC")) {
-                    const divAPC = document.createElement('div');
-                    divAPC.className = 'task-box';
-                    divAPC.setAttribute('draggable', 'true');
-                    divAPC.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    divAPC.innerHTML = `
-                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">👥 LEVAR EQUIPE DA APC (LIMPEZA AO G4)</span></span>
-                        <span class="item-controls">
-                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
-                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
-                        </span>`;
-                    tasksCont.appendChild(divAPC);
-                }
-
-                const ano = dataObj.getFullYear(), mes = dataObj.getMonth(), dia = dataObj.getDate();
-                const ultimoDiaDoMes = new Date(ano, mes + 1, 0).getDate();
-                if (dia >= ultimoDiaDoMes - 6 && !tasksCont.innerText.includes("5S")) {
-                    const div5S = document.createElement('div');
-                    div5S.className = 'task-box';
-                    div5S.setAttribute('draggable', 'true');
-                    div5S.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div5S.innerHTML = `
-                        <span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">🧹 AVALIAÇÃO DOS POSTOS DO 5S</span></span>
-                        <span class="item-controls">
-                            <button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button>
-                            <button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button>
-                        </span>`;
-                    tasksCont.appendChild(div5S);
-                }
-            });
         }
 
         function analisarScript() {
-            const textoScript = document.getElementById('inputScriptTexto').value;
-            const containerSugestoes = document.getElementById('resultadoSugestoes');
-            containerSugestoes.innerHTML = '';
-            if (!textoScript.trim()) return;
-            const palavrasChave = JSON.parse(localStorage.getItem('programacao_palavras_chave_custom')) || palavrasChavePadrao;
-            const linhas = textoScript.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2);
-            const jaAdicionadas = new Set();
-            linhas.forEach(linha => {
-                const linhaUp = aplicarCorrecao(linha);
-                if (palavrasChave.some(p => linhaUp.includes(p)) && !jaAdicionadas.has(linhaUp)) {
-                    jaAdicionadas.add(linhaUp);
+            const texto = document.getElementById('inputScriptTexto').value;
+            const cont = document.getElementById('resultadoSugestoes');
+            cont.innerHTML = '';
+            if (!texto.trim()) return;
+            const usadas = new Set();
+            texto.split(/[\n.!?]+/).map(l => l.trim()).filter(l => l.length > 2).forEach(linha => {
+                const up = aplicarCorrecao(linha);
+                if (estado.palavras.some(p => up.includes(p)) && !usadas.has(up)) {
+                    usadas.add(up);
                     const div = document.createElement('div');
                     div.className = 'flex justify-between items-center bg-blue-50 dark:bg-blue-950/40 p-2.5 rounded-lg border text-xs';
-                    div.innerHTML = `<span>💬 "${escHtml(linhaUp)}"</span><button onclick="usarSugestao(this)" data-texto="${escHtml(linhaUp)}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
-                    containerSugestoes.appendChild(div);
+                    div.innerHTML = `<span>💬 "${escHtml(up)}"</span><button onclick="usarSugestao(this)" data-texto="${escHtml(up)}" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Usar ➜</button>`;
+                    cont.appendChild(div);
                 }
             });
         }
@@ -1604,20 +1275,86 @@
             document.getElementById('inputDesc').value = aplicarCorrecao(botao.getAttribute('data-texto'));
         }
 
+        function escolherEmoji(emoji) { document.getElementById('inputEmoji').value = emoji; }
+
+        // ===== ADICIONAR ITEM (1 dia ou vários, em qualquer semana do período) =====
+        function adicionarItemPorData() {
+            const ini = document.getElementById('inputDataEvento').value;
+            const fim = document.getElementById('inputDataFim').value || ini;
+            const tipo = document.getElementById('inputTipo').value;
+            let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
+
+            if (!ini || !desc) { alert("Preencha a data de início e a descrição."); return; }
+            if (fim < ini) { alert("A data final é anterior à inicial."); return; }
+
+            const emoji = document.getElementById('inputEmoji').value.trim();
+            if (emoji) desc = `${emoji} ${desc}`;
+            const cor = tipo.startsWith('custom:') ? ((estado.tipos.find(t => 'custom:' + t.id === tipo) || {}).cor || '#8b5cf6') : '';
+
+            snapshotSemanaExibida();
+            let adicionados = 0, bloqueados = 0;
+
+            for (let d = parseISO(ini); dataISO(d) <= fim; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)) {
+                const wd = d.getDay();
+                if (wd === 0 || wd === 6) continue;
+                const info = dataParaSemana(d);
+                const doc = new DOMParser().parseFromString(obterHtmlSemana(info.ano, info.sem), 'text/html');
+                const card = doc.querySelector(`.day-card[data-dia-nome="${DIAS[wd - 1]}"]`);
+                if (!card) continue;
+                if (card.querySelector('.check-feriado:checked') || card.querySelector('.check-emenda:checked')) { bloqueados++; continue; }
+                const destino = tipo === 'resource' ? card.querySelector('.day-resources') : card.querySelector('.tasks-container');
+                destino.insertAdjacentHTML('beforeend', htmlItem({ tipo, desc, cor }));
+                estado.semanas[chaveSemana(info.ano, info.sem)] = doc.body.innerHTML;
+                adicionados++;
+            }
+
+            if (adicionados === 0 && bloqueados === 0) { alert("Nenhum dia útil no período escolhido."); return; }
+
+            document.getElementById('inputDesc').value = "";
+            document.getElementById('inputEmoji').value = "";
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
+            const msg = bloqueados
+                ? `✅ Adicionado em ${adicionados} dia(s). ${bloqueados} dia(s) estavam bloqueados (feriado/emenda).`
+                : `✅ Adicionado em ${adicionados} dia(s)!`;
+            mostrarToast(msg, bloqueados ? 'aviso' : 'sucesso');
+        }
+
+        function editarItem(botao) {
+            const box = botao.closest('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
+            if (!box) return;
+            const span = box.querySelector('.item-text');
+            const novo = prompt("Editar descrição:", span ? span.innerText : "");
+            if (novo !== null && novo.trim() !== "" && span) {
+                span.innerText = aplicarCorrecao(novo);
+                alterou();
+            }
+        }
+
+        function removerElemento(botao) {
+            const box = botao.closest('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
+            if (!box) return;
+            if (box.dataset.eventoChave && !estado.dispensados.includes(box.dataset.eventoChave)) {
+                estado.dispensados.push(box.dataset.eventoChave);
+            }
+            box.remove();
+            alterou();
+            atualizarIndicador();
+            mostrarToast("Item removido.");
+        }
+
+        function limparTudo() {
+            if (!confirm("Deseja apagar esta semana?")) return;
+            delete estado.semanas[chaveSemana(semanaExibida.ano, semanaExibida.sem)];
+            renderSemana(semanaExibida.ano, semanaExibida.sem);
+            alterou();
+            mostrarToast("Semana resetada!");
+        }
+
+        // ===== DRAG & DROP (dentro da semana e entre semanas) =====
         function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
-        function permitirDrop(e) { e.preventDefault(); }
-        async function soltarItem(e) { e.preventDefault(); if (elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; await guardarEstadoDOM(); } }
 
-        function reativarEventosDragDrop() {
-            document.querySelectorAll('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box').forEach(item => {
-                item.setAttribute('draggable', 'true');
-                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
-            });
-            document.querySelectorAll('.tasks-container, .day-resources').forEach(cont => {
-                cont.setAttribute('ondragover', 'permitirDrop(event)');
-                cont.setAttribute('ondrop', 'soltarItem(event)');
-            });
-
+        function reativarDragDrop() {
             document.querySelectorAll('.tasks-container, .day-resources').forEach(el => {
                 if (el._sortableInstance) el._sortableInstance.destroy();
                 el._sortableInstance = new Sortable(el, {
@@ -1626,187 +1363,97 @@
                     handle: '.drag-handle',
                     ghostClass: 'sortable-ghost',
                     onStart: () => mostrarDock(true),
-                    onEnd: (evt) => aoSoltarItem(evt)
+                    onEnd: evt => aoSoltarItem(evt)
                 });
             });
         }
 
-        function definirSemanaAtualComRegraSexta() {
-            const hoje = new Date();
-            document.getElementById('inputAno').value = hoje.getFullYear();
-            const dataCalculo = new Date(hoje);
-            if (hoje.getDay() === 5 || hoje.getDay() === 6 || hoje.getDay() === 0) {
-                dataCalculo.setDate(hoje.getDate() + 3);
+        function semanasVizinhas(antes = 3, depois = 3) {
+            const seg = segundaDaSemana(semanaExibida.ano, semanaExibida.sem);
+            const lista = [];
+            for (let k = -antes; k <= depois; k++) {
+                if (k === 0) continue;
+                const d = new Date(seg); d.setDate(seg.getDate() + k * 7);
+                const info = dataParaSemana(d);
+                lista.push(info);
             }
-            const info = dataParaSemana(dataCalculo);
-            document.getElementById('inputNumSemana').value = info.semana;
-            atualizarDatasSemana();
+            return lista;
         }
 
-        function sincronizarSemanaPelaData(dataStr) {
-            if (!dataStr) return;
-            const info = dataParaSemana(new Date(dataStr + 'T00:00:00'));
-            document.getElementById('inputAno').value = info.ano;
-            document.getElementById('inputNumSemana').value = info.semana;
-            atualizarDatasSemana();
+        function mostrarDock(mostrar) {
+            const dock = document.getElementById('dockSemanas');
+            if (!mostrar) { dock.classList.remove('dock-ativo'); return; }
+            dock.innerHTML = `<span class="w-full text-center text-[11px] font-bold text-gray-500 dark:text-gray-300">⬇️ Solte o item na semana de destino</span>` +
+                semanasVizinhas().map(s => `<div class="dock-semana" data-ano="${s.ano}" data-semana="${s.sem}">Semana ${s.sem}<br><small>${s.ano}</small></div>`).join('');
+            dock.classList.add('dock-ativo');
         }
 
-        function getDateRangeOfWeek(weekNo, y) {
-            const d = new Date(y, 0, 1), dayNum = d.getDay();
-            const requiredDay = (weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum);
-            d.setDate(1 + requiredDay);
-            const dias = [];
-            for (let i = 0; i < 5; i++) {
-                const temp = new Date(d); temp.setDate(d.getDate() + i);
-                dias.push(temp);
+        function pontoDoEvento(evt) {
+            const e = evt.originalEvent || evt;
+            const p = e.changedTouches ? e.changedTouches[0] : e;
+            return p ? { x: p.clientX, y: p.clientY } : null;
+        }
+
+        function aoSoltarItem(evt) {
+            mostrarDock(false);
+            const item = evt.item;
+            const pt = pontoDoEvento(evt);
+            const chip = pt ? document.elementFromPoint(pt.x, pt.y)?.closest('.dock-semana') : null;
+
+            if (!chip) { alterou(); return; }
+
+            const ano = parseInt(chip.dataset.ano), sem = parseInt(chip.dataset.semana);
+            const dia = item.closest('.day-card').dataset.diaNome;
+            const ehRecurso = item.parentElement.classList.contains('day-resources');
+
+            const doc = new DOMParser().parseFromString(obterHtmlSemana(ano, sem), 'text/html');
+            const card = doc.querySelector(`.day-card[data-dia-nome="${dia}"]`);
+            if (!card || card.querySelector('.check-feriado:checked') || card.querySelector('.check-emenda:checked')) {
+                mostrarToast('⚠️ Esse dia está bloqueado (feriado/emenda) na semana de destino', 'aviso');
+                renderSemana(semanaExibida.ano, semanaExibida.sem);
+                return;
             }
-            return dias;
+
+            item.classList.remove('dragging', 'sortable-ghost', 'sortable-chosen', 'sortable-drag');
+            sincronizarChecks(item);
+            (ehRecurso ? card.querySelector('.day-resources') : card.querySelector('.tasks-container'))
+                .insertAdjacentHTML('beforeend', item.outerHTML);
+            estado.semanas[chaveSemana(ano, sem)] = doc.body.innerHTML;
+
+            item.remove();
+            alterou();
+            atualizarIndicador();
+            mostrarToast(`↪️ Movido para a Semana ${sem}. Clique em Salvar.`, 'info');
         }
 
-        function gerarGridBase() {
-            const linha = (cls, txt) => `<div class="${cls}" draggable="true" ondragstart="iniciarArrasto(event)"><span class="flex items-center gap-1.5"><input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)"><span class="drag-handle">⠿</span> <span class="item-text">${txt}</span></span><span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span></div>`;
-            const card = dia => `
-                <div class="day-card" data-dia-nome="${dia}">
-                    <div class="day-title">${dia}<br><small>--/---</small></div>
-                    <div class="day-content">
-                        ${htmlBarraDia(false, false)}
-                        <div class="tasks-container">
-                            ${linha('task-box', '🕒 HORA CERTA')}
-                            ${linha('task-box', '📦 MOVIMENTAÇÃO G4')}
-                        </div>
-                    </div>
-                    <div class="day-resources">
-                        <div class="resources-title">Recursos</div>
-                        ${linha('resource-tag', 'CARRO')}
-                        ${linha('resource-tag', 'EMPILHADEIRA G4')}
-                    </div>
-                </div>`;
-            return DIAS_SEMANA.map(card).join('');
-        }
+        // ===== EXPORTAÇÃO E IMPRESSÃO =====
+        function exportarParaExcelTabelaVale() {
+            const semana = semanaExibida.sem;
+            let csv = "\uFEFFITEM;OS;Área Responsável;Atividade;Local de execução;Sala/Equipamento;Data de execução;Dia da Semana;Tem Bloqueio elétrico?;Tem Bloqueio mecânico?;Tem PTS?;Tem solicitação ao almoxarifado;Necessidade de Recurso (Equip. moveis)?\n";
+            const diasMap = { "Segunda": "segunda-feira", "Terça": "terça-feira", "Quarta": "quarta-feira", "Quinta": "quinta-feira", "Sexta": "sexta-feira" };
 
-        async function atualizarDatasSemana() {
-            const ano = parseInt(document.getElementById('inputAno').value) || 2026;
-            const semana = parseInt(document.getElementById('inputNumSemana').value) || 39;
-            document.getElementById('badgeSemana').innerText = `Semana ${semana}`;
+            document.querySelectorAll('.day-card').forEach(card => {
+                const diaNomePt = card.dataset.diaNome;
+                const diaSemanaStr = diasMap[diaNomePt] || diaNomePt.toLowerCase();
+                const dataExec = card.querySelector('.day-title small') ? card.querySelector('.day-title small').innerText : '';
+                const recursos = [...card.querySelectorAll('.resource-tag .item-text')]
+                    .map(el => limparSimbolosTexto(el.innerText.trim())).filter(Boolean);
 
-            const semanaKey = `prog_grid_${ano}_semana_${semana}`;
-            const salvo = dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[semanaKey];
-            document.getElementById('weekGridContainer').innerHTML = salvo
-                ? garantirCaixinhasEmHtmlSalvo(salvo)
-                : gerarGridBase();
-
-            forcarCaixinhasDiaNoDOM();
-
-            const datas = getDateRangeOfWeek(semana, ano);
-            datas.forEach((dataObj, index) => {
-                const card = document.querySelector(`.day-card[data-dia-nome="${DIAS_SEMANA[index]}"]`);
-                if (card) {
-                    card.querySelector('.day-title').innerHTML = `${DIAS_SEMANA[index]}<br><small>${String(dataObj.getDate()).padStart(2,'0')}/${nomesMeses[dataObj.getMonth()]}</small>`;
-                }
+                card.querySelectorAll('.task-box, .tarefa-extra-box, .treinamento-box').forEach(box => {
+                    const el = box.querySelector('.item-text');
+                    const atividade = limparSimbolosTexto(el ? el.innerText.trim() : '');
+                    csv += `1;;ALMOXARIFADO;"${atividade}";;;"${dataExec}";"${diaSemanaStr}";NÃO;NÃO;NÃO;NÃO;"${recursos.join(', ')}"\n`;
+                });
             });
 
-            aplicarEventosAutomaticos(datas);
-            if (!salvo) injetarRotinasFixas(datas);
-            reativarEventosDragDrop();
-            atualizarIndicadorProgresso();
-        }
-
-        async function adicionarItemPorData() {
-            const dataStr = document.getElementById('inputDataEvento').value;
-            const tipo = document.getElementById('inputTipo').value;
-            let desc = aplicarCorrecao(document.getElementById('inputDesc').value);
-
-            if (!dataStr || !desc) { alert("Preencha a data e a descrição."); return; }
-
-            const emojiEscolhido = document.getElementById('inputEmoji').value.trim();
-            if (emojiEscolhido) desc = `${emojiEscolhido} ${desc}`;
-            document.getElementById('inputEmoji').value = "";
-
-            const dObj = new Date(dataStr + 'T00:00:00');
-            const diaNum = dObj.getDay();
-            if (diaNum === 0 || diaNum === 6) { alert("Selecione um dia útil (Segunda a Sexta)."); return; }
-
-            const nomes = { 1: "Segunda", 2: "Terça", 3: "Quarta", 4: "Quinta", 5: "Sexta" };
-            const card = document.querySelector(`.day-card[data-dia-nome="${nomes[diaNum]}"]`);
-
-            if (card) {
-                const handle = `<span class="drag-handle">⠿</span>`;
-                const checkbox = `<input type="checkbox" class="task-check w-3.5 h-3.5 accent-green-700 cursor-pointer" onchange="alternarConclusaoTarefa(this)">`;
-                const controls = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
-                const div = document.createElement('div');
-
-                if (tipo === 'extra') {
-                    div.className = 'tarefa-extra-box';
-                    div.setAttribute('draggable', 'true');
-                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox.replace('accent-green-700', 'accent-orange-600')}⚡ <strong>[EXTRA]</strong> ${handle} <span class="item-text">${desc}</span></span>${controls}`;
-                    card.querySelector('.tasks-container').appendChild(div);
-                } else if (tipo === 'task') {
-                    div.className = 'task-box';
-                    div.setAttribute('draggable', 'true');
-                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
-                    card.querySelector('.tasks-container').appendChild(div);
-                } else if (tipo.startsWith('custom:')) {
-                    const t = (JSON.parse(localStorage.getItem(CHAVE_TIPOS)) || []).find(x => 'custom:' + x.id === tipo);
-                    div.className = 'task-box tipo-custom';
-                    div.style.setProperty('--tc', t ? t.cor : '#8b5cf6');
-                    div.title = t ? t.nome : '';
-                    div.setAttribute('draggable', 'true');
-                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
-                    card.querySelector('.tasks-container').appendChild(div);
-                } else {
-                    div.className = 'resource-tag';
-                    div.setAttribute('draggable', 'true');
-                    div.setAttribute('ondragstart', 'iniciarArrasto(event)');
-                    div.innerHTML = `<span class="flex items-center gap-1.5">${checkbox}${handle} <span class="item-text">${desc}</span></span>${controls}`;
-                    card.querySelector('.day-resources').appendChild(div);
-                }
-
-                document.getElementById('inputDesc').value = "";
-                await salvarNaNuvem();
-                atualizarIndicadorProgresso();
-                reativarEventosDragDrop();
-                mostrarToast("✅ Adicionado com sucesso!");
-            }
-        }
-
-        async function editarItem(botao) {
-            const box = botao.closest('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
-            if (!box) return;
-            const span = box.querySelector('.item-text') || box.querySelector('strong');
-            const novo = prompt("Editar descrição:", span ? span.innerText : "");
-            if (novo !== null && novo.trim() !== "") {
-                if (span) span.innerText = aplicarCorrecao(novo);
-                await salvarNaNuvem();
-                mostrarToast("Item atualizado!");
-            }
-        }
-
-        async function removerElemento(botao) {
-            const box = botao.closest('.task-box, .tarefa-extra-box, .resource-tag, .treinamento-box');
-            if (box) {
-                if (box.dataset.eventoChave) dispensarEvento(box.dataset.eventoChave);
-                box.remove();
-                await salvarNaNuvem();
-                atualizarIndicadorProgresso();
-                mostrarToast("Item removido.");
-            }
-        }
-
-        async function limparTudo() {
-            if (confirm("Deseja apagar esta semana?")) {
-                if (dadosGlobaisNuvem.semanas) delete dadosGlobaisNuvem.semanas[getWeekKey()];
-                await atualizarDatasSemana();
-                await salvarNaNuvem();
-                mostrarToast("Semana resetada!");
-            }
-        }
-
-        function alternarDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `PROGRAMACAO_SEMANAL_SEMANA_${semana}_VALE.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            mostrarToast("📊 Exportado para Excel (Padrão Vale)!");
         }
 
         function imprimirProgramacao() {
@@ -1821,257 +1468,11 @@
             setTimeout(() => window.print(), 150);
         }
 
-        // ===== TIPOS DE ENTRADA PERSONALIZADOS (COM COR) =====
-        function carregarTipos() {
-            const sel = document.getElementById('inputTipo');
-            if (!sel) return;
-            const atual = sel.value;
-            sel.querySelectorAll('option[data-custom]').forEach(o => o.remove());
-            (JSON.parse(localStorage.getItem(CHAVE_TIPOS)) || []).forEach(t => {
-                const o = document.createElement('option');
-                o.value = 'custom:' + t.id;
-                o.dataset.custom = '1';
-                o.textContent = '🎨 ' + t.nome;
-                o.style.color = t.cor;
-                o.style.fontWeight = 'bold';
-                sel.appendChild(o);
-            });
-            sel.value = atual;
-            if (!sel.value) sel.value = 'task';
-        }
-
-        async function adicionarTipoCustom() {
-            const nome = aplicarCorrecao(document.getElementById('novoTipoNome').value);
-            const cor = document.getElementById('novoTipoCor').value;
-            if (!nome) { alert("Escreva o nome do tipo."); return; }
-            const lista = JSON.parse(localStorage.getItem(CHAVE_TIPOS)) || [];
-            const id = 'tipo_' + Date.now();
-            lista.push({ id, nome, cor });
-            localStorage.setItem(CHAVE_TIPOS, JSON.stringify(lista));
-            carregarTipos();
-            document.getElementById('inputTipo').value = 'custom:' + id;
-            document.getElementById('novoTipoNome').value = '';
-            await salvarNaNuvem();
-            mostrarToast(`✅ Tipo "${nome}" criado!`);
-        }
-
-        async function gerirTiposCustom() {
-            const lista = JSON.parse(localStorage.getItem(CHAVE_TIPOS)) || [];
-            if (!lista.length) { alert("Ainda não há tipos personalizados."); return; }
-            const n = prompt(`Tipos:\n\n${lista.map((t, i) => `${i + 1}. ${t.nome} (${t.cor})`).join('\n')}\n\nNúmero para APAGAR (itens já lançados mantêm a cor):`);
-            const i = parseInt(n) - 1;
-            if (i >= 0 && i < lista.length) {
-                lista.splice(i, 1);
-                localStorage.setItem(CHAVE_TIPOS, JSON.stringify(lista));
-                carregarTipos();
-                await salvarNaNuvem();
-                mostrarToast("Tipo apagado.", "info");
-            }
-        }
-
-        // ===== SALVAR NO COMPUTADOR (arquivo .json escolhido pelo usuário) =====
-        let arquivoHandle = null;
-
-        function idbAbrir() {
-            return new Promise((res, rej) => {
-                const r = indexedDB.open('prog_arquivo', 1);
-                r.onupgradeneeded = () => r.result.createObjectStore('h');
-                r.onsuccess = () => res(r.result);
-                r.onerror = () => rej(r.error);
-            });
-        }
-        async function idbSet(v) {
-            try {
-                const db = await idbAbrir();
-                return await new Promise(res => {
-                    const tx = db.transaction('h', 'readwrite');
-                    tx.objectStore('h').put(v, 'handle');
-                    tx.oncomplete = res; tx.onerror = res;
-                });
-            } catch (e) { /* sem persistência: continua nesta sessão */ }
-        }
-        async function idbGet() {
-            try {
-                const db = await idbAbrir();
-                return await new Promise(res => {
-                    const q = db.transaction('h').objectStore('h').get('handle');
-                    q.onsuccess = () => res(q.result || null);
-                    q.onerror = () => res(null);
-                });
-            } catch (e) { return null; }
-        }
-
-        async function gravarArquivoLocal() {
-            if (!arquivoHandle) return false;
-            try {
-                if (await arquivoHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') return false;
-                const w = await arquivoHandle.createWritable();
-                await w.write(JSON.stringify(dadosGlobaisNuvem, null, 2));
-                await w.close();
-                return true;
-            } catch (e) { console.error("Erro ao gravar arquivo local:", e); return false; }
-        }
-
-        async function salvarNoComputador() {
-            if (!window.showSaveFilePicker) {
-                await salvarNaNuvem();
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([JSON.stringify(dadosGlobaisNuvem, null, 2)], { type: 'application/json' }));
-                a.download = 'programacao_semanal.json';
-                a.click();
-                mostrarToast("ℹ️ Este navegador só permite baixar. Use Chrome ou Edge para salvar direto.", "aviso");
-                return;
-            }
-            try {
-                if (!arquivoHandle) arquivoHandle = await idbGet();
-                if (!arquivoHandle) {
-                    arquivoHandle = await window.showSaveFilePicker({
-                        suggestedName: 'programacao_semanal.json',
-                        types: [{ description: 'Programação Semanal', accept: { 'application/json': ['.json'] } }]
-                    });
-                    await idbSet(arquivoHandle);
-                }
-                if (await arquivoHandle.requestPermission({ mode: 'readwrite' }) !== 'granted') {
-                    mostrarToast("❌ Permissão negada para gravar o arquivo.", "erro");
-                    return;
-                }
-                await salvarNaNuvem();
-                mostrarToast(`💻 Salvo em "${arquivoHandle.name}" — os próximos Salvar gravam nele também.`);
-            } catch (e) {
-                if (e.name !== 'AbortError') { console.error(e); mostrarToast("❌ Não foi possível salvar.", "erro"); }
-            }
-        }
-
-        async function abrirArquivoDoComputador() {
-            if (!window.showOpenFilePicker) { alert("Use Chrome ou Edge no computador para abrir arquivos."); return; }
-            try {
-                const [h] = await window.showOpenFilePicker({ types: [{ description: 'Programação Semanal', accept: { 'application/json': ['.json'] } }] });
-                const dados = JSON.parse(await (await h.getFile()).text());
-                if (!confirm("Substituir os dados atuais pelos deste arquivo?")) return;
-                arquivoHandle = h;
-                await idbSet(h);
-                dadosGlobaisNuvem = dados;
-                if (dados.historico) localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(dados.historico));
-                if (dados.treinamentos) localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(dados.treinamentos));
-                if (dados.feriados) localStorage.setItem(CHAVE_LOCAL_FERIADOS, JSON.stringify(dados.feriados));
-                if (dados.tipos) localStorage.setItem(CHAVE_TIPOS, JSON.stringify(dados.tipos));
-                localStorage.setItem(CHAVE_DADOS, JSON.stringify(dados));
-                carregarTipos();
-                renderizarAvisos();
-                atualizarDatasSemana();
-                mostrarToast("📂 Arquivo carregado!");
-            } catch (e) {
-                if (e.name !== 'AbortError') alert("Arquivo inválido.");
-            }
-        }
-
-        // ===== ARRASTAR ENTRE SEMANAS =====
-        function semanaDeData(d) {
-            const info = dataParaSemana(d);
-            return { ano: info.ano, semana: info.semana };
-        }
-
-        function semanasVizinhas(antes = 3, depois = 3) {
-            const ano = parseInt(document.getElementById('inputAno').value);
-            const sem = parseInt(document.getElementById('inputNumSemana').value);
-            const segunda = getDateRangeOfWeek(sem, ano)[0];
-            const lista = [];
-            for (let k = -antes; k <= depois; k++) {
-                if (k === 0) continue;
-                const d = new Date(segunda);
-                d.setDate(segunda.getDate() + k * 7);
-                lista.push(semanaDeData(d));
-            }
-            return lista;
-        }
-
-        function mostrarDock(mostrar) {
-            const dock = document.getElementById('dockSemanas');
-            if (!dock) return;
-            if (mostrar) {
-                dock.innerHTML = `<span class="w-full text-center text-[11px] font-bold text-gray-500 dark:text-gray-300">⬇️ Solte o item na semana de destino</span>` +
-                    semanasVizinhas().map(s => `<div class="dock-semana" data-ano="${s.ano}" data-semana="${s.semana}">Semana ${s.semana}<br><small>${s.ano}</small></div>`).join('');
-                dock.classList.add('dock-ativo');
-            } else {
-                dock.classList.remove('dock-ativo');
-            }
-        }
-
-        function copiarItemParaSemana(item) {
-            const copia = item.cloneNode(true);
-            copia.classList.remove('dragging', 'sortable-ghost', 'sortable-chosen', 'sortable-drag');
-            const originais = item.querySelectorAll('input[type="checkbox"]');
-            const copias = copia.querySelectorAll('input[type="checkbox"]');
-            originais.forEach((cb, i) => {
-                if (!copias[i]) return;
-                copias[i].checked = cb.checked;
-                if (cb.checked) copias[i].setAttribute('checked', '');
-                else copias[i].removeAttribute('checked');
-            });
-            return copia;
-        }
-
-        function pontoDoEvento(evt) {
-            const e = evt.originalEvent || evt;
-            const p = e.changedTouches ? e.changedTouches[0] : e;
-            return p ? { x: p.clientX, y: p.clientY } : null;
-        }
-
-        async function aoSoltarItem(evt) {
-            mostrarDock(false);
-            const pt = pontoDoEvento(evt);
-            const alvoEl = pt ? document.elementFromPoint(pt.x, pt.y) : null;
-            const chip = alvoEl ? alvoEl.closest('.dock-semana') : null;
-
-            if (!chip) { await guardarEstadoDOM(); return; }
-
-            const alvoAno = parseInt(chip.dataset.ano);
-            const alvoSem = parseInt(chip.dataset.semana);
-            const item = evt.item;
-            const ehRecurso = item.parentElement.classList.contains('day-resources');
-            const dia = item.closest('.day-card').dataset.diaNome;
-            const chaveAtual = getWeekKey();
-            const chaveAlvo = `prog_grid_${alvoAno}_semana_${alvoSem}`;
-
-            const base = (dadosGlobaisNuvem.semanas && dadosGlobaisNuvem.semanas[chaveAlvo]) || gerarGridBase();
-            const doc = new DOMParser().parseFromString(garantirCaixinhasEmHtmlSalvo(base), 'text/html');
-            const card = doc.querySelector(`.day-card[data-dia-nome="${dia}"]`);
-            if (!card) return;
-
-            if (card.querySelector('.check-feriado')?.checked || card.querySelector('.check-emenda')?.checked) {
-                mostrarToast('⚠️ Esse dia está bloqueado (feriado/emenda) na semana de destino', 'aviso');
-                await guardarEstadoDOM();
-                return;
-            }
-
-            const destino = ehRecurso ? card.querySelector('.day-resources') : card.querySelector('.tasks-container');
-            destino.insertAdjacentHTML('beforeend', copiarItemParaSemana(item).outerHTML);
-
-            if (!dadosGlobaisNuvem.semanas) dadosGlobaisNuvem.semanas = {};
-            dadosGlobaisNuvem.semanas[chaveAlvo] = doc.body.innerHTML;
-
-            item.remove();
-            dadosGlobaisNuvem.semanas[chaveAtual] = document.getElementById('weekGridContainer').innerHTML;
-            localStorage.setItem(CHAVE_DADOS, JSON.stringify(dadosGlobaisNuvem));
-
-            movimentosPendentes = true;
-            atualizarBotaoSalvarMov();
-            atualizarIndicadorProgresso();
-            mostrarToast(`↪️ Movido para a Semana ${alvoSem}. Clique em Salvar.`, 'info');
-        }
-
-        // ===== EMOJI =====
-        function escolherEmoji(emoji) {
-            document.getElementById('inputEmoji').value = emoji;
-        }
-
-        // ===== IMPRESSÃO NÍTIDA (página separada, sem sombras, texto vetorial) =====
         function imprimirNitido() {
             const semana = document.getElementById('badgeSemana').innerText;
-            const ano = document.getElementById('inputAno').value;
-
+            const ano = semanaExibida.ano;
             const clone = document.getElementById('weekGridContainer').cloneNode(true);
-            clone.querySelectorAll('.item-controls, .drag-handle, button, input, .day-content > div.flex, [style*="display: none"]').forEach(el => el.remove());
+            clone.querySelectorAll('.item-controls, .drag-handle, button, input, [style*="display: none"]').forEach(el => el.remove());
             clone.querySelectorAll('.ring-2').forEach(el => el.classList.remove('ring-2', 'ring-amber-400'));
 
             const html = `<!DOCTYPE html>
@@ -2102,8 +1503,7 @@
     .task-done { text-decoration: line-through; color: #777 !important; background: #eee !important; border-left-color: #aaa !important; }
     .treino-info small { font-size: 9px; display: block; }
     .task-box > span, .tarefa-extra-box > span, .treinamento-box > span, .resource-tag > span { display: block; }
-    input[type="checkbox"] { display: none; }
-    div[style] { font-size: 10px; padding: 4px; border-radius: 4px; }
+    .bloco-feriado { font-size: 10px; padding: 4px; }
 </style>
 </head>
 <body>
@@ -2119,6 +1519,146 @@
             w.document.close();
             setTimeout(() => { w.focus(); w.print(); }, 400);
         }
+
+        // ===== ARQUIVO DO COMPUTADOR =====
+        function idbAbrir() {
+            return new Promise((res, rej) => {
+                const r = indexedDB.open('prog_arquivo', 1);
+                r.onupgradeneeded = () => r.result.createObjectStore('h');
+                r.onsuccess = () => res(r.result);
+                r.onerror = () => rej(r.error);
+            });
+        }
+        async function idbSet(v) {
+            try {
+                const db = await idbAbrir();
+                return await new Promise(res => {
+                    const tx = db.transaction('h', 'readwrite');
+                    tx.objectStore('h').put(v, 'handle');
+                    tx.oncomplete = res; tx.onerror = res;
+                });
+            } catch (e) { }
+        }
+        async function idbGet() {
+            try {
+                const db = await idbAbrir();
+                return await new Promise(res => {
+                    const q = db.transaction('h').objectStore('h').get('handle');
+                    q.onsuccess = () => res(q.result || null);
+                    q.onerror = () => res(null);
+                });
+            } catch (e) { return null; }
+        }
+
+        async function gravarArquivoLocal() {
+            if (!arquivoHandle) return false;
+            try {
+                if (await arquivoHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') return false;
+                const w = await arquivoHandle.createWritable();
+                await w.write(JSON.stringify(estado, null, 2));
+                await w.close();
+                return true;
+            } catch (e) {
+                console.error("Erro ao gravar arquivo:", e);
+                return false;
+            }
+        }
+
+        async function salvarNoComputador() {
+            if (!window.showSaveFilePicker) {
+                snapshotSemanaExibida();
+                persistirLocal();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json' }));
+                a.download = 'programacao_semanal.json';
+                a.click();
+                mostrarToast("ℹ️ Este navegador só baixa o arquivo. Use Chrome ou Edge para salvar direto.", "aviso");
+                return;
+            }
+            try {
+                if (!arquivoHandle) arquivoHandle = await idbGet();
+                if (!arquivoHandle) {
+                    arquivoHandle = await window.showSaveFilePicker({
+                        suggestedName: 'programacao_semanal.json',
+                        types: [{ description: 'Programação Semanal', accept: { 'application/json': ['.json'] } }]
+                    });
+                    await idbSet(arquivoHandle);
+                }
+                if (await arquivoHandle.requestPermission({ mode: 'readwrite' }) !== 'granted') {
+                    mostrarToast("❌ Permissão negada para gravar o arquivo.", "erro");
+                    return;
+                }
+                await salvarTudo();
+            } catch (e) {
+                if (e.name !== 'AbortError') { console.error(e); mostrarToast("❌ Não foi possível salvar.", "erro"); }
+            }
+        }
+
+        async function abrirArquivoDoComputador() {
+            if (!window.showOpenFilePicker) { alert("Use Chrome ou Edge no computador para abrir arquivos."); return; }
+            try {
+                const [h] = await window.showOpenFilePicker({ types: [{ description: 'Programação Semanal', accept: { 'application/json': ['.json'] } }] });
+                const dados = JSON.parse(await (await h.getFile()).text());
+                if (!confirm("Substituir os dados atuais pelos deste arquivo?")) return;
+                arquivoHandle = h;
+                await idbSet(h);
+                carregarEstado(dados);
+                persistirLocal();
+                carregarFrequentes();
+                carregarTipos();
+                renderizarAvisos();
+                renderSemana(semanaExibida.ano, semanaExibida.sem);
+                movimentosPendentes = false;
+                atualizarBotaoSalvar();
+                mostrarToast("📂 Arquivo carregado!");
+            } catch (e) {
+                if (e.name !== 'AbortError') alert("Arquivo inválido.");
+            }
+        }
+
+        // ===== TEMA E INSTALAÇÃO =====
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
+        }
+
+        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+
+        function instalarApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            } else {
+                alert("📱 Para instalar no celular:\n\n• Android (Chrome): toque nos 3 pontinhos e escolha 'Adicionar à tela inicial'.\n• iPhone (Safari): toque em Compartilhar e escolha 'Adicionar à Tela de Início'.");
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        function inicializar() {
+            document.getElementById('popTreinoInicio').valueAsDate = new Date();
+            document.getElementById('popTreinoFim').valueAsDate = new Date();
+            document.getElementById('popFeriadoData').valueAsDate = new Date();
+            document.getElementById('inputDataEvento').valueAsDate = new Date();
+
+            carregarEstado();
+            persistirLocal();
+
+            const manifest = {
+                name: "Programação Semanal", short_name: "ProgSemanal", start_url: ".",
+                display: "standalone", background_color: "#f9f9f9", theme_color: "#1b5e20",
+                icons: [{ src: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", sizes: "512x512", type: "image/png" }]
+            };
+            document.getElementById('pwa-manifest').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+
+            if (localStorage.getItem('dark_mode') === 'true') document.documentElement.classList.add('dark');
+
+            carregarFrequentes();
+            carregarTipos();
+            renderizarAvisos();
+            irParaSemanaAtual();
+        }
+
+        inicializar();
     </script>
 </body>
 </html>
