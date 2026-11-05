@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v6.0 Local)</title>
+    <title>Painel de Indicadores & Gráficos (v6.1 Local)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -106,6 +105,7 @@
                     <button onclick="imprimirComModo()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir</button>
                     <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
                     <button onclick="document.getElementById('inputImportar').click()" class="print-hidden bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 px-3 py-1.5 rounded-xl text-xs font-bold transition" title="Abre o backup .json gerado na Programação">📂 Importar backup</button>
+                    <button onclick="usarDadosLocais()" id="btnUsarLocais" class="print-hidden hidden bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition" title="Ignora o backup importado e lê direto da Programação">🏠 Usar dados locais</button>
                     <input type="file" id="inputImportar" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
                 </div>
             </div>
@@ -472,11 +472,7 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const CHAVE_DADOS_LOCAIS = 'programacao_dados_locais';
-        let supabaseClient = null;
-        try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (e) { console.warn('Supabase indisponível:', e); }
 
         const nomesMesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
         const nomesMesesCompletos = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -820,7 +816,7 @@
             await carregarIndicadoresDaNuvem();
         });
 
-        // ===== CARREGAMENTO DOS DADOS: LOCAL PRIMEIRO, SUPABASE SÓ COMO RESERVA =====
+        // ===== CARREGAMENTO DOS DADOS =====
         function anosComDados(dados) {
             const anos = new Set();
             Object.keys((dados && dados.semanas) || {}).forEach(k => {
@@ -845,43 +841,50 @@
             }
         }
 
+        // Fonte única: backup importado (se o modo for "importado") ou dados locais da Programação
         async function carregarIndicadoresDaNuvem() {
             let dados = null, fonte = '';
-            // 1) localStorage deste endereço (varre também chaves parecidas, por segurança)
-            try {
-                dados = JSON.parse(localStorage.getItem(CHAVE_DADOS_LOCAIS));
-                if (dados && dados.semanas && Object.keys(dados.semanas).length) fonte = 'dados locais da Programação';
-                else dados = null;
-            } catch (e) { dados = null; }
+            const modoImportado = localStorage.getItem('indicadores_modo') === 'importado';
 
-            // 2) backup importado manualmente (guardado só no indicador)
-            if (!dados) {
+            if (modoImportado) {
                 try {
                     const imp = JSON.parse(localStorage.getItem('indicadores_backup_importado'));
-                    if (imp && imp.semanas && Object.keys(imp.semanas).length) { dados = imp; fonte = 'backup importado'; }
+                    if (imp && imp.semanas) { dados = imp; fonte = 'backup importado'; }
+                } catch (e) {}
+            }
+            if (!dados) {
+                try {
+                    const loc = JSON.parse(localStorage.getItem(CHAVE_DADOS_LOCAIS));
+                    if (loc && loc.semanas) { dados = loc; fonte = 'dados locais da Programação'; }
                 } catch (e) {}
             }
 
-            // 3) Supabase (dados antigos)
-            if (!dados && supabaseClient) {
-                try {
-                    let { data } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
-                    if (data && data.conteudo && data.conteudo.semanas) { dados = data.conteudo; fonte = 'Supabase (antigo)'; }
-                } catch (e) { console.error("Erro ao buscar dados:", e); }
-            }
+            const btn = document.getElementById('btnUsarLocais');
+            if (btn) btn.classList.toggle('hidden', fonte !== 'backup importado');
 
-            window.dadosGlobaisNuvem = dados || { semanas: {} };
+            window.dadosGlobaisNuvem = dados || { semanas: {}, frequentes: [] };
             mostrarDiagnostico(fonte, window.dadosGlobaisNuvem);
 
-            // Se o ano selecionado não tem semanas salvas, vai para o ano mais recente que tem
             const anos = anosComDados(window.dadosGlobaisNuvem);
-            const anoSel = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
+            let anoSel = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
             if (anos.length && !anos.includes(anoSel)) {
                 mudarAno(anos[anos.length - 1]);
                 return;
             }
+
+            const temDados = Array.from(semanasSelecionadasSet).some(n => window.dadosGlobaisNuvem.semanas[`prog_grid_${anoSel}_semana_${n}`]);
+            if (!temDados && anos.includes(anoSel)) {
+                selecionarSemanasPredefinicaoInterno('ate_vigente');
+                salvarSemanasNaMemoria();
+                renderizarGridUniversalSemanas();
+            }
             popularSelectAnos(anoSel);
             carregarIndicadores();
+        }
+
+        function usarDadosLocais() {
+            localStorage.setItem('indicadores_modo', 'local');
+            carregarIndicadoresDaNuvem();
         }
 
         async function importarBackup(input) {
@@ -892,11 +895,8 @@
                 const dados = JSON.parse(await arq.text());
                 if (!dados || !dados.semanas) throw new Error('formato');
                 localStorage.setItem('indicadores_backup_importado', JSON.stringify(dados));
-                // Só usa o importado se não houver dados locais: força o uso agora
-                window.dadosGlobaisNuvem = dados;
-                mostrarDiagnostico('backup importado', dados);
-                const anos = anosComDados(dados);
-                if (anos.length) mudarAno(anos[anos.length - 1]); else carregarIndicadores();
+                localStorage.setItem('indicadores_modo', 'importado');
+                await carregarIndicadoresDaNuvem();
             } catch (e) {
                 alert('Arquivo inválido. Use o .json gerado por "Exportar tudo (backup)" ou "Salvar no computador" na Programação.');
             }
