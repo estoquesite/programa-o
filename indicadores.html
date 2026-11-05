@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Indicadores & Gráficos (v5.9)</title>
-    <!-- Tailwind CSS -->
+    <title>Painel de Indicadores & Gráficos (v6.0 Local)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Chart.js para os gráficos dinâmicos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -31,70 +28,36 @@
             padding: 20px;
         }
         .dark body { background-color: #111827; color: #f3f4f6; }
-        .container {
-            max-width: 1150px;
-            margin: 0 auto;
-        }
-        .btn-edit-title {
-            cursor: pointer;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-            font-size: 11px;
-            padding: 1px 3px;
-        }
-        .btn-edit-title:hover {
-            opacity: 1;
-        }
+        .container { max-width: 1150px; margin: 0 auto; }
+        .btn-edit-title { cursor: pointer; opacity: 0.5; transition: opacity 0.2s; font-size: 11px; padding: 1px 3px; }
+        .btn-edit-title:hover { opacity: 1; }
 
-        /* REGRAS DE ENQUADRAMENTO E IMPRESSÃO EM A4 NA HORIZONTAL (PAISAGEM) */
         @media print {
-            @page {
-                size: A4 landscape;
-                margin: 8mm 8mm 8mm 8mm;
-            }
-            .print-hidden, .btn-edit-title {
-                display: none !important;
-            }
+            @page { size: A4 landscape; margin: 8mm 8mm 8mm 8mm; }
+            .print-hidden, .btn-edit-title { display: none !important; }
             html, body {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                font-size: 10px !important;
+                background-color: #ffffff !important; color: #000000 !important;
+                padding: 0 !important; margin: 0 !important; font-size: 10px !important;
             }
             .dark body { background-color: #ffffff !important; color: #000000 !important; }
-            .container {
-                max-width: 100% !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
+            .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
             .space-y-4 > * + * { margin-top: 8px !important; }
             .overflow-x-auto, .max-h-96, .max-h-72, .max-h-60, .max-h-56, .max-h-48, .max-h-40 {
-                max-height: none !important;
-                overflow: visible !important;
+                max-height: none !important; overflow: visible !important;
             }
-
-            /* Em paisagem a largura é fixa: força as colunas das grelhas */
             .lg\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
             .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
             .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
             .grid { gap: 8px !important; }
 
-            /* DIVISÃO EXCLUSIVA DE FOLHAS */
             .folha-a4 {
-                page-break-after: always !important;
-                break-after: page !important;
-                margin-bottom: 0 !important;
-                padding-bottom: 0 !important;
+                page-break-after: always !important; break-after: page !important;
+                margin-bottom: 0 !important; padding-bottom: 0 !important;
             }
-
-            /* Alturas dos gráficos ajustadas à altura da folha em paisagem */
             .chart-wrapper { height: 200px !important; }
             .container > div:nth-child(2) .chart-wrapper { height: 140px !important; }
             canvas { max-height: 100% !important; width: 100% !important; }
 
-            /* Folha 2 = Recursos + Cursos juntos: compactar para caber em 1 página */
             .container > div:nth-child(2) .chart-wrapper { height: 105px !important; }
             .container > div:nth-child(2) .card-a4-impresso { padding: 5px !important; }
             .container > div:nth-child(2) h3 { font-size: 11px !important; }
@@ -103,40 +66,19 @@
             .container > div:nth-child(2) .space-y-4 > * + * { margin-top: 4px !important; }
             .container > div:nth-child(2) p { font-size: 8px !important; }
 
-            .card-a4-impresso {
-                border: 1px solid #d1d5db !important;
-                box-shadow: none !important;
-                break-inside: avoid;
-            }
+            .card-a4-impresso { border: 1px solid #d1d5db !important; box-shadow: none !important; break-inside: avoid; }
 
-            /* Tabelas compactas; podem continuar na página seguinte com cabeçalho repetido */
             table th, table td { padding-top: 2px !important; padding-bottom: 2px !important; font-size: 9px !important; }
             tr { break-inside: avoid; }
             thead { display: table-header-group; }
 
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
-            /* Modo: tudo em 1 folha */
-            body[data-print-mode="uma"] .folha-a4 {
-                page-break-after: auto !important;
-                break-after: auto !important;
-            }
-            body[data-print-mode="uma"] .container {
-                zoom: 0.62;
-            }
+            body[data-print-mode="uma"] .folha-a4 { page-break-after: auto !important; break-after: auto !important; }
+            body[data-print-mode="uma"] .container { zoom: 0.62; }
 
-            /* Modo: cada indicador em folha própria */
-            body[data-print-mode="separado"] .folha-a4 {
-                page-break-after: auto !important;
-                break-after: auto !important;
-            }
-            body[data-print-mode="separado"] .card-a4-impresso {
-                break-after: page !important;
-                page-break-after: always !important;
-            }
+            body[data-print-mode="separado"] .folha-a4 { page-break-after: auto !important; break-after: auto !important; }
+            body[data-print-mode="separado"] .card-a4-impresso { break-after: page !important; page-break-after: always !important; }
         }
     </style>
 </head>
@@ -144,9 +86,7 @@
 
     <div class="container space-y-5">
 
-        <!-- ============================================================== -->
-        <!-- FOLHA 1 NA IMPRESSÃO: CABEÇALHO, CARDS GERAIS E GRÁFICOS SEMANAIS -->
-        <!-- ============================================================== -->
+        <!-- FOLHA 1: CABEÇALHO, CARDS GERAIS E GRÁFICOS -->
         <div class="folha-a4 space-y-4">
 
             <!-- CABEÇALHO -->
@@ -168,9 +108,8 @@
                 </div>
             </div>
 
-            <!-- PAINEL DE CONTROLE DE FILTROS (OCULTADO NA IMPRESSÃO) -->
+            <!-- FILTROS -->
             <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-                <!-- LINHA 1: ESCOLHA DE ANO -->
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-extrabold uppercase text-green-800 dark:text-green-400">📅 Ano:</span>
@@ -185,7 +124,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 2: GAVETA RETRÁTIL DOS 12 MESES -->
                 <div class="space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -203,7 +141,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 3: GAVETA RETRÁTIL DAS 53 SEMANAS DO ANO -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -222,7 +159,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 4: GAVETA DINÂMICA DE RECURSOS -->
                 <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-1.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5">
@@ -240,7 +176,6 @@
                     </div>
                 </div>
 
-                <!-- LINHA 5: CANAIS DE TAREFA -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold">
                         <label class="flex items-center gap-1.5 cursor-pointer bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-900">
@@ -267,7 +202,7 @@
                 </div>
             </div>
 
-            <!-- CARDS DE RESUMO OPERACIONAL -->
+            <!-- CARDS DE RESUMO -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div id="cardBoxTotal" class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center space-y-1 card-a4-impresso">
                     <div class="flex items-center justify-center gap-1">
@@ -315,7 +250,7 @@
                 </div>
             </div>
 
-            <!-- GRÁFICOS OPERACIONAIS (LINHA E BARRAS) -->
+            <!-- GRÁFICOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col justify-between card-a4-impresso">
                     <div class="flex items-center justify-between gap-1 mb-1">
@@ -323,7 +258,6 @@
                             <h3 id="lbl_grafico_mensal" class="text-xs font-bold uppercase text-green-800 dark:text-green-400">📈 Curva Mensal (% Desempenho)</h3>
                             <button type="button" onclick="editarTexto('lbl_grafico_mensal')" class="btn-edit-title">✏️</button>
                         </div>
-                        <!-- CONTROLE DE PORCENTAGEM DA META -->
                         <div class="flex items-center gap-1.5 print-hidden bg-blue-50 dark:bg-blue-950/50 px-2 py-1 rounded-xl border border-blue-200 dark:border-blue-900">
                             <label for="inputMetaDesempenho" class="text-[10px] font-extrabold uppercase text-blue-800 dark:text-blue-300">🎯 Meta:</label>
                             <input type="number" id="inputMetaDesempenho" value="90" min="1" max="100" step="1"
@@ -349,12 +283,9 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- FOLHA 2 NA IMPRESSÃO: RECURSOS / FROTA + CURSOS & CAPACITAÇÃO (JUNTOS)   -->
-        <!-- ========================================================================= -->
+        <!-- FOLHA 2: RECURSOS + CURSOS -->
         <div class="folha-a4 space-y-4">
 
-            <!-- BLOCO DE RECURSOS & EQUIPAMENTOS -->
             <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-3xl border border-emerald-200/80 dark:border-emerald-800/50 space-y-3 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-200 dark:border-emerald-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
@@ -429,7 +360,6 @@
                 </div>
             </div>
 
-            <!-- BLOCO DE CURSOS & CAPACITAÇÃO (agora na mesma folha dos Recursos) -->
             <div class="bg-purple-50/60 dark:bg-purple-950/20 p-4 rounded-3xl border border-purple-200/80 dark:border-purple-800/50 space-y-4 card-a4-impresso">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b border-purple-200 dark:border-purple-800/40 pb-2">
                     <div class="flex items-center gap-1.5">
@@ -502,13 +432,10 @@
                     </div>
                 </div>
             </div>
-        </div><!-- fecha a Folha 2 (Recursos + Cursos) -->
+        </div>
 
-        <!-- ========================================================================= -->
-        <!-- FOLHA 3 NA IMPRESSÃO: DETALHAMENTO DAS SEMANAS (FECHAMENTO DO RELATÓRIO)  -->
-        <!-- ========================================================================= -->
+        <!-- FOLHA 3: DETALHAMENTO DAS SEMANAS -->
         <div class="space-y-4">
-            <!-- TABELA DETALHADA COM AS SEMANAS SELECIONADAS -->
             <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-2 card-a4-impresso">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-1">
@@ -543,7 +470,10 @@
     <script>
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const CHAVE_DADOS_LOCAIS = 'programacao_dados_locais';
+        let supabaseClient = null;
+        try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch (e) { console.warn('Supabase indisponível:', e); }
+
         const nomesMesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
         const nomesMesesCompletos = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
@@ -557,7 +487,6 @@
         let semanasSelecionadasSet = new Set();
         let recursosDesmarcados = new Set();
 
-        // Meta padrão de desempenho: 90% (salva no localStorage)
         let metaDesempenhoValor = parseInt(localStorage.getItem('indicadores_meta_desempenho')) || 90;
 
         function escHtml(s) {
@@ -569,15 +498,12 @@
             localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
         }
 
-        // ===== MODO DE IMPRESSÃO: 3 folhas, tudo em 1 folha ou cada indicador em folha própria =====
         function imprimirComModo() {
             const modo = document.getElementById('selectModoImpressao').value;
             document.body.dataset.printMode = modo;
             window.print();
         }
-        window.addEventListener('afterprint', () => {
-            delete document.body.dataset.printMode;
-        });
+        window.addEventListener('afterprint', () => { delete document.body.dataset.printMode; });
 
         function carregarMetaConfigurada() {
             const input = document.getElementById('inputMetaDesempenho');
@@ -593,7 +519,6 @@
             atualizarVisualizacao();
         }
 
-        // MESMA REGRA DA PROGRAMAÇÃO: devolve as 5 datas (Seg a Sex) da semana ISO
         function getDateRangeOfWeek(weekNo, y) {
             let d = new Date(y, 0, 1), dayNum = d.getDay();
             let requiredDay = (weekNo - 1) * 7 + (dayNum <= 4 ? 1 - dayNum : 8 - dayNum);
@@ -606,25 +531,20 @@
             return dias;
         }
 
-        function obterChaveStorageSemanas(ano) {
-            return `indicadores_semanas_selecionadas_${ano}`;
-        }
+        function obterChaveStorageSemanas(ano) { return `indicadores_semanas_selecionadas_${ano}`; }
 
         function salvarSemanasNaMemoria() {
             const ano = document.getElementById('inputAnoIndicador').value || 2026;
-            const arr = Array.from(semanasSelecionadasSet);
-            localStorage.setItem(obterChaveStorageSemanas(ano), JSON.stringify(arr));
+            localStorage.setItem(obterChaveStorageSemanas(ano), JSON.stringify(Array.from(semanasSelecionadasSet)));
         }
 
         function carregarSemanasDaMemoria() {
             const ano = document.getElementById('inputAnoIndicador').value || 2026;
             const salvo = localStorage.getItem(obterChaveStorageSemanas(ano));
             semanasSelecionadasSet.clear();
-
             if (salvo) {
                 try {
-                    const arr = JSON.parse(salvo);
-                    arr.forEach(s => semanasSelecionadasSet.add(Number(s)));
+                    JSON.parse(salvo).forEach(s => semanasSelecionadasSet.add(Number(s)));
                 } catch(e) {
                     selecionarSemanasPredefinicaoInterno('ate_vigente');
                 }
@@ -652,7 +572,6 @@
             const box = document.getElementById(containerId);
             const btn = document.getElementById(botaoId);
             if (!box || !btn) return;
-
             if (box.classList.contains('hidden')) {
                 box.classList.remove('hidden');
                 btn.innerText = "Ocultar caixas ▴";
@@ -665,8 +584,7 @@
         function editarTexto(elementoId) {
             const el = document.getElementById(elementoId);
             if (!el) return;
-            const textoAtual = el.innerText.trim();
-            const novoTexto = prompt("Editar nome / título:", textoAtual);
+            const novoTexto = prompt("Editar nome / título:", el.innerText.trim());
             if (novoTexto !== null && novoTexto.trim() !== "") {
                 el.innerText = novoTexto.trim();
                 localStorage.setItem(`custom_lbl_${elementoId}`, novoTexto.trim());
@@ -692,8 +610,7 @@
 
         function calcularNumeroSemanaAtual() {
             const hoje = new Date();
-            let dataCalculo = new Date(hoje);
-            const d = new Date(Date.UTC(dataCalculo.getFullYear(), dataCalculo.getMonth(), dataCalculo.getDate()));
+            const d = new Date(Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()));
             const dayNum = d.getUTCDay() || 7;
             d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -761,7 +678,6 @@
                 `;
                 cont.appendChild(label);
             }
-
             document.getElementById('labelContadorSemanas').innerText = `${semanasSelecionadasSet.size} de 53 Marcadas`;
         }
 
@@ -813,8 +729,7 @@
             anosDetectados.add(2028);
             if (anoAtualSelecionado) anosDetectados.add(parseInt(anoAtualSelecionado));
 
-            let anosOrdenados = Array.from(anosDetectados).sort((a,b) => a - b);
-            anosOrdenados.forEach(a => {
+            Array.from(anosDetectados).sort((a,b) => a - b).forEach(a => {
                 let opt = document.createElement('option');
                 opt.value = a;
                 opt.innerText = `Ano ${a}`;
@@ -849,10 +764,8 @@
         function marcarTodosRecursosFiltro(marcar) {
             if (marcar) {
                 recursosDesmarcados.clear();
-            } else {
-                if (cacheDadosProcessados && cacheDadosProcessados.todosRecursosNomes) {
-                    cacheDadosProcessados.todosRecursosNomes.forEach(n => recursosDesmarcados.add(n));
-                }
+            } else if (cacheDadosProcessados && cacheDadosProcessados.todosRecursosNomes) {
+                cacheDadosProcessados.todosRecursosNomes.forEach(n => recursosDesmarcados.add(n));
             }
             carregarIndicadores();
         }
@@ -872,7 +785,6 @@
             nomesArray.forEach(nome => {
                 const isChecked = !recursosDesmarcados.has(nome);
                 if (isChecked) ativosCount++;
-
                 const icone = obterIconeRecurso(nome);
 
                 const label = document.createElement('label');
@@ -904,23 +816,36 @@
             await carregarIndicadoresDaNuvem();
         });
 
+        // ===== CARREGAMENTO DOS DADOS: LOCAL PRIMEIRO, SUPABASE SÓ COMO RESERVA =====
         async function carregarIndicadoresDaNuvem() {
+            let dados = null;
             try {
-                let { data } = await supabaseClient
-                    .from('app_dados_programacao')
-                    .select('conteudo')
-                    .eq('id', '1')
-                    .single();
+                dados = JSON.parse(localStorage.getItem(CHAVE_DADOS_LOCAIS));
+            } catch (e) {}
 
-                if (data && data.conteudo) {
-                    window.dadosGlobaisNuvem = data.conteudo;
+            if (dados && dados.semanas) {
+                window.dadosGlobaisNuvem = dados;
+            } else if (supabaseClient) {
+                try {
+                    let { data } = await supabaseClient
+                        .from('app_dados_programacao')
+                        .select('conteudo')
+                        .eq('id', '1')
+                        .single();
+                    if (data && data.conteudo) window.dadosGlobaisNuvem = data.conteudo;
+                } catch (e) {
+                    console.error("Erro ao buscar dados:", e);
                 }
-            } catch (e) {
-                console.error("Erro ao buscar dados:", e);
             }
             popularSelectAnos(document.getElementById('inputAnoIndicador').value);
             carregarIndicadores();
         }
+
+        // Atualiza sozinho quando a Programação grava (outra aba) ou quando a aba volta ao foco
+        window.addEventListener('storage', e => {
+            if (e.key === CHAVE_DADOS_LOCAIS) carregarIndicadoresDaNuvem();
+        });
+        window.addEventListener('focus', carregarIndicadoresDaNuvem);
 
         function alternarTodosCanais(marcar) {
             document.getElementById('checkCanalTotal').checked = marcar;
@@ -952,7 +877,8 @@
             let mesesCursosConcluidos = Array(12).fill(0);
             let totalCursosConcluidosGeral = 0;
 
-            let frequentesSalvos = JSON.parse(localStorage.getItem('programacao_frequentes_custom')) || [];
+            // Recursos frequentes agora vêm dos dados da Programação
+            let frequentesSalvos = (window.dadosGlobaisNuvem && window.dadosGlobaisNuvem.frequentes) || [];
             frequentesSalvos.forEach(item => {
                 let itemLimpo = limparSimbolosTexto(item).toUpperCase();
                 if (itemLimpo.includes('CAMINHÃO') || itemLimpo.includes('EMPILHADEIRA') || itemLimpo.includes('CARRO') || itemLimpo.includes('MOTO') || itemLimpo.includes('VEICULO') || itemLimpo.includes('EQUIP')) {
@@ -965,7 +891,6 @@
 
             let semanasOrdenadas = Array.from(semanasSelecionadasSet).sort((a,b) => a - b);
 
-            // Um item está feito se tem a classe de riscado OU a caixinha marcada
             const estaFeito = (el) => {
                 if (el.classList.contains('task-done')) return true;
                 const c = el.querySelector('input[type="checkbox"]');
@@ -977,7 +902,6 @@
                 let htmlCard = semanasSalvas[key];
                 const datas = getDateRangeOfWeek(numSemana, anoSelecionado);
 
-                // A semana entra se pelo menos um dos seus dias cai num mês marcado
                 if (!datas.some(dt => mesesSelecionados.has(dt.getMonth()))) return;
 
                 const doc = htmlCard ? new DOMParser().parseFromString(htmlCard, 'text/html') : null;
@@ -990,10 +914,9 @@
                     const card = doc.querySelector(`.day-card[data-dia-nome="${diasNomes[i]}"]`);
                     if (!card) return;
 
-                    const diaJaPassou = dt < hoje0;      // pendente só vira "não realizada" depois que o dia passou
-                    const diaAteHoje = dt <= hoje0;      // cursos e recursos só contam até hoje
+                    const diaJaPassou = dt < hoje0;
+                    const diaAteHoje = dt <= hoje0;
 
-                    // Dia bloqueado por Feriado / Emenda
                     const blocoTarefas = card.querySelector('.tasks-container');
                     const textoBloco = blocoTarefas ? blocoTarefas.textContent : '';
                     const normais = card.querySelectorAll('.task-box, .treinamento-box');
@@ -1002,7 +925,6 @@
                         (/🍃 FERIADO|📌 EMENDA/.test(textoBloco) && normais.length === 0 && extras.length === 0);
                     if (ehFeriadoDia) { w.feriados++; totalFeriadosAno++; }
 
-                    // Tarefas do dia (normais + treinamentos + extras). Recursos NÃO entram nesta conta.
                     let feitasNormais = 0, feitasExtras = 0;
                     normais.forEach(el => { if (estaFeito(el)) feitasNormais++; });
                     extras.forEach(el => { if (estaFeito(el)) feitasExtras++; });
@@ -1022,7 +944,6 @@
                     mesesDados[mesIdx].naoRealizadas += naoFeitasDia;
                     mesesDados[mesIdx].extras += extras.length;
 
-                    // Cursos concluídos
                     card.querySelectorAll('.treinamento-box').forEach(tBox => {
                         if (!estaFeito(tBox) || !diaAteHoje) return;
                         const descEl = tBox.querySelector('.item-text') || tBox.querySelector('strong');
@@ -1033,7 +954,6 @@
                         w.cursos++;
                     });
 
-                    // Recursos utilizados
                     card.querySelectorAll('.resource-tag').forEach(tag => {
                         const descEl = tag.querySelector('.item-text') || tag.querySelector('strong');
                         const nomeBruto = descEl ? descEl.textContent.trim() : tag.textContent.trim();
@@ -1095,30 +1015,21 @@
             processarIndicadoresDeTreinamentos(mapaCursosConcluidos, mesesCursosConcluidos, totalCursosConcluidosGeral);
 
             cacheDadosProcessados = {
-                anoSelecionado,
-                semanasLista,
-                mesesDados,
-                todosRecursosNomes,
-                mapaRecursosUtilizados,
-                totalRecursosUtilizadosGeral,
-                mapaCursosConcluidos,
-                mesesCursosConcluidos,
-                totalCursosConcluidosGeral
+                anoSelecionado, semanasLista, mesesDados, todosRecursosNomes,
+                mapaRecursosUtilizados, totalRecursosUtilizadosGeral,
+                mapaCursosConcluidos, mesesCursosConcluidos, totalCursosConcluidosGeral
             };
 
             atualizarVisualizacao();
         }
 
-        // PROCESSAMENTO DE CURSOS E TREINAMENTOS
+        // ===== CURSOS E TREINAMENTOS =====
         function processarIndicadoresDeTreinamentos(mapaCursos, mesesCursos, totalCursos) {
             document.getElementById('cardTreinoTotal').innerText = totalCursos;
             document.getElementById('cardTreinoTotalSub').innerText = totalCursos > 0 ? "Participações validadas" : "Nenhum curso marcado";
             document.getElementById('tagTotalTreinamentos').innerText = `${totalCursos} Cursos Concluídos`;
 
-            let cursosOrdenados = Object.keys(mapaCursos).map(nome => ({
-                nome: nome,
-                qtd: mapaCursos[nome]
-            })).sort((a, b) => b.qtd - a.qtd);
+            let cursosOrdenados = Object.keys(mapaCursos).map(nome => ({ nome: nome, qtd: mapaCursos[nome] })).sort((a, b) => b.qtd - a.qtd);
 
             if (cursosOrdenados.length > 0 && totalCursos > 0) {
                 let mais = cursosOrdenados[0];
@@ -1130,13 +1041,9 @@
                 document.getElementById('cardTreinoMaisQtd').innerText = "0 participações";
             }
 
-            let maiorMesIdx = 0;
-            let maiorMesValor = 0;
+            let maiorMesIdx = 0, maiorMesValor = 0;
             mesesCursos.forEach((val, idx) => {
-                if (val > maiorMesValor) {
-                    maiorMesValor = val;
-                    maiorMesIdx = idx;
-                }
+                if (val > maiorMesValor) { maiorMesValor = val; maiorMesIdx = idx; }
             });
 
             if (maiorMesValor > 0) {
@@ -1183,12 +1090,7 @@
                 type: 'bar',
                 data: {
                     labels: nomesMesesCurtos,
-                    datasets: [{
-                        label: 'Cursos Realizados',
-                        data: mesesCursos,
-                        backgroundColor: '#9333ea',
-                        borderRadius: 4
-                    }]
+                    datasets: [{ label: 'Cursos Realizados', data: mesesCursos, backgroundColor: '#9333ea', borderRadius: 4 }]
                 },
                 options: {
                     responsive: true,
@@ -1202,15 +1104,13 @@
             });
         }
 
+        // ===== RECURSOS =====
         function processarIndicadoresDeRecursos(mapaUtilizados, totalUtilizados) {
             document.getElementById('cardRecursoTotal').innerText = totalUtilizados;
             document.getElementById('cardRecursoTotalSub').innerText = totalUtilizados > 0 ? "Utilizações registadas" : "Nenhum recurso marcado";
             document.getElementById('tagTotalAlocacoes').innerText = `${totalUtilizados} Utilizados`;
 
-            let recursosOrdenados = Object.keys(mapaUtilizados).map(nome => ({
-                nome: nome,
-                utilizados: mapaUtilizados[nome]
-            })).sort((a, b) => b.utilizados - a.utilizados);
+            let recursosOrdenados = Object.keys(mapaUtilizados).map(nome => ({ nome: nome, utilizados: mapaUtilizados[nome] })).sort((a, b) => b.utilizados - a.utilizados);
 
             const msgGrafico = document.getElementById('msgSemDadosGrafico');
             const canvasGrafico = document.getElementById('graficoRecursosCanvas');
@@ -1281,14 +1181,7 @@
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Vezes Utilizado (Marcado)',
-                            data: valoresUtilizados,
-                            backgroundColor: '#059669',
-                            borderRadius: 4
-                        }
-                    ]
+                    datasets: [{ label: 'Vezes Utilizado (Marcado)', data: valoresUtilizados, backgroundColor: '#059669', borderRadius: 4 }]
                 },
                 options: {
                     indexAxis: 'y',
@@ -1303,6 +1196,7 @@
             });
         }
 
+        // ===== VISUALIZAÇÃO =====
         function atualizarVisualizacao() {
             if (!cacheDadosProcessados) return;
 
@@ -1377,13 +1271,8 @@
                 datasetsAnual.push({
                     label: 'Realizadas (%)',
                     data: meses.map(m => m.planeadas > 0 ? Math.round((m.concluidas / m.planeadas) * 100) : 0),
-                    borderColor: '#16a34a',
-                    backgroundColor: 'rgba(22, 163, 74, 0.08)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 2.5,
-                    pointBackgroundColor: '#15803d'
+                    borderColor: '#16a34a', backgroundColor: 'rgba(22, 163, 74, 0.08)',
+                    borderWidth: 2, fill: true, tension: 0.35, pointRadius: 2.5, pointBackgroundColor: '#15803d'
                 });
             }
 
@@ -1391,14 +1280,8 @@
                 datasetsAnual.push({
                     label: 'Não Realizadas (%)',
                     data: meses.map(m => m.planeadas > 0 ? Math.round((m.naoRealizadas / m.planeadas) * 100) : 0),
-                    borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.05)',
-                    borderWidth: 1.8,
-                    borderDash: [4, 4],
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 2.5,
-                    pointBackgroundColor: '#b91c1c'
+                    borderColor: '#dc2626', backgroundColor: 'rgba(220, 38, 38, 0.05)',
+                    borderWidth: 1.8, borderDash: [4, 4], fill: true, tension: 0.35, pointRadius: 2.5, pointBackgroundColor: '#b91c1c'
                 });
             }
 
@@ -1406,13 +1289,8 @@
                 datasetsAnual.push({
                     label: 'Extras (%)',
                     data: meses.map(m => m.planeadas > 0 ? Math.round((m.extras / m.planeadas) * 100) : 0),
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
-                    borderWidth: 1.8,
-                    fill: false,
-                    tension: 0.35,
-                    pointRadius: 2.5,
-                    pointBackgroundColor: '#d97706'
+                    borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                    borderWidth: 1.8, fill: false, tension: 0.35, pointRadius: 2.5, pointBackgroundColor: '#d97706'
                 });
             }
 
@@ -1420,11 +1298,7 @@
                 datasetsAnual.push({
                     label: `Meta (${metaDesempenhoValor}%)`,
                     data: Array(12).fill(metaDesempenhoValor),
-                    borderColor: '#2563eb',
-                    borderWidth: 1.8,
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0
+                    borderColor: '#2563eb', borderWidth: 1.8, borderDash: [5, 5], fill: false, pointRadius: 0
                 });
             }
 
@@ -1439,19 +1313,14 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                font: { size: 9 },
-                                callback: function(val) { return val + '%'; }
-                            }
+                            beginAtZero: true, max: 100,
+                            ticks: { font: { size: 9 }, callback: function(val) { return val + '%'; } }
                         },
                         x: { ticks: { font: { size: 9 } } }
                     },
                     plugins: {
                         legend: {
-                            display: datasetsAnual.length > 0,
-                            position: 'top',
+                            display: datasetsAnual.length > 0, position: 'top',
                             labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } }
                         }
                     }
@@ -1461,41 +1330,10 @@
             let datasetsSemanal = [];
             let labelsSemanais = semanasAtivas.map(s => `S${String(s.numSemana).padStart(2,'0')}`);
 
-            if (mostrarTotal) {
-                datasetsSemanal.push({
-                    label: 'Total Planeado',
-                    data: semanasAtivas.map(s => s.planeadas),
-                    backgroundColor: '#93c5fd',
-                    borderRadius: 3
-                });
-            }
-
-            if (mostrarConcluidas) {
-                datasetsSemanal.push({
-                    label: 'Concluídas',
-                    data: semanasAtivas.map(s => s.executadas),
-                    backgroundColor: '#22c55e',
-                    borderRadius: 3
-                });
-            }
-
-            if (mostrarNaoRealizadas) {
-                datasetsSemanal.push({
-                    label: 'Não Realizadas',
-                    data: semanasAtivas.map(s => s.naoRealizadas),
-                    backgroundColor: '#ef4444',
-                    borderRadius: 3
-                });
-            }
-
-            if (mostrarExtras) {
-                datasetsSemanal.push({
-                    label: 'Extras',
-                    data: semanasAtivas.map(s => s.extrasCount),
-                    backgroundColor: '#f59e0b',
-                    borderRadius: 3
-                });
-            }
+            if (mostrarTotal) datasetsSemanal.push({ label: 'Total Planeado', data: semanasAtivas.map(s => s.planeadas), backgroundColor: '#93c5fd', borderRadius: 3 });
+            if (mostrarConcluidas) datasetsSemanal.push({ label: 'Concluídas', data: semanasAtivas.map(s => s.executadas), backgroundColor: '#22c55e', borderRadius: 3 });
+            if (mostrarNaoRealizadas) datasetsSemanal.push({ label: 'Não Realizadas', data: semanasAtivas.map(s => s.naoRealizadas), backgroundColor: '#ef4444', borderRadius: 3 });
+            if (mostrarExtras) datasetsSemanal.push({ label: 'Extras', data: semanasAtivas.map(s => s.extrasCount), backgroundColor: '#f59e0b', borderRadius: 3 });
 
             const ctxSemanal = document.getElementById('graficoSemanalCanvas').getContext('2d');
             if (graficoSemanalInstance) graficoSemanalInstance.destroy();
@@ -1512,8 +1350,7 @@
                     },
                     plugins: {
                         legend: {
-                            display: datasetsSemanal.length > 0,
-                            position: 'top',
+                            display: datasetsSemanal.length > 0, position: 'top',
                             labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } }
                         }
                     }
