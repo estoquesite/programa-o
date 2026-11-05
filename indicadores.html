@@ -105,8 +105,12 @@
                     </select>
                     <button onclick="imprimirComModo()" class="print-hidden bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">🖨️ Imprimir</button>
                     <button onclick="carregarIndicadoresDaNuvem()" class="print-hidden bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Atualizar</button>
+                    <button onclick="document.getElementById('inputImportar').click()" class="print-hidden bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 px-3 py-1.5 rounded-xl text-xs font-bold transition" title="Abre o backup .json gerado na Programação">📂 Importar backup</button>
+                    <input type="file" id="inputImportar" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
                 </div>
             </div>
+
+            <div id="barraDiagnostico" class="print-hidden text-[11px] font-bold px-3 py-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900">Verificando dados...</div>
 
             <!-- FILTROS -->
             <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
@@ -817,28 +821,85 @@
         });
 
         // ===== CARREGAMENTO DOS DADOS: LOCAL PRIMEIRO, SUPABASE SÓ COMO RESERVA =====
+        function anosComDados(dados) {
+            const anos = new Set();
+            Object.keys((dados && dados.semanas) || {}).forEach(k => {
+                const m = k.match(/prog_grid_(\d{4})_/);
+                if (m) anos.add(parseInt(m[1]));
+            });
+            return Array.from(anos).sort((x, y) => x - y);
+        }
+
+        function mostrarDiagnostico(fonte, dados) {
+            const el = document.getElementById('barraDiagnostico');
+            if (!el) return;
+            const n = dados && dados.semanas ? Object.keys(dados.semanas).length : 0;
+            const anos = anosComDados(dados);
+            const origem = location.protocol + '//' + (location.host || '(arquivo local)');
+            if (n === 0) {
+                el.className = el.className.replace(/bg-\S+|text-\S+|border-\S+/g, '') + ' bg-red-50 text-red-800 border border-red-200';
+                el.innerHTML = `⚠️ Nenhum dado da Programação encontrado neste endereço (${escHtml(origem)}). Na Programação clique em <b>📦 Exportar tudo (backup)</b> e aqui em <b>📂 Importar backup</b>.`;
+            } else {
+                el.className = el.className.replace(/bg-\S+|text-\S+|border-\S+/g, '') + ' bg-green-50 text-green-800 border border-green-200';
+                el.innerHTML = `✅ Fonte: <b>${escHtml(fonte)}</b> · ${n} semana(s) salvas · anos: ${anos.join(', ')} · ${escHtml(origem)}`;
+            }
+        }
+
         async function carregarIndicadoresDaNuvem() {
-            let dados = null;
+            let dados = null, fonte = '';
+            // 1) localStorage deste endereço (varre também chaves parecidas, por segurança)
             try {
                 dados = JSON.parse(localStorage.getItem(CHAVE_DADOS_LOCAIS));
-            } catch (e) {}
+                if (dados && dados.semanas && Object.keys(dados.semanas).length) fonte = 'dados locais da Programação';
+                else dados = null;
+            } catch (e) { dados = null; }
 
-            if (dados && dados.semanas) {
-                window.dadosGlobaisNuvem = dados;
-            } else if (supabaseClient) {
+            // 2) backup importado manualmente (guardado só no indicador)
+            if (!dados) {
                 try {
-                    let { data } = await supabaseClient
-                        .from('app_dados_programacao')
-                        .select('conteudo')
-                        .eq('id', '1')
-                        .single();
-                    if (data && data.conteudo) window.dadosGlobaisNuvem = data.conteudo;
-                } catch (e) {
-                    console.error("Erro ao buscar dados:", e);
-                }
+                    const imp = JSON.parse(localStorage.getItem('indicadores_backup_importado'));
+                    if (imp && imp.semanas && Object.keys(imp.semanas).length) { dados = imp; fonte = 'backup importado'; }
+                } catch (e) {}
             }
-            popularSelectAnos(document.getElementById('inputAnoIndicador').value);
+
+            // 3) Supabase (dados antigos)
+            if (!dados && supabaseClient) {
+                try {
+                    let { data } = await supabaseClient.from('app_dados_programacao').select('conteudo').eq('id', '1').single();
+                    if (data && data.conteudo && data.conteudo.semanas) { dados = data.conteudo; fonte = 'Supabase (antigo)'; }
+                } catch (e) { console.error("Erro ao buscar dados:", e); }
+            }
+
+            window.dadosGlobaisNuvem = dados || { semanas: {} };
+            mostrarDiagnostico(fonte, window.dadosGlobaisNuvem);
+
+            // Se o ano selecionado não tem semanas salvas, vai para o ano mais recente que tem
+            const anos = anosComDados(window.dadosGlobaisNuvem);
+            const anoSel = parseInt(document.getElementById('inputAnoIndicador').value) || 2026;
+            if (anos.length && !anos.includes(anoSel)) {
+                mudarAno(anos[anos.length - 1]);
+                return;
+            }
+            popularSelectAnos(anoSel);
             carregarIndicadores();
+        }
+
+        async function importarBackup(input) {
+            const arq = input.files[0];
+            input.value = '';
+            if (!arq) return;
+            try {
+                const dados = JSON.parse(await arq.text());
+                if (!dados || !dados.semanas) throw new Error('formato');
+                localStorage.setItem('indicadores_backup_importado', JSON.stringify(dados));
+                // Só usa o importado se não houver dados locais: força o uso agora
+                window.dadosGlobaisNuvem = dados;
+                mostrarDiagnostico('backup importado', dados);
+                const anos = anosComDados(dados);
+                if (anos.length) mudarAno(anos[anos.length - 1]); else carregarIndicadores();
+            } catch (e) {
+                alert('Arquivo inválido. Use o .json gerado por "Exportar tudo (backup)" ou "Salvar no computador" na Programação.');
+            }
         }
 
         // Atualiza sozinho quando a Programação grava (outra aba) ou quando a aba volta ao foco
